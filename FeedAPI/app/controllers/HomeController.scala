@@ -4,6 +4,20 @@ import javax.inject._
 import play.api._
 import play.api.mvc._
 
+import play.api.libs.json._ // JSON library
+import play.api.libs.json.Reads._ // Custom validation helpers
+import play.api.libs.functional.syntax._ // Combinator syntax
+
+import org.apache.mahout.cf.taste.impl.model._
+import org.apache.mahout.cf.taste.impl.model.file._
+import org.apache.mahout.cf.taste.impl.neighborhood._
+import org.apache.mahout.cf.taste.impl.recommender._
+import org.apache.mahout.cf.taste.impl.similarity._
+import org.apache.mahout.cf.taste.model._
+import org.apache.mahout.cf.taste.neighborhood._
+import org.apache.mahout.cf.taste.recommender._
+import org.apache.mahout.cf.taste.similarity._
+
 /**
  * This controller creates an `Action` to handle HTTP requests to the
  * application's home page.
