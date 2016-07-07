@@ -8,17 +8,8 @@
 import scrapy
 import time
 import json
-# from selenium.webdriver.common.keys import Keys
-# from selenium import webdriver
-# from selenium.webdriver.common.action_chains import ActionChains
+import re
 from channel9.items import ChannelItem
-# import sys
-# reload(sys)
-# sys.setdefaultencoding('utf-8')
-
-# def cleanse(alist):
-# return alist[0].strip().encode('utf-8').replace('"', '“').replace('\n',
-# '').replace('\t', '    ').replace('\\', '“') if alist else u''
 
 
 class ChannelSpider(scrapy.Spider):
@@ -28,25 +19,32 @@ class ChannelSpider(scrapy.Spider):
 
     def parse(self, response):
         items = []
+        main_url = "https://channel9.msdn.com"
         data = response.xpath('//ul[@class="areas"]//li')
+        # unichange1 = re.compile('\u00a0')
+        unichange = re.compile('\u00a0')
         counter = 0
         for entry in data:
             try:
                 image = entry.xpath('div[@class="entry-image"]/img/@src').extract()[0]
-                # data.xpath('div[@class="entry-meta"]/a')
                 title = entry.xpath('div[@class="entry-meta"]/a/text()').extract()[0]
-                url = entry.xpath('div[@class="entry-meta"]/a/@href').extract()[0]
-                description = entry.xpath('div[@class="description"]/text()').extract()[0]
+                title = unichange.sub(' ', title)
+                url = main_url + entry.xpath('div[@class="entry-meta"]/a/@href').extract()[0]
+                try:
+                    description = entry.xpath('.//div[@class="description"]/text()').extract()[0]
+                    description = unichange.sub(' ', description)
+                    description = re.sub('\u2026', ' ', description)
+                except Exception:
+                    description = ''
                 item = ChannelItem()
                 item['title'] = title
                 item['url'] = url
                 item['image_src'] = image
-                item['crawled_time'] = time.strftime('%Y-%m-%d %H:%M', time.localtime())
+                # item['crawled_time'] = time.strftime('%Y-%m-%d %H:%M', time.localtime())
                 item['description'] = description
                 counter += 1
                 item['id'] = counter
                 # print(title, url)
-                items.append(item)
+                yield item
             except Exception as err:
                 print(err)
-        return items

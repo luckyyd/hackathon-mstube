@@ -16,5 +16,5 @@ class VideoItem(scrapy.Item):
     video_src = scrapy.Field()
     video_description = scrapy.Field()
     image_src = scrapy.Field()
-    crawled_time = scrapy.Field()
+    # crawled_time = scrapy.Field()
     video_id = scrapy.Field()

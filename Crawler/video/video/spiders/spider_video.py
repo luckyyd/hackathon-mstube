@@ -52,7 +52,7 @@ class VideoSpider(scrapy.Spider):
                 item['video_src'] = video_src
                 item['video_description'] = video_description
                 item['image_src'] = image_src
-                item['crawled_time'] = time.strftime('%Y-%m-%d %H:%M', time.localtime())
+                # item['crawled_time'] = time.strftime('%Y-%m-%d %H:%M', time.localtime())
                 self.counter += 1
                 item['video_id'] = self.counter
                 yield item
