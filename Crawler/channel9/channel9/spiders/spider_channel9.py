@@ -36,11 +36,13 @@ class ChannelSpider(scrapy.Spider):
                 # data.xpath('div[@class="entry-meta"]/a')
                 title = entry.xpath('div[@class="entry-meta"]/a/text()').extract()[0]
                 url = entry.xpath('div[@class="entry-meta"]/a/@href').extract()[0]
+                description = entry.xpath('div[@class="description"]/text()').extract()[0]
                 item = ChannelItem()
                 item['title'] = title
                 item['url'] = url
                 item['image_src'] = image
                 item['crawled_time'] = time.strftime('%Y-%m-%d %H:%M', time.localtime())
+                item['description'] = description
                 counter += 1
                 item['id'] = counter
                 # print(title, url)
