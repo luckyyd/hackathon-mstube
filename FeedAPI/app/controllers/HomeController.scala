@@ -1,5 +1,11 @@
 package controllers
 
+import java.io._
+import java.util._
+
+import scala.collection.JavaConversions._
+import scala.io._
+
 import javax.inject._
 import play.api._
 import play.api.mvc._
@@ -17,6 +23,92 @@ import org.apache.mahout.cf.taste.model._
 import org.apache.mahout.cf.taste.neighborhood._
 import org.apache.mahout.cf.taste.recommender._
 import org.apache.mahout.cf.taste.similarity._
+
+case class Item(itemID: Long, title: String, description: String, image_src: String, url: String, episode: Int)
+
+object Item {
+    
+    implicit val itemReads: Reads[Item] = (
+      (JsPath \\ "id").read[Long] and 
+      (JsPath \\ "title").read[String] and 
+      (JsPath \\ "description").read[String] and 
+      (JsPath \\ "image_src").read[String] and 
+      (JsPath \\ "url").read[String] and
+      (JsPath \\ "episode").read[Int]
+    )(Item.apply _)
+            
+    implicit val itemWrites = new Writes[Item] {
+        def writes(i: Item): JsValue = 
+            Json.obj(
+                "id" -> i.itemID,
+                "title" -> i.title,
+                "description" -> i.description,
+                "image_src" -> i.image_src,
+                "url" -> i.url,
+                "episode" -> i.episode
+            ) 
+    } 
+}
+
+
+object HomeController {
+    
+    private val howMany = 5
+    private val n = 5 // Nearest N User Neighborhood
+    private val pref_file = "prefs.csv"
+    private val item_file = "app/assets/items.json"
+
+    private var items: Seq[Item] = null
+
+    private def getItems() : Seq[Item] = {
+        
+        if (items == null)
+        {
+            val source: String = Source.fromFile(item_file)("UTF-8").getLines.mkString
+            val json: JsValue = Json.parse(source)
+            
+            items = json.as[Seq[Item]]
+        }
+
+        items
+
+    }
+
+    private def recommend(userID: Long) : List[Long] = {
+        
+        var model: GenericBooleanPrefDataModel = new GenericBooleanPrefDataModel(
+				GenericBooleanPrefDataModel.toDataMap(new FileDataModel(new File(pref_file))))
+
+		var similarity: UserSimilarity = new LogLikelihoodSimilarity(model)
+		var neighborhood: UserNeighborhood = new NearestNUserNeighborhood(n, similarity, model);
+	
+		var recommender: Recommender = new GenericUserBasedRecommender(model, neighborhood, similarity)
+		var recommendations = recommender.recommend(userID, howMany)
+
+        for (r <- recommendations) yield r.getItemID
+
+    }
+    
+    private def getCandidates(userID: Long) : Seq[Item] = {
+        
+        val items: Seq[Item]  = getItems
+        val itemIDs: List[Long] = recommend(userID)
+        
+        val candidates: Seq[Item] = items.filter(i => itemIDs.contains(i.itemID))
+        
+        if (candidates.size > 0)
+        {
+            candidates
+        }
+        else
+        {
+            items.take(howMany)
+        }
+
+    }
+}
+
+
 
 /**
  * This controller creates an `Action` to handle HTTP requests to the
@@ -36,39 +128,13 @@ class HomeController @Inject() extends Controller {
   }
   
   def getCandidates = Action {
-      Ok(""""Shows": [
-{
-    "title": "Microsoft Azure Cloud Cover Show",
-    "id": 1,
-    "url": "https://channel9.msdn.com/Shows/Cloud+Cover",
-    "image_src": "https://f.ch9.ms/thumbnail/a4e902b2-c5de-49a0-82ef-d7f5a7b960e8.png",
-    "crawled_time": "2016-07-06 14:19"
-}, {
-   "title": "Azure Friday",
-    "id": 2,
-    "url": "https://channel9.msdn.com/Shows/Azure-Friday",
-    "image_src": "https://f.ch9.ms/thumbnail/a5c7cd91-1a04-45ff-9822-a1197ee46841.png",
-    "crawled_time": "2016-07-06 14:19"
-}, {
-    "title": "Subscribe!",
-    "id": 3,
-    "url": "https://channel9.msdn.com/Blogs/Subscribe",
-    "image_src": "https://f.ch9.ms/thumbnail/815543c1-f096-4771-9b49-d0a3f7a74095.png",
-    "crawled_time": "2016-07-06 14:19"
-}, {
-    "title": "Azure App Service",
-    "id": 4,
-    "url": "https://channel9.msdn.com/Series/Windows-Azure-Web-Sites-Tutorials",
-    "image_src": "https://f.ch9.ms/thumbnail/ffe99e05-c6be-48cd-9bdb-29fc75ba79f1.png",
-    "crawled_time": "2016-07-06 14:19"
-}, {
-    "title": "Windows Azure Active Directory",
-    "id": 5,
-    "url": "https://channel9.msdn.com/Series/Windows-Azure-Active-Directory",
-    "image_src": "https://f.ch9.ms/thumbnail/0e5b8943-3c94-4ad0-8e80-72e7cd5c6a22.png",
-    "crawled_time": "2016-07-06 14:19"
-}]
-""")
+      
+      var userID: Long = 1L
+      
+      val candidates: Seq[Item] = HomeController.getCandidates(userID)
+      val jsonArray = Json.toJson(candidates)
+        
+      Ok(Json.stringify(jsonArray))
   }
 
 }
