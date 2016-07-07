@@ -1,7 +1,0 @@
-New log file opened at Wed Jul 06 17:29:53 CST 2016 by 18296@diyan-devbox
-Taking next connection to: 29445
-New client attempting to connect on port: 29446-29445
-  Address = /10.172.15.132:29445
-This client on port 29446 has uuid ab8ffbb6-a5b8-436f-bbb0-e98cea7a5542 configName activator humanReadableName Activator protocolVersion 3 featureTags Vector()
-Connected Clients: activator-ab8ffbb6-a5b8-436f-bbb0-e98cea7a5542
-Taking next connection to: 29445
