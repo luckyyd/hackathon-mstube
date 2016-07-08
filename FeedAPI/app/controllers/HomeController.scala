@@ -24,7 +24,7 @@ import org.apache.mahout.cf.taste.neighborhood._
 import org.apache.mahout.cf.taste.recommender._
 import org.apache.mahout.cf.taste.similarity._
 
-case class Item(itemID: Long, title: String, description: String, image_src: String, url: String, episode: Int)
+case class Item(itemID: Long, title: String, description: String, image_src: String, url: String)
 
 object Item {
     
@@ -33,8 +33,7 @@ object Item {
       (JsPath \\ "title").read[String] and 
       (JsPath \\ "description").read[String] and 
       (JsPath \\ "image_src").read[String] and 
-      (JsPath \\ "url").read[String] and
-      (JsPath \\ "episode").read[Int]
+      (JsPath \\ "url").read[String]
     )(Item.apply _)
             
     implicit val itemWrites = new Writes[Item] {
@@ -44,8 +43,7 @@ object Item {
                 "title" -> i.title,
                 "description" -> i.description,
                 "image_src" -> i.image_src,
-                "url" -> i.url,
-                "episode" -> i.episode
+                "url" -> i.url
             ) 
     } 
 }
