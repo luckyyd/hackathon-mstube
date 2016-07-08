@@ -9,6 +9,7 @@ import scala.io._
 import javax.inject._
 import play.api._
 import play.api.mvc._
+import play.api.Play.current
 
 import play.api.libs.json._ // JSON library
 import play.api.libs.json.Reads._ // Custom validation helpers
@@ -71,8 +72,31 @@ object HomeController {
         items
 
     }
+    
+    private def getPrefFile() : File = {
+        
+        var file: File = new File(pref_file)
+        
+        if(!file.exists())
+        {
+            val bw = new BufferedWriter(new FileWriter(file))
+            bw.write("1,1,1.0")
+            bw.newLine()
+            bw.close
+            
+            file = new File(pref_file)
+        }
+        
+        file
+    }
 
     private def recommend(userID: Long) : List[Long] = {
+        
+        println("UserID:" + userID)
+        
+        var file: File = getPrefFile()
+        println("Pref file's absolute path = " + file.getAbsolutePath)
+        println("Pref file exists: " + file.exists)
         
         var model: GenericBooleanPrefDataModel = new GenericBooleanPrefDataModel(
 				GenericBooleanPrefDataModel.toDataMap(new FileDataModel(new File(pref_file))))
@@ -133,6 +157,27 @@ class HomeController @Inject() extends Controller {
       val jsonArray = Json.toJson(candidates)
         
       Ok(Json.stringify(jsonArray))
+  }
+  
+  def addPreference = Action(parse.json) {
+      
+      request => 
+      {
+          var json: JsValue = request.body
+          
+          var user_id = (json \ "user id").as[Long]
+          var item_id = (json \ "item id").as[Float]
+          var pref = (json \ "pref").as[Float]
+          
+          var file = new File(HomeController.pref_file)
+          var bw = new BufferedWriter(new FileWriter(file, true))
+          bw.write("%d,%d,%f".format(user_id,item_id,pref))
+          bw.newLine()
+          bw.close()
+          
+          Ok(user_id.toString)
+           
+      }
   }
 
 }
