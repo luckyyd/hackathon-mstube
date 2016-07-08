@@ -13,6 +13,5 @@ class ChannelItem(scrapy.Item):
     title = scrapy.Field()
     url = scrapy.Field()
     image_src = scrapy.Field()
-    # crawled_time = scrapy.Field()
     description = scrapy.Field()
     id = scrapy.Field()

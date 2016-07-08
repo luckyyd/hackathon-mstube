@@ -20,7 +20,7 @@ class VideoSpider(scrapy.Spider):
 
     def __init__(self):
         self.video_src = ''
-
+        self.counter = 0
     # def parse_content(self, response):
     #     self.video_src = response.xpath('//div[@class="playerContainer"]/a[@class="video"]/@href').extract()[0]
     #     print(self.video_src)
@@ -29,12 +29,19 @@ class VideoSpider(scrapy.Spider):
         items = []
         main_url = "https://channel9.msdn.com"
         data = response.xpath('//ul[@class="entries"]//li')
-        self.counter = 0
+        unichange = re.compile('\u00a0')
+
         for entry in data:
             try:
                 title = entry.xpath('div[@class="entry-meta"]/a/text()').extract()[0]
+                title = unichange.sub(' ', title)
                 topic = 'Microsoft Azure Cloud Cover Show'
-                video_description = entry.xpath('//div[@class="description"]/text()').extract()[0]
+                try:
+                    video_description = entry.xpath('//div[@class="description"]/text()').extract()[0]
+                    video_description = unichange.sub(' ', video_description)
+                    video_description = re.sub('\u2026', ' ', video_description)
+                except Exception as err:
+                    print(err)
                 image_src = entry.xpath('div[@class="entry-image"]/a/img/@src').extract()[0]
                 url = entry.xpath('div[@class="entry-image"]/a/@href').extract()[0]
                 url = main_url + url
