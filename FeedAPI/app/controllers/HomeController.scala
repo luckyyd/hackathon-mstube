@@ -175,7 +175,7 @@ class HomeController @Inject() extends Controller {
         println(result)
         
         //Write
-        redis.set("3 3", "3")
+        println(redis.set("3 3", "3"))
        } catch {
          case e: Exception => println("Got some other kind of exception")
        }
