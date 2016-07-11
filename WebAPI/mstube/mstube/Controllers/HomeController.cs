@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using Newtonsoft.Json;
 using System.IO;
+using StackExchange.Redis;
 
 namespace mstube.Controllers
 {
@@ -36,6 +37,20 @@ namespace mstube.Controllers
             var json = JsonConvert.DeserializeObject<List<Item.Item>>(sr.ReadToEnd());
 
             return Json(json, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult Redis()
+        {
+            ConnectionMultiplexer connection = ConnectionMultiplexer.Connect("mstube-dotnet.redis.cache.windows.net,abortConnect=false,ssl=true,password=6/Cq0R6Wh+L6PJeYI80KEMVyYVGUjqZFEnNS6iJHl1A=");
+
+            IDatabase cache = connection.GetDatabase();
+
+            cache.StringSet("1 1", "1");
+            cache.StringSet("2 2", "2");
+
+            string key1 = cache.StringGet("1 1");
+            ViewBag.Message = key1;
+            return View();
         }
     }
 }
