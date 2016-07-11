@@ -25,6 +25,8 @@ import org.apache.mahout.cf.taste.neighborhood._
 import org.apache.mahout.cf.taste.recommender._
 import org.apache.mahout.cf.taste.similarity._
 
+import com.redis._
+
 case class Item(itemID: Long, title: String, description: String, image_src: String, url: String)
 
 object Item {
@@ -155,8 +157,31 @@ class HomeController @Inject() extends Controller {
       
       val candidates: Seq[Item] = HomeController.getCandidates(userID)
       val jsonArray = Json.toJson(candidates)
+      
+      println("Hello World")
         
       Ok(Json.stringify(jsonArray))
+      
+  }
+  
+  def connectRedis = Action {
+      
+      
+      try { 
+        val redis = new RedisClient("hackathon-mstube.redis.cache.windows.net", 6379, secret=Some("sXyQJyy39j1GmfqslvY9I1czfi+PemKepnqc5PR13XU="))
+        
+        //Read
+        val result = redis.get("2 2")
+        println(result)
+        
+        //Write
+        redis.set("3 3", "3")
+       } catch {
+         case e: Exception => println("Got some other kind of exception")
+       }
+      
+      
+      Ok(views.html.index("Your redis."))
   }
   
   def addPreference = Action(parse.json) {
