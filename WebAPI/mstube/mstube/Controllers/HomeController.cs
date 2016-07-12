@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using Newtonsoft.Json;
 using System.IO;
 using StackExchange.Redis;
+using System.Threading.Tasks;
 
 namespace mstube.Controllers
 {
@@ -51,6 +52,14 @@ namespace mstube.Controllers
             string key1 = cache.StringGet("1 1");
             ViewBag.Message = key1;
             return View();
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> Preference(Preference.Preference pre) {
+            //Send POST request to Azure ML
+            string result = await Utils.AzureML.SendPOSTRequest(pre.user_id);
+
+            return Json(result);
         }
     }
 }
