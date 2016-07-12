@@ -31,15 +31,6 @@ namespace mstube.Controllers
             return View();
         }
 
-        public JsonResult Candidates()
-        {
-            StreamReader sr = new StreamReader(Server.MapPath(@"~/App_Data/items.json"));
-
-            var json = JsonConvert.DeserializeObject<List<Item.Item>>(sr.ReadToEnd());
-
-            return Json(json, JsonRequestBehavior.AllowGet);
-        }
-
         public ActionResult Redis()
         {
             ConnectionMultiplexer connection = ConnectionMultiplexer.Connect("mstube-dotnet.redis.cache.windows.net,abortConnect=false,ssl=true,password=6/Cq0R6Wh+L6PJeYI80KEMVyYVGUjqZFEnNS6iJHl1A=");
@@ -54,12 +45,5 @@ namespace mstube.Controllers
             return View();
         }
 
-        [HttpPost]
-        public async Task<JsonResult> Preference(Preference.Preference pre) {
-            //Send POST request to Azure ML
-            string result = await Utils.AzureML.SendPOSTRequest(pre.user_id);
-
-            return Json(result);
-        }
     }
 }
