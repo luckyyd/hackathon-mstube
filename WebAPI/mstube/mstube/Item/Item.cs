@@ -10,10 +10,10 @@ namespace mstube.Item
 {
     public class Item
     {
-        public string title;
-        public long id;
-        public string url;
-        public string image_src;
-        public string description;
+        public string title { get; set; }
+        public long id { get; set; }
+        public string url { get; set; }
+        public string image_src { get; set; }
+        public string description { get; set; }
     }
 }
