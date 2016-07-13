@@ -8,6 +8,9 @@ using System.IO;
 using StackExchange.Redis;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using System.Data.SqlClient;
+using System.Configuration;
+using System.Data;
 
 namespace mstube.Controllers
 {
@@ -21,7 +24,7 @@ namespace mstube.Controllers
 
         [HttpGet]
         public JsonResult UserId(string uuid) {
-            //Get new id for user_id
+            //Get user_id for uuid
             ConnectionMultiplexer connection = ConnectionMultiplexer.Connect("mstube-dotnet-id.redis.cache.windows.net,abortConnect=false,ssl=true,password=Tp/f4EEuKJWK1z7HJOvyrvZrg5IA9y4/W9BELvUPWZg=");
             IDatabase cacheid = connection.GetDatabase();
 
@@ -92,11 +95,35 @@ namespace mstube.Controllers
         [HttpPost]
         public JsonResult Preference(Preference.Preference pre)
         {
-            //Write preference data to Redis
-            ConnectionMultiplexer connection = ConnectionMultiplexer.Connect("mstube-dotnet.redis.cache.windows.net,abortConnect=false,ssl=true,password=6/Cq0R6Wh+L6PJeYI80KEMVyYVGUjqZFEnNS6iJHl1A=");
-            IDatabase cache = connection.GetDatabase();
-            string preStr = pre.user_id.ToString() + pre.item_id.ToString();
-            cache.StringSet(preStr, pre.score);
+            //Write preference data to Azure DB
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["MstubeConnection"].ToString());
+            using (SqlCommand command = new SqlCommand())
+            {
+                command.Connection = connection;
+                command.CommandType = CommandType.Text;
+                command.CommandText = "IF NOT EXISTS(SELECT ratings FROM Preferences WHERE user_id = @user_id AND item_id = @item_id) " +
+                                      "INSERT INTO Preferences (user_id, item_id, ratings, timestamp) VALUES (@user_id, @item_id, @ratings, @timestamp)" +
+                                      "ELSE " +
+                                      "UPDATE Preferences SET ratings = @ratings, timestamp = @timestamp  WHERE user_id = @user_id AND item_id = @item_id";
+                command.Parameters.AddWithValue("@user_id", pre.user_id);
+                command.Parameters.AddWithValue("@item_id", pre.item_id);
+                command.Parameters.AddWithValue("@ratings", pre.score);
+                command.Parameters.AddWithValue("@timestamp", DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond);
+                try
+                {
+                    connection.Open();
+                    int recordsAffected = command.ExecuteNonQuery();
+                }
+                catch (SqlException)
+                {
+                    // error here
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+
             return Json(pre);
         }
     }
