@@ -21,6 +21,7 @@ namespace mstube.Controllers
         [HttpGet]
         public JsonResult Candidates()
         {
+            //DEBUG ONLY
             //Return a random recommend list for test
             StreamReader sr = new StreamReader(Server.MapPath(@"~/App_Data/items.json"));
             var json = JsonConvert.DeserializeObject<List<Item.Item>>(sr.ReadToEnd());
@@ -28,12 +29,27 @@ namespace mstube.Controllers
         }
 
         [HttpGet]
-        public async Task<JsonResult> Candidates(long id)
-        {
+        public JsonResult UserId(long uuid) {
             //Get new id for user_id
+            ConnectionMultiplexer connection = ConnectionMultiplexer.Connect("mstube-dotnet-id.redis.cache.windows.net,abortConnect=false,ssl=true,password=Tp/f4EEuKJWK1z7HJOvyrvZrg5IA9y4/W9BELvUPWZg=");
+            IDatabase cacheid = connection.GetDatabase();
 
+            string dbsize = cacheid.StringGet("RedisSize");
+            if (dbsize == null)
+            {
+                dbsize = "0";
+                cacheid.StringSet("RedisSize", "0");
+            }
+            long user_id = Convert.ToInt64(dbsize) + 1;
+            cacheid.StringSet(uuid.ToString(), user_id.ToString());
+            return Json(user_id);
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> Candidates(long user_id)
+        {
             //Send POST request to Azure ML
-            string result = await Utils.AzureML.SendPOSTRequest(id);
+            string result = await Utils.AzureML.SendPOSTRequest(user_id);
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
