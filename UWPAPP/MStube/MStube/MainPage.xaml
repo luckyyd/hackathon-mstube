@@ -8,13 +8,13 @@
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <ListView Name="Display">
+        <ListView x:Name="VideoBriefList" HorizontalAlignment="Left" Margin="10,69,10,10" VerticalAlignment="Top">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
-                        <Image Margin="10" Height="64" Width="64" Source="{Binding SmallImageUrl}"/>
-                        <HyperlinkButton Content="{Binding Name}" NavigateUri="{Binding Link}"
-                    VerticalAlignment="Center"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
+                        <Image Height="64" Width="64" Source="{Binding ImageSourceUri}"/>
+                        <TextBlock Height="20" Margin="10,5,0,5" Text="{Binding VideoTitle}" HorizontalAlignment="Left"/>
+                        <TextBlock Height="20" Margin="10,5,0,5" Text="{Binding Description}" HorizontalAlignment="Left"/>
                     </StackPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>

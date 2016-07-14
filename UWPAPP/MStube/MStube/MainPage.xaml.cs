@@ -22,9 +22,24 @@ namespace MStube
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        public class VideoBrief
+        {
+            public string ImageSourceUri { get; set; }
+            public string VideoTitle { get; set; }
+            public string Description { get; set; }
+        }
+        private List<VideoBrief> listOfVideoBrief = new List<VideoBrief>();
         public MainPage()
         {
             this.InitializeComponent();
+            listOfVideoBrief.Add(new VideoBrief { ImageSourceUri = "https://www.google.com.sg/images/branding/product/ico/googleg_lodp.ico", VideoTitle = "Google", Description = "Hello, Google." });
+            listOfVideoBrief.Add(new VideoBrief { ImageSourceUri = "https://www.microsoft.com/favicon.ico?v2", VideoTitle = "Microsoft", Description = "Hi, Microsoft." });
+            VideoBriefList.ItemsSource = listOfVideoBrief;
+        }
+
+        private void textBlock_SelectionChanged(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
