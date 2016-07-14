@@ -29,7 +29,7 @@ namespace mstube.Utils
                             "WebServiceInput",
                             new StringTable()
                             {
-                                ColumnNames = new string[] {"UserId"},
+                                ColumnNames = new string[] {"user_id"},
                                 Values = new string[,] {  { user_id.ToString() } }
                             }
                         },
