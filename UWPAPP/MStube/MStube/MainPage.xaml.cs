@@ -36,10 +36,9 @@ namespace MStube
             listOfVideoBrief.Add(new VideoBrief { ImageSourceUri = "https://www.microsoft.com/favicon.ico?v2", VideoTitle = "Microsoft", Description = "Hi, Microsoft." });
             VideoBriefList.ItemsSource = listOfVideoBrief;
         }
-
-        private void textBlock_SelectionChanged(object sender, RoutedEventArgs e)
+        private void hyperlinkButton_Click(object sender, RoutedEventArgs e)
         {
-
+            this.Frame.Navigate(typeof(VideoPage));
         }
     }
 }

@@ -13,7 +13,7 @@
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
                         <Image Height="64" Width="64" Source="{Binding ImageSourceUri}"/>
-                        <TextBlock Height="20" Margin="10,5,0,5" Text="{Binding VideoTitle}" HorizontalAlignment="Left"/>
+                        <HyperlinkButton x:Name="hyperlinkButton"  HorizontalAlignment="Left" Content="{Binding VideoTitle}" Click="hyperlinkButton_Click"/>
                         <TextBlock Height="20" Margin="10,5,0,5" Text="{Binding Description}" HorizontalAlignment="Left"/>
                     </StackPanel>
                 </DataTemplate>
