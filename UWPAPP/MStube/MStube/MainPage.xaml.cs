@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 using System.Diagnostics;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
+using MStube.Items;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -17,20 +18,6 @@ namespace MStube
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        public class VideoBrief
-        {
-            public string ImageSourceUri { get; set; }
-            public string VideoTitle { get; set; }
-            public string Description { get; set; }
-        }
-        public class VideoItem
-        {
-            public int id;
-            public string url;
-            public string description;
-            public string image_src;
-            public string title;
-        }
         private List<VideoBrief> listOfVideoBrief = new List<VideoBrief>();
         static List<VideoItem> LoadVideoItem() {
             string path = @"json/shows.json";
@@ -40,9 +27,7 @@ namespace MStube
             {
                 if (File.Exists(path))
                 {
-                    Debug.WriteLine("File exists.");
                     text = System.IO.File.ReadAllText(path);
-                    Debug.WriteLine(text);
                     items = JsonConvert.DeserializeObject<List<VideoItem>>(text);
                 }
                 else
@@ -59,7 +44,6 @@ namespace MStube
         public MainPage()
         {
             this.InitializeComponent();
-            Debug.WriteLine("Test file");
             // Read the JSON file.
             var t = Task.Run(() => LoadVideoItem());
             t.Wait();
