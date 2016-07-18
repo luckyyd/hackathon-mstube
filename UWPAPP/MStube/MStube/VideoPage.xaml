@@ -9,10 +9,10 @@
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid x:Name="VideoDetail">
-            <TextBlock x:Name="textTitle" HorizontalAlignment="Left" Height="33" Margin="10,10,0,0" TextWrapping="Wrap" Text="{Binding VideoDetail.VideoTitle}" VerticalAlignment="Top" Width="340" FontSize="21.333"/>
-            <WebView x:Name="videoView" HorizontalAlignment="Left" Height="207" Margin="10,48,0,0" VerticalAlignment="Top" Width="340"/>
-            <TextBlock x:Name="textDescription" HorizontalAlignment="Left" Margin="10,303,0,0" TextWrapping="Wrap" Text="{Binding VideoDetail.VideoDescription}" VerticalAlignment="Top" Height="327" Width="340"/>
-            <Button x:Name="backButton" Content="Back" HorizontalAlignment="Left" Height="96" Margin="226,534,0,0" VerticalAlignment="Top" Width="124" Click="backButton_Click"/>
+            <TextBlock x:Name="textTitle" HorizontalAlignment="Center" Height="33" Margin="10,10,0,0" TextWrapping="Wrap" Text="{Binding VideoDetail.VideoTitle}" VerticalAlignment="Top" FontSize="21.333" Width="Auto"/>
+            <WebView x:Name="videoView" HorizontalAlignment="Center" Margin="10,46,10,0" Width="300" Height="200" VerticalAlignment="Top"/>
+            <TextBlock x:Name="textDescription" HorizontalAlignment="Left" Margin="10,303,0,0" TextWrapping="Wrap" Text="{Binding VideoDetail.VideoDescription}" VerticalAlignment="Top" Height="327" Width="Auto"/>
+            <Button x:Name="backButton" Content="Back" HorizontalAlignment="Right" Height="96" Margin="0,0,10,10" VerticalAlignment="Bottom" Width="124" Click="backButton_Click"/>
         </Grid>
     </Grid>
 </Page>
