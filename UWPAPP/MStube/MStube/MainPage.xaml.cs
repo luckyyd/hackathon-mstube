@@ -27,7 +27,7 @@ namespace MStube
             {
                 if (File.Exists(path))
                 {
-                    text = System.IO.File.ReadAllText(path);
+                    text = File.ReadAllText(path);
                     items = JsonConvert.DeserializeObject<List<VideoItem>>(text);
                 }
                 else
@@ -44,7 +44,9 @@ namespace MStube
         public MainPage()
         {
             this.InitializeComponent();
-            // Read the JSON file.
+            this.InitializeValues();
+        }
+        public void InitializeValues() { 
             var t = Task.Run(() => LoadVideoItem());
             t.Wait();
             List<VideoItem> items = t.Result;

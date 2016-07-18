@@ -12,6 +12,10 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using MStube.Items;
+using System.Threading.Tasks;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -22,11 +26,34 @@ namespace MStube
     /// </summary>
     public sealed partial class VideoPage : Page
     {
+        private 
+        static VideoDetailItem LoadVideoDetail()
+        {
+            string path = @"json/videos.json";
+            string text = "";
+            text = File.ReadAllText(path);
+            List<VideoDetailItem> items = JsonConvert.DeserializeObject<List<VideoDetailItem>>(text);
+            // Here choose an example item.
+            VideoDetailItem item = items[0];
+            return item;
+        }
         public VideoPage()
         {
             this.InitializeComponent();
-            textBlock.Text = "This is the description of the video detail. The picture above is microsoft logo.";
+            this.InitializeValues();
         }
-
+        public void InitializeValues()
+        {
+            var t = Task.Run(() => LoadVideoDetail());
+            t.Wait();
+            VideoDetailItem item = t.Result;
+            textTitle.Text = item.title;
+            textDescription.Text = item.video_description;
+            videoView.Source = new System.Uri(item.video_src);
+        }
+        private void backButton_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(MainPage));
+        }
     }
 }

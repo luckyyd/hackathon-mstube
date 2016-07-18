@@ -8,11 +8,11 @@
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <Image x:Name="image" HorizontalAlignment="Center" Height="233.008" Margin="14.799,24.668,44.905,0" VerticalAlignment="Top" Width="300.296" RenderTransformOrigin="0.5,0.5" UseLayoutRounding="False" d:LayoutRounding="Auto" Source="Assets/LockScreenLogo.png">
-            <Image.RenderTransform>
-                <CompositeTransform Rotation="0.122"/>
-            </Image.RenderTransform>
-        </Image>
-        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="10,268,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Height="362" Width="340"/>
+        <Grid x:Name="VideoDetail">
+            <TextBlock x:Name="textTitle" HorizontalAlignment="Left" Height="33" Margin="10,10,0,0" TextWrapping="Wrap" Text="{Binding VideoDetail.VideoTitle}" VerticalAlignment="Top" Width="340" FontSize="21.333"/>
+            <WebView x:Name="videoView" HorizontalAlignment="Left" Height="207" Margin="10,48,0,0" VerticalAlignment="Top" Width="340"/>
+            <TextBlock x:Name="textDescription" HorizontalAlignment="Left" Margin="10,303,0,0" TextWrapping="Wrap" Text="{Binding VideoDetail.VideoDescription}" VerticalAlignment="Top" Height="327" Width="340"/>
+            <Button x:Name="backButton" Content="Back" HorizontalAlignment="Left" Height="96" Margin="226,534,0,0" VerticalAlignment="Top" Width="124" Click="backButton_Click"/>
+        </Grid>
     </Grid>
 </Page>
