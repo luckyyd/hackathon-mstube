@@ -17,6 +17,7 @@ using Microsoft.WindowsAzure.Storage.Blob;
 using System.Globalization;
 using System.IO;
 using System.Diagnostics;
+using Newtonsoft.Json;
 
 namespace mstube.Utils
 {
@@ -117,7 +118,7 @@ namespace mstube.Utils
             blob.UploadFromFile(inputFileLocation);
         }
 
-        static void ProcessResults(BatchScoreStatus status)
+        static async void ProcessResults(BatchScoreStatus status)
         {
 
 
@@ -129,12 +130,15 @@ namespace mstube.Utils
                 System.Diagnostics.Debug.WriteLine(string.Format("BaseLocation: {0}", blobLocation.BaseLocation));
                 System.Diagnostics.Debug.WriteLine(string.Format("RelativeLocation: {0}", blobLocation.RelativeLocation));
                 System.Diagnostics.Debug.WriteLine(string.Format("SasBlobToken: {0}", blobLocation.SasBlobToken));
-                //System.Diagnostics.Debug.WriteLine();
 
                 // Save the first output to disk
                 if (first)
                 {
                     first = false;
+
+                    // Update model
+                    await OverwriteModel(blobLocation.BaseLocation, blobLocation.RelativeLocation, blobLocation.SasBlobToken);
+
                     //SaveBlobToFile(blobLocation, string.Format("The results for {0}", output.Key));
                 }
             }
@@ -148,7 +152,6 @@ namespace mstube.Utils
             // 2. Upload the file to an Azure blob - you'd need an Azure storage account
             // 3. Call the Batch Execution Service to process the data in the blob. Any output is written to Azure blobs.
             // 4. Download the output blob, if any, to local file
-
             const string BaseUrl = "https://asiasoutheast.services.azureml.net/workspaces/0cd16c9abdb94e249ae6f6fb27b76402/services/55aab8a6811848929c5daa6468b554a0/jobs";
 
             const string StorageAccountName = "mstubeblob"; // Replace this with your Azure Storage Account name
@@ -159,10 +162,8 @@ namespace mstube.Utils
             // set a time out for polling status
             const int TimeOutInMilliseconds = 120 * 1000; // Set a timeout of 2 minutes
 
-
             string storageConnectionString = string.Format("DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1}", StorageAccountName, StorageAccountKey);
 
-            //System.IO.Path.GetFullPath(mstube.MapPath(@"~/App_Data/PreferenceSample.csv"))
             UploadFileToBlob(AppDomain.CurrentDomain.BaseDirectory + "App_Data/PreferenceSample.csv"  /*Replace this with the location of your input file*/,
                "TrainingInputdatablob.csv" /*Replace this with the name you would like to use for your Azure blob; this needs to have the same extension as the input file */,
                StorageContainerName, storageConnectionString);
@@ -187,6 +188,23 @@ namespace mstube.Utils
 
                     Outputs = new Dictionary<string, AzureBlobDataReference>()
                     {
+                        {
+                            "TrainingOutput",
+                            new AzureBlobDataReference()
+                            {
+                                ConnectionString = storageConnectionString,
+                                RelativeLocation = string.Format("/{0}/TrainingOutputresults.ilearner", StorageContainerName)
+                            }
+                        },
+
+                        {
+                            "TrainingOutput1",
+                            new AzureBlobDataReference()
+                            {
+                                ConnectionString = storageConnectionString,
+                                RelativeLocation = string.Format("/{0}/TrainingOutput1results.csv", StorageContainerName)
+                            }
+                        },
 
                         {
                             "TrainingOutput2",
@@ -196,15 +214,6 @@ namespace mstube.Utils
                                 RelativeLocation = string.Format("/{0}/TrainingOutput2results.csv", StorageContainerName)
                             }
                         },
-
-                        {
-                            "TrainingOutput",
-                            new AzureBlobDataReference()
-                            {
-                                ConnectionString = storageConnectionString,
-                                RelativeLocation = string.Format("/{0}/TrainingOutputresults.csv", StorageContainerName)
-                            }
-                        },
                     },
                     GlobalParameters = new Dictionary<string, string>()
                     {
@@ -212,7 +221,6 @@ namespace mstube.Utils
                 };
 
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
-                //client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                 // WARNING: The 'await' statement below can result in a deadlock if you are calling this code from the UI thread of an ASP.Net application.
                 // One way to address this would be to call ConfigureAwait(false) so that the execution does not attempt to resume on the original context.
@@ -297,6 +305,47 @@ namespace mstube.Utils
                     {
                         Thread.Sleep(1000); // Wait one second
                     }
+                }
+            }
+        }
+
+        private static async Task OverwriteModel(string BaseLocation, string RelativeLocation, string SasBlobToken)
+        {
+            const string apiKey = "VyAFByLVCp0+wioHMVnP0TvBTid+ygzRMLxLj12F9pzsOto1M7RNSQk81Y04XeZt11iap+HdvxChLup9G9s9/g==";
+            const string endpointUrl = "https://asiasoutheast.management.azureml.net/workspaces/0cd16c9abdb94e249ae6f6fb27b76402/webservices/607c26dec08e4d688330be768bc03ea5/endpoints/update-endpoint";
+            var resourceLocations = new
+            {
+                Resources = new[]
+                {
+            new
+            {
+                Name = "Trained recommender",
+                Location = new AzureBlobDataReference()
+                {
+                    BaseLocation = BaseLocation,
+                    RelativeLocation = RelativeLocation,
+                    SasBlobToken = SasBlobToken
+                }
+            }
+        }
+            };
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
+
+                using (var request = new HttpRequestMessage(new HttpMethod("PATCH"), endpointUrl))
+                {
+                    request.Content = new StringContent(JsonConvert.SerializeObject(resourceLocations), System.Text.Encoding.UTF8, "application/json");
+                    HttpResponseMessage response = await client.SendAsync(request);
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        await WriteFailedResponse(response);
+                    }
+
+                    // Do what you want with a successful response here.
+                    System.Diagnostics.Debug.WriteLine("Update Model Successful!");
                 }
             }
         }
