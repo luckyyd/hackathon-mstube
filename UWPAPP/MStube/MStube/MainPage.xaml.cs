@@ -8,6 +8,7 @@ using System.Diagnostics;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
 using MStube.Items;
+using MStube.ViewModels;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -18,17 +19,17 @@ namespace MStube
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        private List<VideoBrief> listOfVideoBrief = new List<VideoBrief>();
-        static List<VideoItem> LoadVideoItem() {
+        private List<ShowViewModel> listOfVideoBrief = new List<ShowViewModel>();
+        static List<ShowItem> LoadShowItem() {
             string path = @"json/shows.json";
             string text = "";
-            List<VideoItem> items = new List<VideoItem>();
+            List<ShowItem> items = new List<ShowItem>();
             try
             {
                 if (File.Exists(path))
                 {
                     text = File.ReadAllText(path);
-                    items = JsonConvert.DeserializeObject<List<VideoItem>>(text);
+                    items = JsonConvert.DeserializeObject<List<ShowItem>>(text);
                 }
                 else
                 {
@@ -44,25 +45,25 @@ namespace MStube
         public MainPage()
         {
             this.InitializeComponent();
+            this.GetUserId();
             this.InitializeValues();
         }
+        private void GetUserId()
+        {
+
+        }
         public void InitializeValues() { 
-            var t = Task.Run(() => LoadVideoItem());
+            var t = Task.Run(() => LoadShowItem());
             t.Wait();
-            List<VideoItem> items = t.Result;
-            foreach (VideoItem item in items)
+            List<ShowItem> items = t.Result;
+            foreach (ShowItem item in items)
             {
-                listOfVideoBrief.Add(new VideoBrief { Id = item.id, ImageSourceUri = item.image_src, VideoTitle = item.title, Description = item.description });
+                listOfVideoBrief.Add(new ShowViewModel { Id = item.id, ImageSourceUri = item.image_src, VideoTitle = item.title, Description = item.description });
             }
             VideoBriefList.ItemsSource = listOfVideoBrief;
         }
         private void hyperlinkButton_Click(object sender, RoutedEventArgs e)
         {
-            //HyperlinkButton button = sender as HyperlinkButton;
-            //Debug.WriteLine(button.Tag);
-            //StackPanel sp = button.Parent as StackPanel;
-            //Debug.WriteLine(sp.Tag);
-            //Debug.WriteLine((sp.Parent as FrameworkElement).Tag);
             HyperlinkButton button = sender as HyperlinkButton;
             var id = button.Tag;
             this.Frame.Navigate(typeof(VideoPage), id);

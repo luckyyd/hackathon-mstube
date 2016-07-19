@@ -15,6 +15,7 @@ using Windows.UI.Xaml.Navigation;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using MStube.Items;
+using MStube.ViewModels;
 using System.Threading.Tasks;
 using System.Diagnostics;
 
@@ -46,6 +47,7 @@ namespace MStube
         {
             var t = Task.Run(() => LoadVideoDetail());
             t.Wait();
+            // TODO: Use ViewModel to bind variables.
             VideoDetailItem item = t.Result;
             textTitle.Text = item.title;
             textDescription.Text = item.video_description;

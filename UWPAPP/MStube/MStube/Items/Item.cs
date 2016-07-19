@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MStube.Items
 {
-    public class VideoItem
+    public class ShowItem
     {
         // Used for json object.
         public int id { get; set; }
@@ -14,15 +14,6 @@ namespace MStube.Items
         public string description { get; set; }
         public string image_src { get; set; }
         public string title { get; set; }
-    }
-
-    public class VideoBrief
-    {
-        // Used for view.
-        public int Id { get; set; }
-        public string ImageSourceUri { get; set; }
-        public string VideoTitle { get; set; }
-        public string Description { get; set; }
     }
     public class VideoDetailItem
     {
@@ -33,12 +24,5 @@ namespace MStube.Items
         public string title { get; set; }
         public string video_description { get; set; }
         public string topic { get; set; }
-    }
-    public class VideoDetailBrief
-    {
-        // Use for view.
-        public string VideoTitle { get; set; }
-        public string VideoSourceUri { get; set; }
-        public string VideoDescription { get; set; }
     }
 }
