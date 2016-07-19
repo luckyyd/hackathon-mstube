@@ -19,6 +19,7 @@ namespace MStube.Items
     public class VideoBrief
     {
         // Used for view.
+        public int Id { get; set; }
         public string ImageSourceUri { get; set; }
         public string VideoTitle { get; set; }
         public string Description { get; set; }

@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using MStube.Items;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -26,8 +27,7 @@ namespace MStube
     /// </summary>
     public sealed partial class VideoPage : Page
     {
-        private 
-        static VideoDetailItem LoadVideoDetail()
+        private static VideoDetailItem LoadVideoDetail()
         {
             string path = @"json/videos.json";
             string text = "";
@@ -54,6 +54,12 @@ namespace MStube
         private void backButton_Click(object sender, RoutedEventArgs e)
         {
             Frame.Navigate(typeof(MainPage));
+        }
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+            var id = e.Parameter;
+            Debug.WriteLine(id);
         }
     }
 }

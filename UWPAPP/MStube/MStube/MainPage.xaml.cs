@@ -52,13 +52,20 @@ namespace MStube
             List<VideoItem> items = t.Result;
             foreach (VideoItem item in items)
             {
-                listOfVideoBrief.Add(new VideoBrief { ImageSourceUri = item.image_src, VideoTitle = item.title, Description = item.description });
+                listOfVideoBrief.Add(new VideoBrief { Id = item.id, ImageSourceUri = item.image_src, VideoTitle = item.title, Description = item.description });
             }
             VideoBriefList.ItemsSource = listOfVideoBrief;
         }
         private void hyperlinkButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Frame.Navigate(typeof(VideoPage));
+            //HyperlinkButton button = sender as HyperlinkButton;
+            //Debug.WriteLine(button.Tag);
+            //StackPanel sp = button.Parent as StackPanel;
+            //Debug.WriteLine(sp.Tag);
+            //Debug.WriteLine((sp.Parent as FrameworkElement).Tag);
+            HyperlinkButton button = sender as HyperlinkButton;
+            var id = button.Tag;
+            this.Frame.Navigate(typeof(VideoPage), id);
         }
     }
 }
