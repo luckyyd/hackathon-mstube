@@ -19,6 +19,7 @@ namespace mstube.Controllers
         // GET: Api
         public ActionResult Index()
         {
+            Utils.RetrainModel.InvokeBatchExecutionService().Wait();
             return View();
         }
 
