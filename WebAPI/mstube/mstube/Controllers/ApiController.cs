@@ -70,9 +70,6 @@ namespace mstube.Controllers
         [HttpGet]
         public async Task<JsonResult> Candidates(long user_id)
         {
-            StreamReader sr = new StreamReader(Server.MapPath(@"~/App_Data/items.json"));
-            List<Item.Item> jsonItem = JsonConvert.DeserializeObject<List<Item.Item>>(sr.ReadToEnd());
-
             List<Item.Item> jsonResult = new List<Item.Item>();
 
             //Send POST request to Azure ML
@@ -81,16 +78,135 @@ namespace mstube.Controllers
             dynamic jsonObj = JsonConvert.DeserializeObject(result);
             JArray values = (JArray)jsonObj.Results.output1.value.Values[0];
             List<string> val = values.ToObject<List<string>>();
-            val.RemoveAt(0); 
-            
-            foreach (var v in val) { 
-                foreach (Item.Item item in jsonItem) {
-                    if (item.id.ToString() == v) {
-                        jsonResult.Add(item);
+            val.RemoveAt(0);
+
+            //Append val up to 10 items
+            if (val.Count < 10) {
+                var max = val.Select(v => int.Parse(v)).Max();
+                while (val.Count < 10) {
+                    Random ran = new Random();
+                    int RandKey = ran.Next(1, max);
+                    val.Add(RandKey.ToString());
+                }   
+            }
+
+            //Return items from db
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["MstubeConnection"].ToString());
+
+            foreach (var item_id in val) {
+                using (SqlCommand command = new SqlCommand())
+                {
+                    command.Connection = connection;
+                    command.CommandType = CommandType.Text;
+                    command.CommandText = "SELECT * FROM Item WHERE item_id = @item_id";
+                    command.Parameters.AddWithValue("@item_id", item_id);
+                    try
+                    {
+                        connection.Open();
+                        using (var reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                jsonResult.Add(new Item.Item
+                                {
+                                    item_id = Convert.ToInt64(reader["item_id"]),
+                                    image_src = reader["image_src"].ToString(),
+                                    video_src = reader["video_src"].ToString(),
+                                    title = reader["title"].ToString(),
+                                    description = reader["description"].ToString(),
+                                    topic = reader["topic"].ToString(),
+                                });
+                            }
+                        }
+
+                    }
+                    catch (SqlException)
+                    {
+                        // error here
+                    }
+                    finally
+                    {
+                        connection.Close();
                     }
                 }
             }
-            
+            return Json(jsonResult, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public JsonResult ListTopic() {
+            List<Item.Topic> jsonResult = new List<Item.Topic>();
+            //Return list topic from db
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["MstubeConnection"].ToString());
+            using (SqlCommand command = new SqlCommand())
+            {
+                command.Connection = connection;
+                command.CommandType = CommandType.Text;
+                command.CommandText = "SELECT DISTINCT topic FROM Item";
+                try
+                {
+                    connection.Open();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            jsonResult.Add(new Item.Topic
+                            {
+                                topic = reader["topic"].ToString()
+                            });
+                        }
+                    }
+
+                }
+                catch (SqlException)
+                {
+                    // error here
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+            return Json(jsonResult, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public JsonResult SearchTopic(string topic) {
+            List<Item.Item> jsonResult = new List<Item.Item>();
+            //Return search topic from db
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["MstubeConnection"].ToString());
+            using (SqlCommand command = new SqlCommand())
+            {
+                command.Connection = connection;
+                command.CommandType = CommandType.Text;
+                command.CommandText = "SELECT * FROM Item WHERE topic = @topic";
+                command.Parameters.AddWithValue("@topic", topic);
+                try
+                {
+                    connection.Open();
+                    using (var reader = command.ExecuteReader()) {
+                        while (reader.Read()) {
+                            jsonResult.Add(new Item.Item {
+                                item_id = Convert.ToInt64(reader["item_id"]),
+                                image_src = reader["image_src"].ToString(),
+                                video_src = reader["video_src"].ToString(),
+                                title = reader["title"].ToString(),
+                                description = reader["description"].ToString(),
+                                topic = reader["topic"].ToString(),
+                            });
+                        }
+                    }
+
+                }
+                catch (SqlException)
+                {
+                    // error here
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
             return Json(jsonResult, JsonRequestBehavior.AllowGet);
         }
 
