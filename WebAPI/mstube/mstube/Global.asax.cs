@@ -17,8 +17,8 @@ namespace mstube
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
-            //Start the backend job (10min per round)
-            System.Timers.Timer Timer = new System.Timers.Timer(600000);
+            //Start the backend job (30min per round)
+            System.Timers.Timer Timer = new System.Timers.Timer(1800000);
             Timer.Elapsed += new System.Timers.ElapsedEventHandler(Utils.RetrainModel.InvokeBatchExecutionService1);
             Timer.Enabled = true;
             Timer.AutoReset = true;

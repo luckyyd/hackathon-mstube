@@ -11,6 +11,8 @@ using Newtonsoft.Json.Linq;
 using System.Data.SqlClient;
 using System.Configuration;
 using System.Data;
+using Microsoft.WindowsAzure.Storage;
+using System.Text;
 
 namespace mstube.Controllers
 {
@@ -95,33 +97,23 @@ namespace mstube.Controllers
         [HttpPost]
         public JsonResult Preference(Preference.Preference pre)
         {
-            //Write preference data to Azure DB
-            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["MstubeConnection"].ToString());
-            using (SqlCommand command = new SqlCommand())
+            //Append preference data to Azure Blob
+            const string StorageAccountName = "mstubeblob";
+            const string StorageAccountKey = "nG0MPtLcKCMPj15uKalobeFWvfLNljGen/K21qcbLdxrPtdW/UWViA4xuqEJPvb9O+FoAd7BIXgFxLSluWAM5g==";
+            const string storageContainerName = "mstube-container";
+            const string inputBlobName = "TrainingInputdatablob.csv";
+            
+            string storageConnectionString = string.Format("DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1}", StorageAccountName, StorageAccountKey);
+            var blobClient = CloudStorageAccount.Parse(storageConnectionString).CreateCloudBlobClient();
+            var container = blobClient.GetContainerReference(storageContainerName);
+            container.CreateIfNotExists();
+            var blob = container.GetAppendBlobReference(inputBlobName);
+            StringBuilder csvData = new StringBuilder();
+            csvData.AppendLine(pre.user_id + "," + pre.item_id + "," + pre.score + "," + pre.timestamp);
+            string dataToUpload = csvData.ToString();
+            using (MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(dataToUpload)))
             {
-                command.Connection = connection;
-                command.CommandType = CommandType.Text;
-                command.CommandText = "IF NOT EXISTS(SELECT ratings FROM Preferences WHERE user_id = @user_id AND item_id = @item_id) " +
-                                      "INSERT INTO Preferences (user_id, item_id, ratings, timestamp) VALUES (@user_id, @item_id, @ratings, @timestamp)" +
-                                      "ELSE " +
-                                      "UPDATE Preferences SET ratings = @ratings, timestamp = @timestamp  WHERE user_id = @user_id AND item_id = @item_id";
-                command.Parameters.AddWithValue("@user_id", pre.user_id);
-                command.Parameters.AddWithValue("@item_id", pre.item_id);
-                command.Parameters.AddWithValue("@ratings", pre.score);
-                command.Parameters.AddWithValue("@timestamp", DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond);
-                try
-                {
-                    connection.Open();
-                    int recordsAffected = command.ExecuteNonQuery();
-                }
-                catch (SqlException)
-                {
-                    // error here
-                }
-                finally
-                {
-                    connection.Close();
-                }
+                blob.AppendFromStream(ms);
             }
 
             return Json(pre);

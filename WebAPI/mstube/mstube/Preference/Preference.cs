@@ -12,5 +12,7 @@ namespace mstube.Preference
         public long item_id { get; set; }
 
         public int score { get; set; }
+
+        public long timestamp { get; set; }
     }
 }

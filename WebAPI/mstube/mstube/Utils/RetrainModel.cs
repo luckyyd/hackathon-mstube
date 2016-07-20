@@ -170,9 +170,13 @@ namespace mstube.Utils
 
             string storageConnectionString = string.Format("DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1}", StorageAccountName, StorageAccountKey);
 
-            UploadFileToBlob(AppDomain.CurrentDomain.BaseDirectory + "App_Data/PreferenceSample.csv"  /*Replace this with the location of your input file*/,
-               "TrainingInputdatablob.csv" /*Replace this with the name you would like to use for your Azure blob; this needs to have the same extension as the input file */,
-               StorageContainerName, storageConnectionString);
+            //Get Preference data from SQL Server
+            //This procedure is done by Azure Data Factory
+
+           //Below is for DEBUG ONLY
+           // UploadFileToBlob(AppDomain.CurrentDomain.BaseDirectory + "App_Data/PreferenceSample.csv"  /*Replace this with the location of your input file*/,
+           //    "TrainingInputdatablob.csv" /*Replace this with the name you would like to use for your Azure blob; this needs to have the same extension as the input file */,
+           //    StorageContainerName, storageConnectionString);
 
             using (HttpClient client = new HttpClient())
             {
