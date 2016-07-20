@@ -113,6 +113,7 @@ namespace mstube.Controllers
                                     image_src = reader["image_src"].ToString(),
                                     video_src = reader["video_src"].ToString(),
                                     title = reader["title"].ToString(),
+                                    url = reader["url"].ToString(),
                                     description = reader["description"].ToString(),
                                     topic = reader["topic"].ToString(),
                                 });
@@ -191,6 +192,7 @@ namespace mstube.Controllers
                                 image_src = reader["image_src"].ToString(),
                                 video_src = reader["video_src"].ToString(),
                                 title = reader["title"].ToString(),
+                                url = reader["url"].ToString(),
                                 description = reader["description"].ToString(),
                                 topic = reader["topic"].ToString(),
                             });
