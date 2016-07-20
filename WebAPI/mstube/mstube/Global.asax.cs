@@ -16,6 +16,12 @@ namespace mstube
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+
+            //Start the backend job (10min per round)
+            System.Timers.Timer Timer = new System.Timers.Timer(600000);
+            Timer.Elapsed += new System.Timers.ElapsedEventHandler(Utils.RetrainModel.InvokeBatchExecutionService1);
+            Timer.Enabled = true;
+            Timer.AutoReset = true;
         }
     }
 }
