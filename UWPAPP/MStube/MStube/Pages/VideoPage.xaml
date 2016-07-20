@@ -22,7 +22,7 @@
                 </Grid.RowDefinitions>
                 <TextBlock x:Name="textTitle" Grid.Row="0" Grid.Column="1" Height="Auto" Margin="10,10,0,0" TextWrapping="Wrap" Text="{Binding VideoDetail.VideoTitle}" VerticalAlignment="Center" FontSize="21.333" Width="Auto" HorizontalAlignment="Center"/>
                 <WebView x:Name="videoView" Grid.Row="1" Grid.Column="1" Width="Auto"/>
-                <TextBlock x:Name="textDescription" Grid.Row="2" Grid.Column="1" Margin="10,10,10,10" Text="{Binding VideoDetail.VideoDescription}"/>
+                <TextBlock x:Name="textDescription" Grid.Row="2" Grid.Column="1" TextWrapping="Wrap" Padding="10,10,10,10" Text="{Binding VideoDetail.VideoDescription}" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                 <Button x:Name="backButton" Grid.Row="2" Grid.Column="1" Content="Back" HorizontalAlignment="Right" Height="64" Width="64" Margin="0,0,10,10" VerticalAlignment="Bottom" Click="backButton_Click"/>
             </Grid>
         </Grid>
