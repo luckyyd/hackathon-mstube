@@ -18,6 +18,7 @@ using System.Globalization;
 using System.IO;
 using System.Diagnostics;
 using Newtonsoft.Json;
+using System.Timers;
 
 namespace mstube.Utils
 {
@@ -72,6 +73,11 @@ namespace mstube.Utils
 
     public class RetrainModel
     {
+        public static void InvokeBatchExecutionService1(object source, ElapsedEventArgs e)
+        {
+            InvokeBatchExecutionService().Wait();
+        }
+
         static async Task WriteFailedResponse(HttpResponseMessage response)
         {
             System.Diagnostics.Debug.WriteLine(string.Format("The request failed with status code: {0}", response.StatusCode));
