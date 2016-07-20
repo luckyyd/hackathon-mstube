@@ -21,8 +21,6 @@ namespace MStube
     public sealed partial class MainPage : Page
     {
         private List<ShowViewModel> listOfVideoBrief = new List<ShowViewModel>();
-        private int user_id;
-        private string shows_json;
 
         public MainPage()
         {
