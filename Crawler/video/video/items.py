@@ -10,11 +10,11 @@ import scrapy
 
 class VideoItem(scrapy.Item):
     # define the fields for your item here like:
+    item_id = scrapy.Field()
     title = scrapy.Field()
+    tags = scrapy.Field()
     topic = scrapy.Field()
-    url = scrapy.Field()
     video_src = scrapy.Field()
-    video_description = scrapy.Field()
     image_src = scrapy.Field()
-    # crawled_time = scrapy.Field()
-    video_id = scrapy.Field()
+    url = scrapy.Field()
+    description = scrapy.Field()

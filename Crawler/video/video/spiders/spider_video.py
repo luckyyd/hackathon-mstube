@@ -16,7 +16,10 @@ from video.items import VideoItem
 class VideoSpider(scrapy.Spider):
     name = 'video'
     allowed_domains = ["channel9.msdn.com"]
-    start_urls = ["https://channel9.msdn.com/Shows/Cloud+Cover/"]
+    start_urls = ["https://channel9.msdn.com/Shows/Cloud+Cover/",
+                  "https://channel9.msdn.com/Blogs/Subscribe/",
+                  "https://channel9.msdn.com/Shows/Mechanics/",
+                  "https://channel9.msdn.com/Series/Windows-10-development-for-absolute-beginners"]
 
     def __init__(self):
         self.video_src = ''
@@ -30,44 +33,56 @@ class VideoSpider(scrapy.Spider):
         main_url = "https://channel9.msdn.com"
         data = response.xpath('//ul[@class="entries"]//li')
         unichange = re.compile('\u00a0')
-
+        topic = response.xpath('//div[@class="area-header item-header"]/h1/text()').extract()[0].strip()
         for entry in data:
             try:
-                title = entry.xpath('div[@class="entry-meta"]/a/text()').extract()[0]
+                title = entry.xpath('div[@class="entry-meta"]/a/text()').extract()[0].strip()
                 title = unichange.sub(' ', title)
-                topic = 'Microsoft Azure Cloud Cover Show'
                 try:
                     video_description = entry.xpath('//div[@class="description"]/text()').extract()[0]
-                    video_description = unichange.sub(' ', video_description)
+                    video_description = re.sub('\u00a0', ' ', video_description)
                     video_description = re.sub('\u2026', ' ', video_description)
+                    video_description = re.sub(r'\r', '', video_description)
+                    video_description = re.sub(r'\n', '', video_description)
+                    video_description = re.sub(r'\t', '', video_description)
                 except Exception as err:
                     print(err)
                 image_src = entry.xpath('div[@class="entry-image"]/a/img/@src').extract()[0]
                 url = entry.xpath('div[@class="entry-image"]/a/@href').extract()[0]
                 url = main_url + url
                 # Here to get video src by subpage.
-                subpage = requests.get(url)
-                subpage_content = subpage.content.decode('utf-8')
+                try:
+                    subpage = requests.get(url, timeout=5.0)
+                    subpage_content = subpage.content.decode('utf-8')
+                except Exception as err:
+                    # Jump to next item
+                    continue
+                # Get the video source
                 pattern = re.compile(r'<a class="video".*?href="(.*?\.mp4)"')
                 result = pattern.findall(subpage_content)
                 video_src = result[0]
+                # Get the video tag
+                pattern = re.compile(r'<a href="/Tags.*?">(.*?)</a>')
+                result = pattern.findall(subpage_content)
+                tags = result
                 # Generate an item
                 item = VideoItem()
                 item['title'] = title
                 item['topic'] = topic
                 item['url'] = url
                 item['video_src'] = video_src
-                item['video_description'] = video_description
+                item['description'] = video_description
                 item['image_src'] = image_src
+                item['tags'] = tags
                 # item['crawled_time'] = time.strftime('%Y-%m-%d %H:%M', time.localtime())
                 self.counter += 1
-                item['video_id'] = self.counter
+                item['item_id'] = self.counter
                 yield item
             except Exception as err:
                 print(err)
-        try:
-            next_page_url = main_url + response.xpath('//ul[@class="paging"]/li[@class="next"]/a/@href').extract()[0]
-            print("Crawling next page: %s" % next_page_url)
-            yield scrapy.Request(next_page_url, callback=self.parse)
-        except Exception:
-            print("Crawling done.")
+        # try:
+        #     next_page_url = main_url + response.xpath('//ul[@class="paging"]/li[@class="next"]/a/@href').extract()[0]
+        #     print("Crawling next page: %s" % next_page_url)
+        #     yield scrapy.Request(next_page_url, callback=self.parse)
+        # except Exception:
+        #     print("Crawling done.")
