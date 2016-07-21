@@ -20,7 +20,3 @@ class JsonWriterPipeline(object):
         # line = json.dumps(dict(item)) + "\n"
         # self.file.write(line.decode('unicode_escape'))
         return item
-
-    def close_spider(self, spider):
-        print("Spider is closed.")
-        self.client.close()
