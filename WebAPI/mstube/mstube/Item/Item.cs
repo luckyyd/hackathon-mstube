@@ -16,6 +16,14 @@ namespace mstube.Item
         public string title { get; set; }
         public string url { get; set; }
         public string description { get; set; }
+        public string full_description { get; set; }
         public string topic { get; set; }
+        public string category { get; set; }
+        public string posted_time { get; set; }
+        public string video_time { get; set; }
+        public string views { get; set; }
+        public string quality { get; set; }
+        public List<string> tags { get; set; }
+        public double score { get; set; }
     }
 }
