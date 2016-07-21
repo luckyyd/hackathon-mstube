@@ -52,7 +52,8 @@ namespace MStube
             VideoDetailItem item = t.Result;
             textTitle.Text = item.title;
             textDescription.Text = item.video_description;
-            videoView.Source = new System.Uri(item.video_src);
+            Debug.WriteLine("source: " + item.video_src);
+            mediaElement.Source = new Uri(item.video_src);
         }
         private void backButton_Click(object sender, RoutedEventArgs e)
         {

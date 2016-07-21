@@ -70,6 +70,8 @@ namespace MStube
             try
             {
                 var result = await httpClient.GetStringAsync(uri);
+                Debug.WriteLine("User id: " + user_id);
+                Debug.WriteLine(result);
                 items = JsonConvert.DeserializeObject<List<ShowItem>>(result as string);
             }
             catch (Exception)
