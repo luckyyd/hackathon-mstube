@@ -12,7 +12,7 @@ namespace mstube.UserProfile
 {
     public class Filter
     {
-        public List<Item.Item> FilterItem(List<string> rawRecommendItemId, long user_id, string network, string time) {
+        public static List<Item.Item> FilterItem(List<string> rawRecommendItemId, long user_id, string network, string time) {
 
             //Step1: Ger Raw Recommendation Data from DB
             #region Step1
@@ -136,12 +136,11 @@ namespace mstube.UserProfile
                     }
                 }
             }
-
                 #endregion
 
-                //Step4: Ratings
-                #region Step4
-                long milliseconds = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+            //Step4: Ratings
+            #region Step4
+            long milliseconds = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
             foreach (Item.Item item in rawReconData) {
                 foreach (string tag in item.tags) {
                     foreach (var interest in InterestList) {

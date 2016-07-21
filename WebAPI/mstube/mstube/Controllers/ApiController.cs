@@ -234,6 +234,10 @@ namespace mstube.Controllers
                 blob.AppendFromStream(ms);
             }
 
+            //Update User Profile
+            long milliseconds = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+            UserProfile.Update.updateUserProfile(pre, milliseconds);
+       
             return Json(pre);
         }
     }
