@@ -1,0 +1,73 @@
+﻿<Page
+    x:Class="MStube.VideoPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:MStube"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid x:Name="VideoDetail">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="18*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="64"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="3*"/>
+                </Grid.RowDefinitions>
+                <TextBlock x:Name="textTitle" 
+                           Grid.Row="0"
+                           Grid.Column="1" 
+                           Height="Auto" 
+                           Margin="10,10,0,0" 
+                           TextWrapping="Wrap"
+                           Text="{Binding VideoDetail.VideoTitle}" 
+                           VerticalAlignment="Center"
+                           FontSize="21.333" 
+                           Width="Auto"
+                           HorizontalAlignment="Center"/>
+                <!--<WebView x:Name="videoView" Grid.Row="1" Grid.Column="1" Width="Auto"/>-->
+                <MediaElement x:Name="mediaElement" 
+                              Grid.Row="1" 
+                              Grid.Column="1"
+                              AutoPlay="False"
+                              AreTransportControlsEnabled="True">
+                    <!--<MediaElement.TransportControls>
+                        <local:CustomMediaTransportControls x:Name="customMTC" 
+                                                    IsFastForwardButtonVisible="True"
+                                                    IsFastForwardEnabled="True"
+                                                    IsFastRewindButtonVisible="True"
+                                                    IsFastRewindEnabled="True"
+                                                    IsPlaybackRateButtonVisible="True"
+                                                    IsPlaybackRateEnabled="True"
+                                                    IsCompact="False">
+                        </local:CustomMediaTransportControls>
+                    </MediaElement.TransportControls>-->
+                </MediaElement>
+                    <TextBlock x:Name="textDescription" 
+                           Grid.Row="2" 
+                           Grid.Column="1" 
+                           TextWrapping="Wrap" 
+                           Padding="10,10,10,10"
+                           Text="{Binding VideoDetail.VideoDescription}" 
+                           HorizontalAlignment="Left" 
+                           VerticalAlignment="Top"/>
+                <Button x:Name="backButton" 
+                        Grid.Row="2" 
+                        Grid.Column="1" 
+                        Content="Back"
+                        HorizontalAlignment="Right"
+                        Height="64" 
+                        Width="64" 
+                        Margin="0,0,10,10" 
+                        VerticalAlignment="Bottom" 
+                        Click="backButton_Click"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>
