@@ -44,10 +44,11 @@ class VideoSpider(scrapy.Spider):
         pattern_views = re.compile(r'<span class="count">(\d*)</span>')
         pattern_upload_date = re.compile(r'"uploadDate":"([\d-]*)T')
         pattern_avg_rating = re.compile(r'<p class="avg-rating">.*?([\d.]+)</p>')
-        # Todo: topic
+        pattern_full_description = re.compile(r'<div id="entry-body">\s*(.*)\s*</div>')
         try:
             topic = response.xpath('//div[@class="area-header item-header"]/h1/text()').extract()[0].strip()
-        except Exception:
+        except Exception as err:
+            self.log('Topic extract error with ' + str(response))
             return
         for entry in data:
             try:
@@ -63,7 +64,7 @@ class VideoSpider(scrapy.Spider):
                     video_description = re.sub(r'\n', '', video_description)
                     video_description = re.sub(r'\t', '', video_description)
                 except Exception as err:
-                    print(err)
+                    self.log('Video description error with ' + str(response))
                 # Get video image source and video url
                 image_src = entry.xpath('div[@class="entry-image"]/a/img/@src').extract()[0]
                 url = entry.xpath('div[@class="entry-image"]/a/@href').extract()[0]
@@ -75,22 +76,23 @@ class VideoSpider(scrapy.Spider):
                     subpage_content = subpage.content.decode('utf-8')
                 except Exception as err:
                     # Jump to next item
+                    self.log('Subpage request error with ' + url)
                     continue
                 video_src = pattern_video_src.findall(subpage_content)[0]
                 tags = pattern_tags.findall(subpage_content)
                 views = int(pattern_views.findall(subpage_content)[0])
                 upload_date = pattern_upload_date.findall(subpage_content)[0]
                 avg_rating = float(pattern_avg_rating.findall(subpage_content)[0])
+                full_description = pattern_full_description.findall(subpage_content)[0]
                 category = 'video'
-                full_description = ''
                 """Generate an item"""
                 item = VideoItem()
                 item['title'] = title
                 item['topic'] = topic
                 item['url'] = url
-                item['video_src'] = video_src
                 item['description'] = video_description
                 item['image_src'] = image_src
+                item['video_src'] = video_src
                 item['tags'] = tags
                 item['views'] = views
                 item['category'] = category
@@ -101,11 +103,11 @@ class VideoSpider(scrapy.Spider):
                 item['item_id'] = self.counter
                 yield item
             except Exception as err:
-                print(err)
+                self.log('item error: ' + str(err))
         try:
             next_page_url = self.main_url + \
                 response.xpath('//ul[@class="paging"]/li[@class="next"]/a/@href').extract()[0]
             self.log("Crawling next page: %s" % next_page_url)
-            yield scrapy.Request(next_page_url, callback=self.parse)
+            yield scrapy.Request(next_page_url, callback=self.parse_video)
         except Exception:
-            self.log("Crawling done.")
+            self.log("Crawl done with topic: " + topic)
