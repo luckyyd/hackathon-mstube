@@ -92,6 +92,7 @@ namespace mstube.Controllers
                     Random ran = new Random();
                     int RandKey = ran.Next(1, 190);
                     val.Add(RandKey.ToString());
+                    val = val.Distinct().ToList(); 
                 }
             }
 
