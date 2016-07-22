@@ -29,7 +29,8 @@ class VideoSpider(scrapy.Spider):
             self.log('Found show url: %s' % url)
             yield scrapy.Request(url, callback=self.parse_video)
         try:
-            next_page_url = main_url + response.xpath('//ul[@class="paging"]/li[@class="next"]/a/@href').extract()[0]
+            next_page_url = self.main_url + \
+                response.xpath('//ul[@class="paging"]/li[@class="next"]/a/@href').extract()[0]
             self.log("Crawling next shows page: %s" % next_page_url)
             yield scrapy.Request(next_page_url, callback=self.parse)
         except Exception:
@@ -43,7 +44,11 @@ class VideoSpider(scrapy.Spider):
         pattern_views = re.compile(r'<span class="count">(\d*)</span>')
         pattern_upload_date = re.compile(r'"uploadDate":"([\d-]*)T')
         pattern_avg_rating = re.compile(r'<p class="avg-rating">.*?([\d.]+)</p>')
-        topic = response.xpath('//div[@class="area-header item-header"]/h1/text()').extract()[0].strip()
+        # Todo: topic
+        try:
+            topic = response.xpath('//div[@class="area-header item-header"]/h1/text()').extract()[0].strip()
+        except Exception:
+            return
         for entry in data:
             try:
                 # Get video title
@@ -76,6 +81,7 @@ class VideoSpider(scrapy.Spider):
                 views = int(pattern_views.findall(subpage_content)[0])
                 upload_date = pattern_upload_date.findall(subpage_content)[0]
                 avg_rating = float(pattern_avg_rating.findall(subpage_content)[0])
+                category = 'video'
                 full_description = ''
                 """Generate an item"""
                 item = VideoItem()
@@ -87,6 +93,7 @@ class VideoSpider(scrapy.Spider):
                 item['image_src'] = image_src
                 item['tags'] = tags
                 item['views'] = views
+                item['category'] = category
                 item['upload_date'] = upload_date
                 item['avg_rating'] = avg_rating
                 item['full_description'] = full_description
@@ -95,9 +102,10 @@ class VideoSpider(scrapy.Spider):
                 yield item
             except Exception as err:
                 print(err)
-        # try:
-        #     next_page_url = main_url + response.xpath('//ul[@class="paging"]/li[@class="next"]/a/@href').extract()[0]
-        #     self.log("Crawling next page: %s" % next_page_url)
-        #     yield scrapy.Request(next_page_url, callback=self.parse)
-        # except Exception:
-        #     self.log("Crawling done.")
+        try:
+            next_page_url = self.main_url + \
+                response.xpath('//ul[@class="paging"]/li[@class="next"]/a/@href').extract()[0]
+            self.log("Crawling next page: %s" % next_page_url)
+            yield scrapy.Request(next_page_url, callback=self.parse)
+        except Exception:
+            self.log("Crawling done.")

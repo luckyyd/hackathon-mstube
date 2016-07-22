@@ -18,6 +18,7 @@ class VideoItem(scrapy.Item):
     image_src = scrapy.Field()
     url = scrapy.Field()
     views = scrapy.Field()
+    category = scrapy.Field()
     upload_date = scrapy.Field()
     avg_rating = scrapy.Field()
     description = scrapy.Field()
