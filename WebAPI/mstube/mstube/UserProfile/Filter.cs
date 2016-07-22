@@ -48,8 +48,8 @@ namespace mstube.UserProfile
                                     category = reader["category"].ToString(),
                                     posted_time = reader["posted_time"].ToString(),
                                     video_time = reader["video_time"].ToString(),
-                                    views = reader["views"].ToString(),
-                                    quality = reader["quality"].ToString(),
+                                    //views = reader["views"].ToString(),
+                                    //quality = reader["quality"].ToString(),
                                 });
                             }
                         }

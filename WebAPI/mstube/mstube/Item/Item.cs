@@ -21,8 +21,8 @@ namespace mstube.Item
         public string category { get; set; }
         public string posted_time { get; set; }
         public string video_time { get; set; }
-        public string views { get; set; }
-        public string quality { get; set; }
+        public int views { get; set; }
+        public double quality { get; set; }
         public List<string> tags { get; set; }
         public double score { get; set; }
     }
