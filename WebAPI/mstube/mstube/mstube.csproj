@@ -232,6 +232,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Interest\Interest.cs" />
     <Compile Include="Item\Item.cs" />
     <Compile Include="Item\Topic.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -240,6 +241,8 @@
     <Compile Include="Preference\Preference.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="UserProfile\Filter.cs" />
+    <Compile Include="UserProfile\Update.cs" />
     <Compile Include="Utils\AzureML.cs" />
     <Compile Include="Utils\RetrainModel.cs" />
   </ItemGroup>
