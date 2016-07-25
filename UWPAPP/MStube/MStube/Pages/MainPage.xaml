@@ -8,21 +8,22 @@
     mc:Ignorable="d">
 
     <Grid x:Name="OuterContainer" Padding="12,12,12,12" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <ListView x:Name="VideoBriefList" 
-                  HorizontalAlignment="Left"
-                  Margin="10,30,10,10"
-                  VerticalAlignment="Top" 
-                  IsItemClickEnabled="True" ItemClick="ItemClicked"
-                  >
+        <ListView
+            x:Name="VideoBriefList"
+            HorizontalAlignment="Left"
+            Margin="10,30,10,10"
+            VerticalAlignment="Top"
+            IsItemClickEnabled="True" 
+            ItemClick="ItemClicked">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <Grid>
+                    <Grid
+                        MaxHeight="150">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="120" />
                             <ColumnDefinition Width="16" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
@@ -42,16 +43,8 @@
                             x:Name="titleText"
                             Grid.Row="0"
                             Grid.Column="2"
-                            Text="{Binding Title}"
-                            />
-                        <TextBlock 
-                            Grid.Row="1"
-                            Grid.Column="2"
-                            HorizontalAlignment="Left"
-                            VerticalAlignment="Top" 
-                            Style="{StaticResource CaptionTextBlockStyle}"
-                            MaxLines="1" 
-                            Text="Test textblock"/>
+                            Style="{StaticResource TitleTextBlockStyle}"
+                            Text="{Binding Title}"/>
                         <TextBlock 
                             Grid.Row="2"
                             Grid.Column="2"

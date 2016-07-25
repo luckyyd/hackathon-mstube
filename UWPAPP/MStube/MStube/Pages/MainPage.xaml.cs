@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.Web.Http;
-using Windows.Web.Http.Filters;
+using Windows.Web.Http.Headers;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -21,7 +21,7 @@ namespace MStube
     public sealed partial class MainPage : Page
     {
         private List<VideoViewModel> listOfVideoBrief = new List<VideoViewModel>();
-
+        private int user_id = 0;
         public MainPage()
         {
             this.InitializeComponent();
@@ -30,8 +30,8 @@ namespace MStube
 
         public void InitializeValues()
         {
-            int user_id = Task.Run(() => GetUserId()).Result;
-            List<VideoDetailItem> items = Task.Run(() => GetVideoJson(user_id)).Result;
+            this.user_id = Task.Run(() => GetUserId()).Result;
+            List<VideoDetailItem> items = Task.Run(() => GetVideoJson()).Result;
             foreach (VideoDetailItem item in items)
             {
                 listOfVideoBrief.Add(new VideoViewModel
@@ -67,7 +67,7 @@ namespace MStube
             }
             return user_id;
         }
-        private async Task<List<VideoDetailItem>> GetVideoJson(int user_id)
+        private async Task<List<VideoDetailItem>> GetVideoJson()
         {
             List<VideoDetailItem> items = new List<VideoDetailItem>();
             HttpClient httpClient = new HttpClient();
@@ -92,7 +92,40 @@ namespace MStube
 
         private void ItemClicked(object sender, ItemClickEventArgs e)
         {
+            VideoViewModel clickedItem = e.ClickedItem as VideoViewModel;
+            Debug.WriteLine(clickedItem.Id);
+            Task.Run(()=>SendPreference(clickedItem.Id));
             this.Frame.Navigate(typeof(VideoPage), e.ClickedItem);
+        }
+        private async void SendPreference(int item_id)
+        {
+            Int32 unixTimestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+            Perference perference = new Perference {
+                user_id = this.user_id,
+                item_id = item_id,
+                score = 4,
+                timestamp = unixTimestamp};
+            var uri = new Uri("http://mstubedotnet.azurewebsites.net/api/Preference");
+            string uploadPerference = JsonConvert.SerializeObject(perference);
+            Debug.WriteLine(uploadPerference);
+            HttpClient httpClient = new HttpClient();
+            try
+            {
+                HttpRequestMessage mSent = new HttpRequestMessage(HttpMethod.Post, uri);
+                mSent.Content = new HttpStringContent(String.Format("{0}", uploadPerference),
+                    Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json");
+                HttpResponseMessage mReceived = await httpClient.SendRequestAsync(mSent,
+                                                   HttpCompletionOption.ResponseContentRead);
+                Debug.WriteLine(mReceived);
+            }
+            catch (Exception error)
+            {
+                Debug.WriteLine(error);
+            }
+            finally
+            {
+                httpClient.Dispose();
+            }
         }
     }
 }

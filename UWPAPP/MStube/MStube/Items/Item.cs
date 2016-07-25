@@ -31,4 +31,11 @@ namespace MStube.Items
         public float avg_rating { get; set;}
         public int views { get; set; }
     }
+    public class Perference
+    {
+        public long user_id { get; set; }
+        public long item_id { get; set; }
+        public int score { get; set; }
+        public long timestamp { get; set; }
+    }
 }
