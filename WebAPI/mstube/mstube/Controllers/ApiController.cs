@@ -257,7 +257,7 @@ namespace mstube.Controllers
         [HttpGet]
         public JsonResult UpdateDB()
         {
-            StreamReader sr = new StreamReader(Server.MapPath(@"~/App_Data/items2.json"));
+            StreamReader sr = new StreamReader(Server.MapPath(@"~/App_Data/items_full.json"));
             List<Item.Item> jsonItem = JsonConvert.DeserializeObject<List<Item.Item>>(sr.ReadToEnd());
 
             foreach (var item in jsonItem)
