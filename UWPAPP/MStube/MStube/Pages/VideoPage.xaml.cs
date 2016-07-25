@@ -13,9 +13,6 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using MStube.Items;
 using MStube.ViewModels;
 using System.Threading.Tasks;
 using System.Diagnostics;
@@ -29,32 +26,13 @@ namespace MStube
     /// </summary>
     public sealed partial class VideoPage : Page
     {
-        private static VideoDetailItem LoadVideoDetail()
-        {
-            string path = @"json/videos.json";
-            string text = "";
-            text = File.ReadAllText(path);
-            List<VideoDetailItem> items = JsonConvert.DeserializeObject<List<VideoDetailItem>>(text);
-            // Here choose an example item.
-            VideoDetailItem item = items[0];
-            return item;
-        }
+        public VideoViewModel VideoDetail { get; set; }
+
         public VideoPage()
         {
             this.InitializeComponent();
-            this.InitializeValues();
         }
-        public void InitializeValues()
-        {
-            var t = Task.Run(() => LoadVideoDetail());
-            t.Wait();
-            // TODO: Use ViewModel to bind variables.
-            VideoDetailItem item = t.Result;
-            textTitle.Text = item.title;
-            textDescription.Text = item.video_description;
-            Debug.WriteLine("source: " + item.video_src);
-            mediaElement.Source = new Uri(item.video_src);
-        }
+
         private void backButton_Click(object sender, RoutedEventArgs e)
         {
             Frame.Navigate(typeof(MainPage));
@@ -62,8 +40,9 @@ namespace MStube
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            var id = e.Parameter;
-            Debug.WriteLine("Navigating to the detail page with video id: " + id);
+            var video = e.Parameter as VideoViewModel;
+            Debug.WriteLine(video.Title);
+            VideoDetail = video;
         }
     }
 }

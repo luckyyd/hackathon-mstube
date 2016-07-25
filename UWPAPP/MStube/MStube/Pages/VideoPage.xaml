@@ -8,7 +8,7 @@
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <Grid x:Name="VideoDetail">
+        <Grid>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*"/>
@@ -26,7 +26,7 @@
                            Height="Auto" 
                            Margin="10,10,0,0" 
                            TextWrapping="Wrap"
-                           Text="{Binding VideoDetail.VideoTitle}" 
+                           Text="{x:Bind VideoDetail.Title}" 
                            VerticalAlignment="Center"
                            FontSize="21.333" 
                            Width="Auto"
@@ -36,6 +36,7 @@
                               Grid.Row="1" 
                               Grid.Column="1"
                               AutoPlay="False"
+                              Source="{x:Bind VideoDetail.VideoSourceUri}"
                               AreTransportControlsEnabled="True">
                     <!--<MediaElement.TransportControls>
                         <local:CustomMediaTransportControls x:Name="customMTC" 
@@ -54,7 +55,7 @@
                            Grid.Column="1" 
                            TextWrapping="Wrap" 
                            Padding="10,10,10,10"
-                           Text="{Binding VideoDetail.VideoDescription}" 
+                           Text="{x:Bind VideoDetail.Description}" 
                            HorizontalAlignment="Left" 
                            VerticalAlignment="Top"/>
                 <Button x:Name="backButton" 
@@ -65,7 +66,8 @@
                         Height="64" 
                         Width="64" 
                         Margin="0,0,10,10" 
-                        VerticalAlignment="Bottom" 
+                        VerticalAlignment="Bottom"
+                        Style="{StaticResource NavigationBackButtonNormalStyle}"
                         Click="backButton_Click"/>
             </Grid>
         </Grid>
