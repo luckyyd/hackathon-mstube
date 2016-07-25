@@ -30,7 +30,8 @@ namespace MStube
 
         public void InitializeValues()
         {
-            int user_id = Task.Run(() => GetUserId()).Result;
+            Utils.DeviceInfo device = Utils.DeviceInfo.Instance;
+            int user_id = Task.Run(() => GetUserId(device)).Result;
             List<VideoDetailItem> items = Task.Run(() => GetVideoJson(user_id)).Result;
             foreach (VideoDetailItem item in items)
             {
@@ -47,10 +48,10 @@ namespace MStube
             VideoBriefList.ItemsSource = listOfVideoBrief;
         }
 
-        private async Task<int> GetUserId()
+        private async Task<int> GetUserId(Utils.DeviceInfo device)
         {
             HttpClient httpClient = new HttpClient();
-            var uuid = "testuuid";
+            var uuid = device.Id;
             var uri = new Uri("http://mstubedotnet.azurewebsites.net/api/userid?uuid=" + uuid);
             int user_id = 0;
             try
