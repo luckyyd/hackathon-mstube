@@ -38,22 +38,16 @@ class VideoSpider(scrapy.Spider):
 
     def parse_video(self, response):
         data = response.xpath('//ul[@class="entries"]//li')
-        unichange = re.compile('\u00a0')
-        pattern_video_src = re.compile(r'<a class="video".*?href="(.*\.mp4)"')
-        pattern_tags = re.compile(r'<a href="/Tags.*?">(.*)</a>')
-        pattern_views = re.compile(r'<span class="count">(\d*)</span>')
-        pattern_upload_date = re.compile(r'"uploadDate":"([\d-]*)T')
-        pattern_avg_rating = re.compile(r'<p class="avg-rating">.*?([\d.]+)</p>')
-        # Todo: topic
         try:
             topic = response.xpath('//div[@class="area-header item-header"]/h1/text()').extract()[0].strip()
-        except Exception:
+        except Exception as err:
+            self.log('Topic extract error with ' + str(response))
             return
         for entry in data:
             try:
                 # Get video title
                 title = entry.xpath('div[@class="entry-meta"]/a/text()').extract()[0].strip()
-                title = unichange.sub(' ', title)
+                title = re.sub('\u00a0', ' ', title)
                 # Get video brief description
                 try:
                     video_description = entry.xpath('//div[@class="description"]/text()').extract()[0]
@@ -63,49 +57,66 @@ class VideoSpider(scrapy.Spider):
                     video_description = re.sub(r'\n', '', video_description)
                     video_description = re.sub(r'\t', '', video_description)
                 except Exception as err:
-                    print(err)
+                    self.log('Video description error with ' + str(response))
                 # Get video image source and video url
                 image_src = entry.xpath('div[@class="entry-image"]/a/img/@src').extract()[0]
                 url = entry.xpath('div[@class="entry-image"]/a/@href').extract()[0]
                 url = self.main_url + url
 
-                """Turn to video detail page"""
-                try:
-                    subpage = requests.get(url, timeout=5.0)
-                    subpage_content = subpage.content.decode('utf-8')
-                except Exception as err:
-                    # Jump to next item
-                    continue
-                video_src = pattern_video_src.findall(subpage_content)[0]
-                tags = pattern_tags.findall(subpage_content)
-                views = int(pattern_views.findall(subpage_content)[0])
-                upload_date = pattern_upload_date.findall(subpage_content)[0]
-                avg_rating = float(pattern_avg_rating.findall(subpage_content)[0])
-                category = 'video'
-                full_description = ''
-                """Generate an item"""
-                item = VideoItem()
-                item['title'] = title
-                item['topic'] = topic
-                item['url'] = url
-                item['video_src'] = video_src
-                item['description'] = video_description
-                item['image_src'] = image_src
-                item['tags'] = tags
-                item['views'] = views
-                item['category'] = category
-                item['upload_date'] = upload_date
-                item['avg_rating'] = avg_rating
-                item['full_description'] = full_description
-                self.counter += 1
-                item['item_id'] = self.counter
-                yield item
+                req = scrapy.Request(url, callback=self.parse_video_detail)
+                req.meta['topic'] = topic
+                req.meta['title'] = title
+                req.meta['description'] = video_description
+                req.meta['image_src'] = image_src
+                req.meta['url'] = url
+                yield req
             except Exception as err:
-                print(err)
+                self.log('item error: ' + str(err))
         try:
             next_page_url = self.main_url + \
                 response.xpath('//ul[@class="paging"]/li[@class="next"]/a/@href').extract()[0]
             self.log("Crawling next page: %s" % next_page_url)
-            yield scrapy.Request(next_page_url, callback=self.parse)
+            yield scrapy.Request(next_page_url, callback=self.parse_video)
         except Exception:
-            self.log("Crawling done.")
+            self.log("Crawl done with topic: " + topic)
+
+    def parse_video_detail(self, response):
+        pattern_video_src = re.compile(r'<a class="video".*?href="(.*\.mp4)"')
+        pattern_tags = re.compile(r'<a href="/Tags.*?">(.*)</a>')
+        # TODO:
+        pattern_views = re.compile(r'<span class="count">(\d*)</span>')
+        pattern_upload_date = re.compile(r'"uploadDate":"([\d-]*)T')
+        pattern_avg_rating = re.compile(r'<p class="avg-rating">.*?([\d.]+)</p>')
+        pattern_full_description = re.compile(r'<div id="entry-body">\s*(.*)\s*</div>')
+        try:
+            tags = response.xpath('//div[@id="entry-tags"]/ul/li/a/text()').extract()
+        except Exception:
+            tags = []
+        video_src = response.xpath('//a[@class="video"]/@href').extract()[0]
+        str_views = response.xpath('//span[@class="count"]/text()').extract()[0]
+        views = int(''.join(str_views.split(',')))
+        try:
+            upload_date = response.xpath('//script[@type="application/ld+json"]').re('"uploadDate":"(.*?)T')[0]
+        except Exception:
+            self.log('This video is too early.')
+            return
+        avg_rating = float(response.xpath('//p[@class="avg-rating"]').re('([\d.]+)')[0])
+        full_description = response.xpath('//div[@id="entry-body"]').extract()[0]
+        category = 'video'
+        """Generate an item"""
+        item = VideoItem()
+        item['title'] = response.meta['title']
+        item['topic'] = response.meta['topic']
+        item['url'] = response.meta['url']
+        item['description'] = response.meta['description']
+        item['image_src'] = response.meta['image_src']
+        item['video_src'] = video_src
+        item['tags'] = tags
+        item['views'] = views
+        item['category'] = category
+        item['upload_date'] = upload_date
+        item['avg_rating'] = avg_rating
+        item['full_description'] = full_description
+        self.counter += 1
+        item['item_id'] = self.counter
+        yield item

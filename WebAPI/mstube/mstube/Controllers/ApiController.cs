@@ -25,7 +25,8 @@ namespace mstube.Controllers
         }
 
         [HttpGet]
-        public JsonResult UserId(string uuid) {
+        public JsonResult UserId(string uuid)
+        {
             //Get user_id for uuid
             ConnectionMultiplexer connection = ConnectionMultiplexer.Connect("mstube-dotnet-id.redis.cache.windows.net,abortConnect=false,ssl=true,password=Tp/f4EEuKJWK1z7HJOvyrvZrg5IA9y4/W9BELvUPWZg=");
             IDatabase cacheid = connection.GetDatabase();
@@ -46,11 +47,13 @@ namespace mstube.Controllers
                     cacheid.StringSet("RedisSize", user_id.ToString());
                     return Json(user_id, JsonRequestBehavior.AllowGet);
                 }
-                else {
+                else
+                {
                     return Json(Convert.ToInt64(id), JsonRequestBehavior.AllowGet);
                 }
             }
-            else {
+            else
+            {
                 return Json("Invalid", JsonRequestBehavior.AllowGet);
             }
         }
@@ -81,19 +84,23 @@ namespace mstube.Controllers
             val.RemoveAt(0);
 
             //Append val up to 10 items
-            if (val.Count < 10) {
+            if (val.Count < 10)
+            {
                 var max = val.Select(v => int.Parse(v)).Max();
-                while (val.Count < 10) {
+                while (val.Count < 10)
+                {
                     Random ran = new Random();
-                    int RandKey = ran.Next(1, max);
+                    int RandKey = ran.Next(1, 190);
                     val.Add(RandKey.ToString());
-                }   
+                    val = val.Distinct().ToList(); 
+                }
             }
 
             //Return items from db
             SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["MstubeConnection"].ToString());
 
-            foreach (var item_id in val) {
+            foreach (var item_id in val)
+            {
                 using (SqlCommand command = new SqlCommand())
                 {
                     command.Connection = connection;
@@ -135,7 +142,8 @@ namespace mstube.Controllers
         }
 
         [HttpGet]
-        public JsonResult ListTopic() {
+        public JsonResult ListTopic()
+        {
             List<Item.Topic> jsonResult = new List<Item.Topic>();
             //Return list topic from db
             SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["MstubeConnection"].ToString());
@@ -172,7 +180,8 @@ namespace mstube.Controllers
         }
 
         [HttpGet]
-        public JsonResult SearchTopic(string topic) {
+        public JsonResult SearchTopic(string topic)
+        {
             List<Item.Item> jsonResult = new List<Item.Item>();
             //Return search topic from db
             SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["MstubeConnection"].ToString());
@@ -185,9 +194,12 @@ namespace mstube.Controllers
                 try
                 {
                     connection.Open();
-                    using (var reader = command.ExecuteReader()) {
-                        while (reader.Read()) {
-                            jsonResult.Add(new Item.Item {
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            jsonResult.Add(new Item.Item
+                            {
                                 item_id = Convert.ToInt64(reader["item_id"]),
                                 image_src = reader["image_src"].ToString(),
                                 video_src = reader["video_src"].ToString(),
@@ -220,7 +232,7 @@ namespace mstube.Controllers
             const string StorageAccountKey = "nG0MPtLcKCMPj15uKalobeFWvfLNljGen/K21qcbLdxrPtdW/UWViA4xuqEJPvb9O+FoAd7BIXgFxLSluWAM5g==";
             const string storageContainerName = "mstube-container";
             const string inputBlobName = "TrainingInputdatablob.csv";
-            
+
             string storageConnectionString = string.Format("DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1}", StorageAccountName, StorageAccountKey);
             var blobClient = CloudStorageAccount.Parse(storageConnectionString).CreateCloudBlobClient();
             var container = blobClient.GetContainerReference(storageContainerName);
@@ -237,8 +249,58 @@ namespace mstube.Controllers
             //Update User Profile
             long milliseconds = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
             UserProfile.Update.updateUserProfile(pre, milliseconds);
-       
+
             return Json(pre);
+        }
+
+        //FOR DEBUG ONLY!
+        [HttpGet]
+        public JsonResult UpdateDB()
+        {
+            StreamReader sr = new StreamReader(Server.MapPath(@"~/App_Data/items2.json"));
+            List<Item.Item> jsonItem = JsonConvert.DeserializeObject<List<Item.Item>>(sr.ReadToEnd());
+
+            foreach (var item in jsonItem)
+            {
+                SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["MstubeConnection"].ToString());
+                using (SqlCommand command = new SqlCommand())
+                {
+                    command.Connection = connection;
+                    command.CommandType = CommandType.Text;
+                    command.CommandText = "INSERT INTO Item (item_id, image_src, video_src, title, url, description, topic, category, full_description, posted_time, views, quality)"
+                                            + "VALUES (@item_id, @image_src, @video_src, @title, @url, @description, @topic, @category, @full_description, @posted_time, @views, @quality)";
+                    command.Parameters.AddWithValue("@item_id", item.item_id);
+                    command.Parameters.AddWithValue("@image_src", item.image_src);
+                    command.Parameters.AddWithValue("@video_src", item.video_src);
+                    command.Parameters.AddWithValue("@title", item.title);
+                    command.Parameters.AddWithValue("@url", item.url);
+                    command.Parameters.AddWithValue("@description", item.description);
+                    command.Parameters.AddWithValue("@topic", item.topic);
+                    command.Parameters.AddWithValue("@category", item.category);
+                    command.Parameters.AddWithValue("@full_description", item.full_description);
+                    command.Parameters.AddWithValue("@posted_time", item.posted_time);
+                    //command.Parameters.AddWithValue("@video_time", item.video_time);
+                    command.Parameters.AddWithValue("@views", item.views);
+                    command.Parameters.AddWithValue("@quality", item.quality);
+                    try
+                    {
+                        connection.Open();
+                        int recordsAffected = command.ExecuteNonQuery();
+
+                    }
+                    catch (SqlException e)
+                    {
+                        System.Diagnostics.Debug.WriteLine(e.Message);
+                        break;
+                    }
+                    finally
+                    {
+                        connection.Close();
+                    }
+                }
+                System.Diagnostics.Debug.WriteLine("Insert Succeed!");
+            }
+            return Json(jsonItem, JsonRequestBehavior.AllowGet);
         }
     }
 }
