@@ -8,19 +8,36 @@
     mc:Ignorable="d">
 
     <Grid x:Name="OuterContainer" Padding="12,12,12,12" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <ListView x:Name="VideoBriefList" HorizontalAlignment="Left" Margin="10,30,10,10" VerticalAlignment="Top">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <TextBlock 
+            Grid.Row="0"
+            Text="MStube"
+            HorizontalAlignment="Center" FontSize="21.333"
+            >
+        </TextBlock>
+        <ListView 
+            x:Name="VideoBriefList"
+            Grid.Row="1"
+            HorizontalAlignment="Left"
+            Margin="10,30,10,10"
+            VerticalAlignment="Top"
+            IsItemClickEnabled="True" 
+            ItemClick="ItemClicked">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <Grid>
+                    <Grid
+                        MaxHeight="150">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="120" />
                             <ColumnDefinition Width="16" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <Image 
@@ -33,22 +50,12 @@
                             VerticalAlignment="Center" 
                             Source="{Binding ImageSourceUri}" 
                             Stretch="UniformToFill"/>
-                        <HyperlinkButton
-                            x:Name="hyperlinkButton" 
+                        <TextBlock 
+                            x:Name="titleText"
                             Grid.Row="0"
                             Grid.Column="2"
-                            HorizontalAlignment="Left"
-                            Content="{Binding VideoTitle}"
-                            Click="hyperlinkButton_Click"
-                            Tag="{Binding Id}"/>
-                        <TextBlock 
-                            Grid.Row="1"
-                            Grid.Column="2"
-                            HorizontalAlignment="Left"
-                            VerticalAlignment="Top" 
-                            Style="{StaticResource CaptionTextBlockStyle}"
-                            MaxLines="1" 
-                            Text="Test textblock"/>
+                            Style="{StaticResource TitleTextBlockStyle}"
+                            Text="{Binding Title}"/>
                         <TextBlock 
                             Grid.Row="2"
                             Grid.Column="2"
