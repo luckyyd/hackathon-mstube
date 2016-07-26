@@ -123,7 +123,12 @@ namespace mstube.Controllers
                                     url = reader["url"].ToString(),
                                     description = reader["description"].ToString(),
                                     topic = reader["topic"].ToString(),
-                                });
+                                    category = reader["topic"].ToString(),
+                                    full_description = reader["full_description"].ToString(),
+                                    posted_time = reader["posted_time"].ToString(),
+                                    views = Convert.ToInt32(reader["views"]),
+                                    quality = Convert.ToDouble(reader["quality"])
+                            });
                             }
                         }
 
@@ -207,6 +212,11 @@ namespace mstube.Controllers
                                 url = reader["url"].ToString(),
                                 description = reader["description"].ToString(),
                                 topic = reader["topic"].ToString(),
+                                category = reader["topic"].ToString(),
+                                full_description = reader["full_description"].ToString(),
+                                posted_time = reader["posted_time"].ToString(),
+                                views = Convert.ToInt32(reader["views"]),
+                                quality = Convert.ToDouble(reader["quality"])
                             });
                         }
                     }
