@@ -94,12 +94,6 @@
     </Content>
     <None Include="project.json" />
     <Content Include="Assets\SplashScreen.scale-100.png" />
-    <Content Include="json\shows.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="json\videos.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.xaml.cs">
