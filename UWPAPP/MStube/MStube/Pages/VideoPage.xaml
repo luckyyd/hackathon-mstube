@@ -31,7 +31,6 @@
                            FontSize="21.333" 
                            Width="Auto"
                            HorizontalAlignment="Center"/>
-                <!--<WebView x:Name="videoView" Grid.Row="1" Grid.Column="1" Width="Auto"/>-->
                 <MediaElement x:Name="mediaElement" 
                               Grid.Row="1" 
                               Grid.Column="1"
@@ -67,7 +66,6 @@
                         Width="64" 
                         Margin="0,0,10,10" 
                         VerticalAlignment="Bottom"
-                        Style="{StaticResource NavigationBackButtonNormalStyle}"
                         Click="backButton_Click"/>
             </Grid>
         </Grid>

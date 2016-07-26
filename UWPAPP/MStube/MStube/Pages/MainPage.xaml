@@ -8,8 +8,19 @@
     mc:Ignorable="d">
 
     <Grid x:Name="OuterContainer" Padding="12,12,12,12" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <ListView
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <TextBlock 
+            Grid.Row="0"
+            Text="MStube"
+            HorizontalAlignment="Center" FontSize="21.333"
+            >
+        </TextBlock>
+        <ListView 
             x:Name="VideoBriefList"
+            Grid.Row="1"
             HorizontalAlignment="Left"
             Margin="10,30,10,10"
             VerticalAlignment="Top"
