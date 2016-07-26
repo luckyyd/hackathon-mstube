@@ -27,8 +27,8 @@ namespace MStube.Items
         public string category { get; set; }
         public string url { get; set; }
         public string full_description { get; set; }
-        public string upload_date { get; set; }
-        public float avg_rating { get; set;}
+        public string posted_time { get; set; }
+        public float quality { get; set;}
         public int views { get; set; }
     }
     public class Perference

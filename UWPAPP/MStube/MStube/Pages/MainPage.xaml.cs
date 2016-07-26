@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 using MStube.Items;
 using MStube.ViewModels;
 using Newtonsoft.Json;
+using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Navigation;
 using Windows.Web.Http;
 using Windows.Web.Http.Headers;
 
@@ -42,7 +44,9 @@ namespace MStube
                     ImageSourceUri = item.image_src,
                     VideoSourceUri = item.video_src,
                     Description = item.description,
-                    FullDescription = item.full_description
+                    FullDescription = item.full_description,
+                    Views = item.views,
+                    UploadDate = item.posted_time
                 });
             }
             VideoBriefList.ItemsSource = listOfVideoBrief;
@@ -96,7 +100,8 @@ namespace MStube
             VideoViewModel clickedItem = e.ClickedItem as VideoViewModel;
             Debug.WriteLine(clickedItem.Id);
             Task.Run(()=>SendPreference(clickedItem.Id));
-            this.Frame.Navigate(typeof(VideoPage), e.ClickedItem);
+            Frame rootFrame = Window.Current.Content as Frame;
+            rootFrame.Navigate(typeof(VideoPage), e.ClickedItem);
         }
         private async void SendPreference(int item_id)
         {
@@ -127,6 +132,12 @@ namespace MStube
             {
                 httpClient.Dispose();
             }
+        }
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+            SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
         }
     }
 }

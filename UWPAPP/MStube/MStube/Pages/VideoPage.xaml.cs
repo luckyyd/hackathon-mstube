@@ -32,16 +32,6 @@ namespace MStube
         public VideoPage()
         {
             this.InitializeComponent();
-            var currentView = SystemNavigationManager.GetForCurrentView();
-            currentView.AppViewBackButtonVisibility = AppViewBackButtonVisibility.Visible;
-            currentView.BackRequested += (s, e) =>
-            {
-                Frame.Navigate(typeof(MainPage));
-            };
-        }
-        private void backButton_Click(object sender, RoutedEventArgs e)
-        {
-            Frame.Navigate(typeof(MainPage));
         }
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
@@ -49,6 +39,16 @@ namespace MStube
             var video = e.Parameter as VideoViewModel;
             Debug.WriteLine(video.Title);
             VideoDetail = video;
+
+            Frame rootFrame = Window.Current.Content as Frame;
+            if (rootFrame.CanGoBack)
+            {
+                SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Visible;
+            }
+            else
+            {
+                SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
+            }
         }
     }
 }
