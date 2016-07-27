@@ -5,6 +5,7 @@
     xmlns:local="using:MStube"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:pr="using:PullToRefresh.UWP"
     mc:Ignorable="d">
 
     <Grid x:Name="OuterContainer" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
@@ -13,73 +14,72 @@
                 <RowDefinition Height="Auto" MaxHeight="20"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center">
-                <Image Source="/Assets/Square44x44Logo.scale-100.png" VerticalAlignment="Center"/>
-                <TextBlock 
-                Margin="15"
-                Text="MStube"
-                FontSize="24"
-                Style="{StaticResource HeaderTextBlockStyle}" 
-                VerticalAlignment="Center">
-                </TextBlock>
-            </StackPanel>
-            <ListView 
-                x:Name="VideoBriefList"
-                Grid.Row="1"
-                HorizontalAlignment="Left"
-                Margin="0,20,0,10"
-                VerticalAlignment="Top"
-                IsItemClickEnabled="True" 
-                ItemClick="ItemClicked">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <Grid Margin="5,5,5,5" MaxHeight="120">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <Image 
-                                Grid.Row="0" 
-                                Grid.Column="0"
-                                Width="100"
-                                Height="100" 
-                                HorizontalAlignment="Left" 
-                                VerticalAlignment="Center" 
-                                Source="{Binding ImageSourceUri}" 
-                                Stretch="UniformToFill"/>
-                            <Grid Grid.Row="0" Grid.Column="1" Margin="10">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="*"/>
-                                </Grid.RowDefinitions>
-                                <TextBlock 
-                                x:Name="titleText"
-                                Grid.Row="0"
-                                MaxLines="2"
-                                Padding="5,5,5,5"
-                                Style="{StaticResource BodyTextBlockStyle}"
-                                Text="{Binding Title}"
-                                FontSize="16"/>
-                                <StackPanel Grid.Row="1" Orientation="Horizontal">
-                                    <TextBlock Text="&#xe600;" FontFamily="/Assets/iconfont.ttf#iconfont" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                    <TextBlock Margin="5" Text="{Binding Views}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-                                </StackPanel>
-                                <StackPanel Grid.Row="2" Orientation="Horizontal">
-                                    <TextBlock Text="&#xe606;" FontFamily="/Assets/iconfont.ttf#iconfont" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                    <TextBlock Margin="5" Text="{Binding UploadDate}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-                                </StackPanel>
-                            </Grid>
-                        </Grid>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-                <ListView.ItemContainerStyle>
-                    <Style TargetType="ListViewItem">
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                    </Style>
-                </ListView.ItemContainerStyle>
-            </ListView>
-            <ProgressRing x:Name="LoadingProgressRing" IsActive="True" Grid.Row="1" Height="80" Width="80"/>
+            <Grid Grid.Row="0">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Image Source="/Assets/Square44x44Logo.scale-100.png" VerticalAlignment="Center"/>
+                    <TextBlock Margin="15" Text="MStube" FontSize="24" VerticalAlignment="Center" Style="{StaticResource HeaderTextBlockStyle}" />
+                </StackPanel>
+            </Grid>
+            <Grid Grid.Row="1">
+                <pr:PullToRefreshBox RefreshInvoked="PullToRefreshBox_RefreshInvoked">
+                    <pr:PullToRefreshBox.TopIndicatorTemplate>
+                        <DataTemplate>
+                            <pr:PullRefreshProgressControl PullToRefreshText="Pull" ReleaseToRefreshText="Release" Progress="{Binding}"/>
+                        </DataTemplate>
+                    </pr:PullToRefreshBox.TopIndicatorTemplate>
+                    <ListView 
+                        x:Name="VideoBriefList"
+                        HorizontalAlignment="Left"
+                        Margin="0,5,0,10"
+                        VerticalAlignment="Top"
+                        IsItemClickEnabled="True" 
+                        ItemClick="ItemClicked">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="5,5,5,5" MaxHeight="120">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Image 
+                                    Grid.Row="0" 
+                                    Grid.Column="0"
+                                    Width="100"
+                                    Height="100" 
+                                    HorizontalAlignment="Left" 
+                                    VerticalAlignment="Center" 
+                                    Source="{Binding ImageSourceUri}" 
+                                    Stretch="UniformToFill"/>
+                                    <Grid Grid.Row="0" Grid.Column="1" Margin="10">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock x:Name="titleText" Grid.Row="0" MaxLines="2"
+                                        Padding="5,5,5,5" Style="{StaticResource BodyTextBlockStyle}"
+                                        Text="{Binding Title}" FontSize="16"/>
+                                        <StackPanel Grid.Row="1" Orientation="Horizontal">
+                                            <TextBlock Text="&#xe600;" FontFamily="/Assets/iconfont.ttf#iconfont" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                            <TextBlock Margin="5" Text="{Binding Views}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Row="2" Orientation="Horizontal">
+                                            <TextBlock Text="&#xe606;" FontFamily="/Assets/iconfont.ttf#iconfont" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                            <TextBlock Margin="5" Text="{Binding UploadDate}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                    </ListView>
+                </pr:PullToRefreshBox>
+                <ProgressRing x:Name="LoadingProgressRing" IsActive="True" Height="80" Width="80"/>
+            </Grid>
         </Grid>
     </Grid>
 </Page>

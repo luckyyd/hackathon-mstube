@@ -144,5 +144,10 @@ namespace MStube
             SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
             InitializeValues();
         }
+
+        private void PullToRefreshBox_RefreshInvoked(DependencyObject sender, object args)
+        {
+            InitializeValues();
+        }
     }
 }
