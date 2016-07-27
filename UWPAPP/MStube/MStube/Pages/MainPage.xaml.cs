@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using MStube.Items;
 using MStube.ViewModels;
 using Newtonsoft.Json;
+using MStube.Utils;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -23,18 +24,20 @@ namespace MStube
     public sealed partial class MainPage : Page
     {
         private List<VideoViewModel> listOfVideoBrief = new List<VideoViewModel>();
+        private DeviceInfo device = DeviceInfo.Instance;
         private int user_id = 0;
         public MainPage()
         {
             this.InitializeComponent();
-            this.InitializeValues();
         }
 
-        public void InitializeValues()
+        public async void InitializeValues()
         {
-            Utils.DeviceInfo device = Utils.DeviceInfo.Instance;
-            this.user_id = Task.Run(() => GetUserId(device)).Result;
-            List<VideoDetailItem> items = Task.Run(() => GetVideoJson()).Result;
+            LoadingProgressRing.IsActive = true;
+            //this.user_id = Task.Run(() => GetUserId(device)).Result;
+            //List<VideoDetailItem> items = Task.Run(() => GetVideoJson()).Result;
+            this.user_id = await GetUserId(this.device);
+            List<VideoDetailItem> items = await GetVideoJson();
             foreach (VideoDetailItem item in items)
             {
                 listOfVideoBrief.Add(new VideoViewModel
@@ -50,6 +53,7 @@ namespace MStube
                 });
             }
             VideoBriefList.ItemsSource = listOfVideoBrief;
+            LoadingProgressRing.IsActive = false;
         }
 
         private async Task<int> GetUserId(Utils.DeviceInfo device)
@@ -138,6 +142,7 @@ namespace MStube
         {
             base.OnNavigatedTo(e);
             SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
+            InitializeValues();
         }
     }
 }
