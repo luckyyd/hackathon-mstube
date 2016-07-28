@@ -76,12 +76,30 @@ namespace mstube.Controllers
             List<Item.Item> jsonResult = new List<Item.Item>();
 
             //Send POST request to Azure ML
-            string result = await Utils.AzureML.SendPOSTRequest(user_id);
+            string result = await Utils.AzureML_CollaborativeFilter.SendPOSTRequest(user_id);
 
             dynamic jsonObj = JsonConvert.DeserializeObject(result);
             JArray values = (JArray)jsonObj.Results.output1.value.Values[0];
             List<string> val = values.ToObject<List<string>>();
             val.RemoveAt(0);
+
+            //Get data from content-based filter in Redis
+            ConnectionMultiplexer connectionRedis = ConnectionMultiplexer.Connect("mstube-dotnet.redis.cache.windows.net,abortConnect=false,ssl=true,password=6/Cq0R6Wh+L6PJeYI80KEMVyYVGUjqZFEnNS6iJHl1A=");
+            IDatabase cacheid = connectionRedis.GetDatabase();
+
+            string last_item_id = cacheid.StringGet(user_id.ToString());
+            System.Diagnostics.Debug.WriteLine(last_item_id);
+            if (last_item_id != null)
+            {
+                //Call ML api
+                string contentbasedResult = await Utils.AzureML_ContentBasedFilter.SendPOSTRequest(user_id, Convert.ToInt64(last_item_id), 3);
+                dynamic jsonContentbasedResultObj = JsonConvert.DeserializeObject(contentbasedResult);
+                JArray valuesContentbasedResult = (JArray)jsonContentbasedResultObj.Results.output1.value.Values[0];
+                List<string> valContentbasedResult = valuesContentbasedResult.ToObject<List<string>>();
+                valContentbasedResult.RemoveAt(0);
+                valContentbasedResult.AddRange(val);
+                val = valContentbasedResult;
+            }
 
             //Append val up to 10 items
             if (val.Count < 10)
@@ -90,7 +108,7 @@ namespace mstube.Controllers
                 while (val.Count < 10)
                 {
                     Random ran = new Random();
-                    int RandKey = ran.Next(1, 190);
+                    int RandKey = ran.Next(1, 5000);
                     val.Add(RandKey.ToString());
                     val = val.Distinct().ToList(); 
                 }
@@ -250,9 +268,11 @@ namespace mstube.Controllers
             var blob = container.GetAppendBlobReference(inputBlobName);
             StringBuilder csvData = new StringBuilder();
             csvData.AppendLine(pre.user_id + "," + pre.item_id + "," + pre.score + "," + pre.timestamp);
+            //csvData.AppendLine("user_id,item_id,ratings,timestamp");
             string dataToUpload = csvData.ToString();
             using (MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(dataToUpload)))
             {
+                //blob.UploadFromStream(ms);
                 blob.AppendFromStream(ms);
             }
 
@@ -260,6 +280,19 @@ namespace mstube.Controllers
             long milliseconds = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
             UserProfile.Update.updateUserProfile(pre, milliseconds);
 
+            //Append data to Redis
+            ConnectionMultiplexer connection = ConnectionMultiplexer.Connect("mstube-dotnet.redis.cache.windows.net,abortConnect=false,ssl=true,password=6/Cq0R6Wh+L6PJeYI80KEMVyYVGUjqZFEnNS6iJHl1A=");
+            IDatabase cacheid = connection.GetDatabase();
+
+            string last_item_id = cacheid.StringGet(pre.user_id.ToString());
+            if (last_item_id == null)
+            {
+                cacheid.StringSet(pre.user_id.ToString(), pre.item_id.ToString());
+            }
+            else {
+                cacheid.StringSet(pre.user_id.ToString(), pre.item_id.ToString());
+            }
+         
             return Json(pre);
         }
 
