@@ -6,15 +6,6 @@ using System.Threading.Tasks;
 
 namespace MStube.Items
 {
-    //public class ShowItem
-    //{
-    //    // Used for json object.
-    //    public int id { get; set; }
-    //    public string url { get; set; }
-    //    public string description { get; set; }
-    //    public string image_src { get; set; }
-    //    public string title { get; set; }
-    //}
     public class VideoDetailItem
     {
         // Used for json object.
@@ -30,12 +21,6 @@ namespace MStube.Items
         public string posted_time { get; set; }
         public float quality { get; set;}
         public int views { get; set; }
-    }
-    public class Perference
-    {
-        public long user_id { get; set; }
-        public long item_id { get; set; }
-        public int score { get; set; }
-        public long timestamp { get; set; }
+        public int brand { get; set; }
     }
 }

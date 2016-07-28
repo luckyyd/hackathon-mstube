@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using MStube.Common;
 using MStube.Items;
 using MStube.ViewModels;
-using Newtonsoft.Json;
 using MStube.Utils;
+using Newtonsoft.Json;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -23,7 +24,7 @@ namespace MStube
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        private List<VideoViewModel> listOfVideoBrief = new List<VideoViewModel>();
+        private VideoList listOfVideoBrief = VideoList.Instance;
         private DeviceInfo device = DeviceInfo.Instance;
         private int user_id = 0;
         public MainPage()
@@ -34,11 +35,10 @@ namespace MStube
         public async void InitializeValues()
         {
             LoadingProgressRing.IsActive = true;
-            //this.user_id = Task.Run(() => GetUserId(device)).Result;
-            //List<VideoDetailItem> items = Task.Run(() => GetVideoJson()).Result;
-            this.user_id = await GetUserId(this.device);
-            List<VideoDetailItem> items = await GetVideoJson();
-            foreach (VideoDetailItem item in items)
+            user_id = await GetUserId(this.device);
+            List<VideoDetailItem> new_items = await GetVideoJson();
+            new_items.Reverse();
+            foreach (VideoDetailItem item in new_items)
             {
                 listOfVideoBrief.Add(new VideoViewModel
                 {
@@ -49,11 +49,12 @@ namespace MStube
                     Description = item.description,
                     FullDescription = item.full_description,
                     Views = item.views,
-                    UploadDate = item.posted_time
+                    UploadDate = item.posted_time,
+                    Brand = item.brand
                 });
             }
-            VideoBriefList.ItemsSource = listOfVideoBrief;
             LoadingProgressRing.IsActive = false;
+            VideoBriefList.ItemsSource = listOfVideoBrief.GetList();
         }
 
         private async Task<int> GetUserId(Utils.DeviceInfo device)
@@ -76,6 +77,7 @@ namespace MStube
             }
             return user_id;
         }
+
         private async Task<List<VideoDetailItem>> GetVideoJson()
         {
             List<VideoDetailItem> items = new List<VideoDetailItem>();
@@ -108,16 +110,19 @@ namespace MStube
             Frame rootFrame = Window.Current.Content as Frame;
             rootFrame.Navigate(typeof(VideoPage), e.ClickedItem);
         }
+
         private async void SendPreference(int item_id)
         {
             Int32 unixTimestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
-            Perference perference = new Perference {
+            Prefrence preference = new Prefrence
+            {
                 user_id = this.user_id,
                 item_id = item_id,
                 score = 4,
-                timestamp = unixTimestamp};
+                timestamp = unixTimestamp
+            };
             var uri = new Uri("http://mstubedotnet.azurewebsites.net/api/Preference");
-            string uploadPerference = JsonConvert.SerializeObject(perference);
+            string uploadPerference = JsonConvert.SerializeObject(preference);
             Debug.WriteLine(uploadPerference);
             HttpClient httpClient = new HttpClient();
             try

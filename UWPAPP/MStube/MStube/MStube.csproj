@@ -101,7 +101,8 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="CustomMediaTransportControls.cs" />
-    <Compile Include="Items\Item.cs" />
+    <Compile Include="Items\VideoDetailItem.cs" />
+    <Compile Include="Items\Prefrence.cs" />
     <Compile Include="Pages\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
@@ -110,6 +111,7 @@
       <DependentUpon>VideoPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Utils\DeviceInfo.cs" />
+    <Compile Include="Common\VideoList.cs" />
     <Compile Include="ViewModels\VideoViewModel.cs" />
   </ItemGroup>
   <ItemGroup>

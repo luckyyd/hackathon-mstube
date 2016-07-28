@@ -17,5 +17,6 @@ namespace MStube.ViewModels
         public string FullDescription { get; set; }
         public int Views { get; set; }
         public string UploadDate { get; set; }
+        public int Brand { get; set; }
     }
 }

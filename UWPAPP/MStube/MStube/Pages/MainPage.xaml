@@ -41,15 +41,8 @@
                                         <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
-                                    <Image 
-                                    Grid.Row="0" 
-                                    Grid.Column="0"
-                                    Width="100"
-                                    Height="100" 
-                                    HorizontalAlignment="Left" 
-                                    VerticalAlignment="Center" 
-                                    Source="{Binding ImageSourceUri}" 
-                                    Stretch="UniformToFill"/>
+                                    <Image Grid.Row="0" Grid.Column="0" Width="100" Height="100" HorizontalAlignment="Left" 
+                                           VerticalAlignment="Center" Source="{Binding ImageSourceUri}" Stretch="UniformToFill"/>
                                     <Grid Grid.Row="0" Grid.Column="1" Margin="10">
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto"/>
