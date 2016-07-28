@@ -80,7 +80,8 @@ namespace MStube
         {
             List<VideoDetailItem> items = new List<VideoDetailItem>();
             HttpClient httpClient = new HttpClient();
-            var uri = new Uri("http://mstubedotnet.azurewebsites.net/api/Candidates?user_id=" + user_id.ToString());
+            // Cache-Control: private, to avoid load cache.
+            var uri = new Uri("http://mstubedotnet.azurewebsites.net/api/Candidates?user_id=" + user_id.ToString() + "&t=" + new Random().Next(1, 1000).ToString());
             try
             {
                 var result = await httpClient.GetStringAsync(uri);
