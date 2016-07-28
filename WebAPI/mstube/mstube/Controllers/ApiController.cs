@@ -84,8 +84,8 @@ namespace mstube.Controllers
             val.RemoveAt(0);
 
             //Get data from content-based filter in Redis
-            ConnectionMultiplexer connectionRedis = ConnectionMultiplexer.Connect("mstube-dotnet.redis.cache.windows.net,abortConnect=false,ssl=true,password=6/Cq0R6Wh+L6PJeYI80KEMVyYVGUjqZFEnNS6iJHl1A=");
-            IDatabase cacheid = connectionRedis.GetDatabase();
+            ConnectionMultiplexer ContentBasedRedis = ConnectionMultiplexer.Connect("mstube-dotnet.redis.cache.windows.net,abortConnect=false,ssl=true,password=6/Cq0R6Wh+L6PJeYI80KEMVyYVGUjqZFEnNS6iJHl1A=");
+            IDatabase cacheid = ContentBasedRedis.GetDatabase();
 
             string last_item_id = cacheid.StringGet(user_id.ToString());
             System.Diagnostics.Debug.WriteLine(last_item_id);
@@ -101,17 +101,33 @@ namespace mstube.Controllers
                 val = valContentbasedResult;
             }
 
-            //Append val up to 10 items
-            if (val.Count < 10)
-            {
+            //Filter data without duplicate
+            ConnectionMultiplexer FilterRedis = ConnectionMultiplexer.Connect("mstube-dotnet-filter.redis.cache.windows.net,abortConnect=false,ssl=true,password=K6Cxw7qz8TEWmvCdApIck+bQKHnc3+t8Z2SYw5xqOd8=");
+            IDatabase cachefilter = FilterRedis.GetDatabase();
+            while (val.Count < 10) {
+                //Append val up to 10 items
                 var max = val.Select(v => int.Parse(v)).Max();
+                if (max < 100) max = 5000;
                 while (val.Count < 10)
                 {
                     Random ran = new Random();
-                    int RandKey = ran.Next(1, 5000);
+                    int RandKey = ran.Next(1, max);
                     val.Add(RandKey.ToString());
-                    val = val.Distinct().ToList(); 
+                    val = val.Distinct().ToList();
                 }
+                //Filterdel
+                for (int i = val.Count - 1; i >= 0; i--) {
+                    string v = val[i];
+                    if (cachefilter.SetContains(user_id.ToString(), v))
+                    {
+                        val.Remove(v);
+                    }
+                }
+            }
+
+            foreach (var v in val)
+            {
+                cachefilter.SetAdd(user_id.ToString(), v);
             }
 
             //Return items from db
@@ -283,15 +299,7 @@ namespace mstube.Controllers
             //Append data to Redis
             ConnectionMultiplexer connection = ConnectionMultiplexer.Connect("mstube-dotnet.redis.cache.windows.net,abortConnect=false,ssl=true,password=6/Cq0R6Wh+L6PJeYI80KEMVyYVGUjqZFEnNS6iJHl1A=");
             IDatabase cacheid = connection.GetDatabase();
-
-            string last_item_id = cacheid.StringGet(pre.user_id.ToString());
-            if (last_item_id == null)
-            {
-                cacheid.StringSet(pre.user_id.ToString(), pre.item_id.ToString());
-            }
-            else {
-                cacheid.StringSet(pre.user_id.ToString(), pre.item_id.ToString());
-            }
+            cacheid.StringSet(pre.user_id.ToString(), pre.item_id.ToString());
          
             return Json(pre);
         }
