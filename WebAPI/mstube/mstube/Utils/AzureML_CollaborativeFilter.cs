@@ -26,11 +26,11 @@ namespace mstube.Utils
 
                     Inputs = new Dictionary<string, StringTable>() {
                         {
-                            "WebServiceInput",
+                            "ScoringInput",
                             new StringTable()
                             {
-                                ColumnNames = new string[] {"user_id"},
-                                Values = new string[,] {  { user_id.ToString() } }
+                                ColumnNames = new string[] {"user_id", "item_id", "ratings"},
+                                Values = new string[,] {  { user_id.ToString(), "0", "0" } }
                             }
                         },
                     },
@@ -38,10 +38,10 @@ namespace mstube.Utils
                     {
                     }
                 };
-                const string apiKey = "k4WtmlOEkQddsV884V3WENiU/WqXpVJ22iESXE+lSpFgueas+PBjKaqC0MOOZ1MSdeoXMZPAKwrSYMqMVSbgtw==";
+                const string apiKey = "wDJrd0QXCPH7bo6r0a+3zKjdSpnvMxw8LZp0wTMvdDVeslUmdDohgbwylT+7oOQLQBx/TDe8K2O8ujGf2fz8sw==";
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
 
-                client.BaseAddress = new Uri("https://ussouthcentral.services.azureml.net/workspaces/64245b84ee7344e0880b61dcaca86826/services/794fae9c794f4c5993af5e275123b56a/execute?api-version=2.0&details=true");
+                client.BaseAddress = new Uri("https://asiasoutheast.services.azureml.net/workspaces/0cd16c9abdb94e249ae6f6fb27b76402/services/cc0f591208854390b93d137a1098d034/execute?api-version=2.0&details=true");
 
                 HttpResponseMessage response = await client.PostAsJsonAsync("", scoreRequest);
 
