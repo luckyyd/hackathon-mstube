@@ -243,7 +243,8 @@
     <Compile Include="Startup.cs" />
     <Compile Include="UserProfile\Filter.cs" />
     <Compile Include="UserProfile\Update.cs" />
-    <Compile Include="Utils\AzureML.cs" />
+    <Compile Include="Utils\AzureML_ContentBasedFilter.cs" />
+    <Compile Include="Utils\AzureML_CollaborativeFilter.cs" />
     <Compile Include="Utils\RetrainModel.cs" />
   </ItemGroup>
   <ItemGroup>
