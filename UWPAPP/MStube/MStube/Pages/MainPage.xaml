@@ -50,8 +50,8 @@
                                             <RowDefinition Height="*"/>
                                         </Grid.RowDefinitions>
                                         <TextBlock x:Name="titleText" Grid.Row="0" MaxLines="2"
-                                        Padding="5,5,5,5" Style="{StaticResource BodyTextBlockStyle}"
-                                        Text="{Binding Title}" FontSize="16"/>
+                                            Padding="5,5,5,5" Style="{StaticResource BodyTextBlockStyle}"
+                                            Text="{Binding Title}" FontSize="16"/>
                                         <StackPanel Grid.Row="1" Orientation="Horizontal">
                                             <TextBlock Text="&#xe600;" FontFamily="/Assets/iconfont.ttf#iconfont" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                             <TextBlock Margin="5" Text="{Binding Views}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
@@ -60,6 +60,7 @@
                                             <TextBlock Text="&#xe606;" FontFamily="/Assets/iconfont.ttf#iconfont" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                             <TextBlock Margin="5" Text="{Binding UploadDate}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
                                         </StackPanel>
+                                        <TextBlock Grid.Row="2" Text="{Binding BrandIcon}" FontFamily="/Assets/iconfont.ttf#iconfont" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,25,0" />
                                     </Grid>
                                 </Grid>
                             </DataTemplate>

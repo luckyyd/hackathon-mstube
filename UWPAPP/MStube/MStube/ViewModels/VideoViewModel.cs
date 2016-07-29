@@ -18,5 +18,21 @@ namespace MStube.ViewModels
         public int Views { get; set; }
         public string UploadDate { get; set; }
         public int Brand { get; set; }
+        public string BrandIcon
+        {
+            get
+            {
+                if (Brand == 1)
+                    // CF recommend
+                    return "\xe60a";
+                if (Brand == 2)
+                    // Content-based recommend
+                    return "\xe609";
+                if (Brand == 3)
+                    // Random recommend
+                    return "\xe60b";
+                return "";
+            }
+        }
     }
 }
