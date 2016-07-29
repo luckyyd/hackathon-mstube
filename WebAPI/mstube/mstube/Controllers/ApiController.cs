@@ -13,6 +13,7 @@ using System.Configuration;
 using System.Data;
 using Microsoft.WindowsAzure.Storage;
 using System.Text;
+using mstube.Utils;
 
 namespace mstube.Controllers
 {
@@ -80,14 +81,33 @@ namespace mstube.Controllers
             List<string> contentBasedCandidates = new List<string>();
             List<string> popularityCandidates = new List<string>();
 
+            //Filter data in cache
+            ConnectionMultiplexer FilterRedis = ConnectionMultiplexer.Connect("mstube-dotnet-filter.redis.cache.windows.net,abortConnect=false,ssl=true,password=K6Cxw7qz8TEWmvCdApIck+bQKHnc3+t8Z2SYw5xqOd8=");
+            IDatabase cachefilter = FilterRedis.GetDatabase();
+
             //Get Data from collaborative filtering
             //Send POST request to Azure ML
             string result = await Utils.AzureML_CollaborativeFilter.SendPOSTRequest(user_id);
 
             dynamic jsonObj = JsonConvert.DeserializeObject(result);
-            JArray values = (JArray)jsonObj.Results.output1.value.Values[0];
+            JArray values = (JArray)jsonObj.Results.ScoringOutput.value.Values[0];
             collaborativeFilteringCandidates = values.ToObject<List<string>>();
             collaborativeFilteringCandidates.RemoveAt(0);
+
+            if(collaborativeFilteringCandidates.Count > 0)
+            {
+                //Filter collaborativeFilteringCandidates
+                for (int i = collaborativeFilteringCandidates.Count - 1; i >= 0; i--)
+                {
+                    string v = collaborativeFilteringCandidates[i];
+                    if (cachefilter.SetContains(user_id.ToString(), v))
+                    {
+                        collaborativeFilteringCandidates.Remove(collaborativeFilteringCandidates[i]);
+                    }
+                }
+                collaborativeFilteringCandidates = collaborativeFilteringCandidates.Take(5).ToList();
+
+            }
 
             //Get data from content-based filtering in Redis
             ConnectionMultiplexer ContentBasedRedis = ConnectionMultiplexer.Connect("mstube-dotnet.redis.cache.windows.net,abortConnect=false,ssl=true,password=6/Cq0R6Wh+L6PJeYI80KEMVyYVGUjqZFEnNS6iJHl1A=");
@@ -104,6 +124,21 @@ namespace mstube.Controllers
                 contentBasedCandidates = valuesContentbasedResult.ToObject<List<string>>();
                 contentBasedCandidates.RemoveAt(0);
             }
+
+            if(contentBasedCandidates.Count > 0)
+            {
+                //Filter contentBasedCandidates
+                for (int i = contentBasedCandidates.Count - 1; i >= 0; i--)
+                {
+                    string v = contentBasedCandidates[i];
+                    if (cachefilter.SetContains(user_id.ToString(), v))
+                    {
+                        contentBasedCandidates.Remove(contentBasedCandidates[i]);
+                    }
+                }
+                contentBasedCandidates = contentBasedCandidates.Take(5).ToList();
+            }
+            
 
             HashSet<int> randSet = new HashSet<int>();
             //Get data from popularity filtering
@@ -196,23 +231,23 @@ namespace mstube.Controllers
                 }
             }
             popularityList = popularityList.OrderByDescending(o => o.views).ToList();
-            distinctList.AddRange(popularityList);
 
-            //Filter data in cache
-            ConnectionMultiplexer FilterRedis = ConnectionMultiplexer.Connect("mstube-dotnet-filter.redis.cache.windows.net,abortConnect=false,ssl=true,password=K6Cxw7qz8TEWmvCdApIck+bQKHnc3+t8Z2SYw5xqOd8=");
-            IDatabase cachefilter = FilterRedis.GetDatabase();
-
-            //Filter
-            for (int i = distinctList.Count - 1; i >= 0; i--)
+            if (popularityList.Count > 0)
             {
-                string v = distinctList[i].item_id.ToString();
-                if (cachefilter.SetContains(user_id.ToString(), v))
+                //Filter popularityList
+                for (int i = popularityList.Count - 1; i >= 0; i--)
                 {
-                    distinctList.Remove(distinctList[i]);
+                    string v = popularityList[i].item_id.ToString();
+                    if (cachefilter.SetContains(user_id.ToString(), v))
+                    {
+                        popularityList.Remove(popularityList[i]);
+                    }
                 }
+                popularityList = popularityList.Take(5).ToList();
             }
-
+            distinctList.AddRange(popularityList);
             distinctList = distinctList.Take(10).ToList();
+            distinctList.Shuffle();
 
             foreach (var v in totalCandidates)
             {
