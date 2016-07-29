@@ -8,23 +8,12 @@ namespace MStube.Common
 {
     public class VideoList
     {
-        private static VideoList _Instance;
-        private static readonly object padlock = new object();
+        private static VideoList _Instance = new VideoList();
         private List<VideoViewModel> videoList { get; set; }
         public static VideoList Instance
         {
             get
             {
-                if (_Instance == null)
-                {
-                    lock(padlock)
-                    {
-                        if (_Instance == null)
-                        {
-                            _Instance = new VideoList();
-                        }
-                    }
-                }
                 return _Instance;
             }
         }
