@@ -267,7 +267,7 @@
     <Content Include="App_Data\PreferenceSample.csv" />
     <None Include="Properties\PublishProfiles\mstubedotnet.pubxml" />
     <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
+      <Generator>PublicSettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </None>
