@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using mstube.Controllers;
+using mstube.Item;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -33,24 +34,44 @@ namespace mstube.Controllers.Tests
         }
 
         [TestMethod()]
-        public void CandidatesTest()
+        public async Task CandidatesTest()
         {
             var controller = new ApiController();
             long user_id = 10001;
-            var result = controller.Candidates(user_id);
-            Assert.IsInstanceOfType(result, typeof(Task<JsonResult>));
+            var result = await controller.Candidates(user_id);
+            Assert.IsInstanceOfType(result, typeof(JsonResult));
         }
 
         [TestMethod()]
         public void ListTopicTest()
         {
-            Assert.Fail();
+            var controller = new ApiController();
+            var result = controller.ListTopic();
+            System.Diagnostics.Debug.WriteLine(result);
+            Assert.IsNotNull(result);
         }
 
         [TestMethod()]
-        public void SearchTopicTest()
+        public void SearchNoneTopicTest()
         {
-            Assert.Fail();
+            var controller = new ApiController();
+            string topic = "NoneTopic";
+            var result = controller.SearchTopic(topic);
+            Assert.IsInstanceOfType(result, typeof(JsonResult));
+        }
+
+        [TestMethod()]
+        public void SearchExistTopicTest()
+        {
+            var controller = new ApiController();
+            var listResult = controller.ListTopic();
+            List<Item.Topic> topics = JsonConvert.DeserializeObject<List<Item.Topic>>(JsonConvert.SerializeObject(listResult.Data));
+            Assert.IsNotNull(topics);
+            string topic = topics[0].topic;
+            var searchResult = controller.SearchTopic(topic);
+            Assert.IsInstanceOfType(searchResult, typeof(JsonResult));
+            List<Item.Item> items = JsonConvert.DeserializeObject<List<Item.Item>>(JsonConvert.SerializeObject(searchResult.Data));
+            Assert.IsNotNull(items);
         }
 
         [TestMethod()]

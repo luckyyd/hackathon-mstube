@@ -161,9 +161,9 @@ namespace mstube.Utils
             const string BaseUrl = "https://asiasoutheast.services.azureml.net/workspaces/0cd16c9abdb94e249ae6f6fb27b76402/services/55aab8a6811848929c5daa6468b554a0/jobs";
 
             const string StorageAccountName = "mstubeblob"; // Replace this with your Azure Storage Account name
-            const string StorageAccountKey = "nG0MPtLcKCMPj15uKalobeFWvfLNljGen/K21qcbLdxrPtdW/UWViA4xuqEJPvb9O+FoAd7BIXgFxLSluWAM5g=="; // Replace this with your Azure Storage Key
             const string StorageContainerName = "mstube-container"; // Replace this with your Azure Storage Container name
-            const string apiKey = "bqJI6kjh8otOSbB7Px6KrjN7Jp3Qrn+3msZxYmqmoSzDufuzOJiXerN39FPH2YXFT3PxTeWnjRtd1CiFbJB6MA=="; // Replace this with the API key for the web service
+            string StorageAccountKey = Properties.Settings.Default.StorageAccountKey;
+            string apiKey = "bqJI6kjh8otOSbB7Px6KrjN7Jp3Qrn+3msZxYmqmoSzDufuzOJiXerN39FPH2YXFT3PxTeWnjRtd1CiFbJB6MA=="; // Replace this with the API key for the web service
 
             // set a time out for polling status
             const int TimeOutInMilliseconds = 120 * 1000; // Set a timeout of 2 minutes

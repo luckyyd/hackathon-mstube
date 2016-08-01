@@ -19,7 +19,6 @@ namespace mstube.Controllers
 {
     public class ApiController : Controller
     {
-        // GET: Api
         public ActionResult Index()
         {
             return View();
@@ -59,18 +58,6 @@ namespace mstube.Controllers
             }
         }
 
-        /*
-        [HttpGet]
-        public JsonResult Candidates()
-        {
-            //DEBUG ONLY
-            //Return a random recommend list for test
-            StreamReader sr = new StreamReader(Server.MapPath(@"~/App_Data/items.json"));
-            var json = JsonConvert.DeserializeObject<List<Item.Item>>(sr.ReadToEnd());
-            return Json(json, JsonRequestBehavior.AllowGet);
-        }
-        */
-
         [HttpGet]
         public async Task<JsonResult> Candidates(long user_id)
         {
@@ -87,6 +74,7 @@ namespace mstube.Controllers
 
             //Get Data from collaborative filtering
             //Send POST request to Azure ML
+
             string result = await Utils.AzureML_CollaborativeFilter.SendPOSTRequest(user_id);
 
             dynamic jsonObj = JsonConvert.DeserializeObject(result);
@@ -94,7 +82,7 @@ namespace mstube.Controllers
             collaborativeFilteringCandidates = values.ToObject<List<string>>();
             collaborativeFilteringCandidates.RemoveAt(0);
 
-            if(collaborativeFilteringCandidates.Count > 0)
+            if (collaborativeFilteringCandidates.Count > 0)
             {
                 //Filter collaborativeFilteringCandidates
                 for (int i = collaborativeFilteringCandidates.Count - 1; i >= 0; i--)
@@ -262,9 +250,9 @@ namespace mstube.Controllers
         {
             List<Item.Topic> jsonResult = new List<Item.Topic>();
             //Return list topic from db
-            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["MstubeConnection"].ToString());
             using (SqlCommand command = new SqlCommand())
             {
+                SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["MstubeConnection"].ToString());
                 command.Connection = connection;
                 command.CommandType = CommandType.Text;
                 command.CommandText = "SELECT DISTINCT topic FROM Item";
@@ -283,9 +271,9 @@ namespace mstube.Controllers
                     }
 
                 }
-                catch (SqlException)
+                catch (SqlException e)
                 {
-                    // error here
+                    System.Diagnostics.Debug.WriteLine(e.ToString());
                 }
                 finally
                 {

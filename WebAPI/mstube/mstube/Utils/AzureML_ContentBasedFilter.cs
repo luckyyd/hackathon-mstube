@@ -32,10 +32,10 @@ namespace mstube.Utils
                     {
                     }
                 };
-                const string apiKey = "FLrpT2xb8hRFQ+Ot2BVL3B3cep/hUUIx/hnYF5RIVVMsDujyymaMTTwQJ2lNbJBlQINy/vBegJvfT99qvPvoTA==";
+                string apiKey = Properties.Settings.Default.AzureMLContentBasedApiKey;
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
 
-                client.BaseAddress = new Uri("https://asiasoutheast.services.azureml.net/workspaces/0cd16c9abdb94e249ae6f6fb27b76402/services/18b53af654d44315be711d9386e32afb/execute?api-version=2.0&details=true");
+                client.BaseAddress = new Uri(Properties.Settings.Default.AzureMLContentBasedUri);
 
                 HttpResponseMessage response = await client.PostAsJsonAsync("", scoreRequest);
 
