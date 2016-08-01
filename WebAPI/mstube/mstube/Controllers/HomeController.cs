@@ -31,19 +31,5 @@ namespace mstube.Controllers
             return View();
         }
 
-        public ActionResult Redis()
-        {
-            ConnectionMultiplexer connection = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisContentBased);
-
-            IDatabase cache = connection.GetDatabase();
-
-            cache.StringSet("1 1", "1");
-            cache.StringSet("2 2", "2");
-
-            string key1 = cache.StringGet("1 1");
-            ViewBag.Message = key1;
-            return View();
-        }
-
     }
 }
