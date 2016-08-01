@@ -29,7 +29,7 @@ namespace mstube.Controllers
         public JsonResult UserId(string uuid)
         {
             //Get user_id for uuid
-            ConnectionMultiplexer connection = ConnectionMultiplexer.Connect("mstube-dotnet-id.redis.cache.windows.net,abortConnect=false,ssl=true,password=Tp/f4EEuKJWK1z7HJOvyrvZrg5IA9y4/W9BELvUPWZg=");
+            ConnectionMultiplexer connection = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisUserId);
             IDatabase cacheid = connection.GetDatabase();
 
             string dbsize = cacheid.StringGet("RedisSize");
@@ -82,7 +82,7 @@ namespace mstube.Controllers
             List<string> popularityCandidates = new List<string>();
 
             //Filter data in cache
-            ConnectionMultiplexer FilterRedis = ConnectionMultiplexer.Connect("mstube-dotnet-filter.redis.cache.windows.net,abortConnect=false,ssl=true,password=K6Cxw7qz8TEWmvCdApIck+bQKHnc3+t8Z2SYw5xqOd8=");
+            ConnectionMultiplexer FilterRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisPostHistory);
             IDatabase cachefilter = FilterRedis.GetDatabase();
 
             //Get Data from collaborative filtering
@@ -110,7 +110,7 @@ namespace mstube.Controllers
             }
 
             //Get data from content-based filtering in Redis
-            ConnectionMultiplexer ContentBasedRedis = ConnectionMultiplexer.Connect("mstube-dotnet.redis.cache.windows.net,abortConnect=false,ssl=true,password=6/Cq0R6Wh+L6PJeYI80KEMVyYVGUjqZFEnNS6iJHl1A=");
+            ConnectionMultiplexer ContentBasedRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisLastItem);
             IDatabase cacheid = ContentBasedRedis.GetDatabase();
 
             string last_item_id = cacheid.StringGet(user_id.ToString());
@@ -350,9 +350,9 @@ namespace mstube.Controllers
         {
             //Append preference data to Azure Blob
             const string StorageAccountName = "mstubeblob";
-            const string StorageAccountKey = "nG0MPtLcKCMPj15uKalobeFWvfLNljGen/K21qcbLdxrPtdW/UWViA4xuqEJPvb9O+FoAd7BIXgFxLSluWAM5g==";
             const string storageContainerName = "mstube-container";
-            const string inputBlobName = "TrainingInputdatablob.csv";
+            string StorageAccountKey = Properties.Settings.Default.StorageAccountKey;
+            string inputBlobName = Properties.Settings.Default.StorageInputBlobName;
 
             string storageConnectionString = string.Format("DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1}", StorageAccountName, StorageAccountKey);
             var blobClient = CloudStorageAccount.Parse(storageConnectionString).CreateCloudBlobClient();
@@ -374,7 +374,7 @@ namespace mstube.Controllers
             UserProfile.Update.updateUserProfile(pre, milliseconds);
 
             //Append data to Redis
-            ConnectionMultiplexer connection = ConnectionMultiplexer.Connect("mstube-dotnet.redis.cache.windows.net,abortConnect=false,ssl=true,password=6/Cq0R6Wh+L6PJeYI80KEMVyYVGUjqZFEnNS6iJHl1A=");
+            ConnectionMultiplexer connection = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisLastItem);
             IDatabase cacheid = connection.GetDatabase();
             cacheid.StringSet(pre.user_id.ToString(), pre.item_id.ToString());
          

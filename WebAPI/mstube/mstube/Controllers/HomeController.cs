@@ -33,7 +33,7 @@ namespace mstube.Controllers
 
         public ActionResult Redis()
         {
-            ConnectionMultiplexer connection = ConnectionMultiplexer.Connect("mstube-dotnet.redis.cache.windows.net,abortConnect=false,ssl=true,password=6/Cq0R6Wh+L6PJeYI80KEMVyYVGUjqZFEnNS6iJHl1A=");
+            ConnectionMultiplexer connection = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisContentBased);
 
             IDatabase cache = connection.GetDatabase();
 
