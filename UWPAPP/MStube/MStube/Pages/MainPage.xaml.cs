@@ -14,6 +14,7 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 using Windows.Web.Http;
 using Windows.Web.Http.Headers;
+using Microsoft.HockeyApp;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -70,6 +71,7 @@ namespace MStube
             catch (Exception error)
             {
                 Debug.WriteLine(error);
+                HockeyClient.Current.TrackException(error);
             }
             finally
             {
@@ -94,6 +96,7 @@ namespace MStube
             catch (Exception error)
             {
                 Debug.WriteLine(error);
+                HockeyClient.Current.TrackException(error);
             }
             finally
             {
@@ -106,6 +109,7 @@ namespace MStube
         {
             VideoViewModel clickedItem = e.ClickedItem as VideoViewModel;
             Debug.WriteLine(clickedItem.Id);
+            HockeyClient.Current.TrackEvent("Item Clicked: " +clickedItem.Id.ToString());
             Task.Run(()=>SendPreference(clickedItem.Id));
             Frame rootFrame = Window.Current.Content as Frame;
             rootFrame.Navigate(typeof(VideoPage), e.ClickedItem);
@@ -137,6 +141,7 @@ namespace MStube
             catch (Exception error)
             {
                 Debug.WriteLine(error);
+                HockeyClient.Current.TrackException(error);
             }
             finally
             {

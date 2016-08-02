@@ -15,6 +15,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Microsoft.HockeyApp;
 
 namespace MStube
 {
@@ -29,7 +30,14 @@ namespace MStube
         /// </summary>
         public App()
         {
-            Microsoft.ApplicationInsights.WindowsAppInitializer.InitializeAsync(
+            HockeyClient.Current.Configure("MStube.ad9b6bc7c6c443b2850b4182ed38ae7b",
+                new TelemetryConfiguration() { EnableDiagnostics = true })
+                .SetContactInfo("Admin", "t-diaya@microsoft.com")
+                .SetExceptionDescriptionLoader((Exception ex) =>
+                {
+                    return "Exception HResult: " + ex.HResult.ToString();
+                });
+           Microsoft.ApplicationInsights.WindowsAppInitializer.InitializeAsync(
                 Microsoft.ApplicationInsights.WindowsCollectors.Metadata |
                 Microsoft.ApplicationInsights.WindowsCollectors.Session);
             this.InitializeComponent();
