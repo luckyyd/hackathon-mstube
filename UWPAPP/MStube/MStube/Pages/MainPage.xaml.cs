@@ -77,6 +77,7 @@ namespace MStube
             {
                 httpClient.Dispose();
             }
+            HockeyClient.Current.TrackEvent("User: " + user_id.ToString());
             return user_id;
         }
 
