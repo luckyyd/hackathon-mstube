@@ -262,10 +262,13 @@ namespace mstube.Controllers
             long timerFilterPopularity = timer.ElapsedMilliseconds;
 
             timer.Restart();
-            foreach (var v in totalCandidates)
+            Task.Run(() =>
             {
-                cachefilter.SetAdd(user_id.ToString(), v);
-            }
+                foreach (var v in totalCandidates)
+                {
+                    cachefilter.SetAdd(user_id.ToString(), v);
+                }
+            });
             timer.Stop();
             long timerAddCache = timer.ElapsedMilliseconds;
 
@@ -285,7 +288,7 @@ namespace mstube.Controllers
             Debug.WriteLine("Filter and sort popularity list time: {0} ms", timerFilterPopularity);
             Debug.WriteLine("Add Cache: {0} ms ", timerAddCache);
 
-            Debug.WriteLine("Total time: {0} ms", timerTotal.ElapsedMilliseconds); 
+            Debug.WriteLine("Total time: {0} ms", timerTotal.ElapsedMilliseconds);
             return Json(distinctList, JsonRequestBehavior.AllowGet);
         }
 
