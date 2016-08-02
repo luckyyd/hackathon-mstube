@@ -30,7 +30,7 @@ namespace MStube
         /// </summary>
         public App()
         {
-            HockeyClient.Current.Configure("MStube.ad9b6bc7c6c443b2850b4182ed38ae7b",
+           HockeyClient.Current.Configure("ad9b6bc7c6c443b2850b4182ed38ae7b",
                 new TelemetryConfiguration() { EnableDiagnostics = true })
                 .SetContactInfo("Admin", "t-diaya@microsoft.com")
                 .SetExceptionDescriptionLoader((Exception ex) =>
