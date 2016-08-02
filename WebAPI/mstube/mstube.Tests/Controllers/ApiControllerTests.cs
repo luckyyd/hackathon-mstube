@@ -4,6 +4,7 @@ using mstube.Item;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -46,10 +47,7 @@ namespace mstube.Controllers.Tests
         public async Task LoadCandidatesTest()
         {
             var controller = new ApiController();
-            Random ran = new Random();
-            int Rankey = ran.Next(50000, 60000);
-            long user_id = Rankey;
-            var result = await controller.Candidates(user_id);
+            var result = await controller.Candidates(new Random().Next(50000,60000));
             Assert.IsInstanceOfType(result, typeof(JsonResult));
         }
 
@@ -58,9 +56,14 @@ namespace mstube.Controllers.Tests
         {
             var controller = new ApiController();
             var result = controller.ListTopic();
-            System.Diagnostics.Debug.WriteLine(result);
+            Assert.IsInstanceOfType(result, typeof(JsonResult));
             Assert.IsNotNull(result);
-        }
+            List<Item.Topic> topics = JsonConvert.DeserializeObject<List<Item.Topic>>(JsonConvert.SerializeObject(result.Data));
+            if (topics.Count > 0)
+            {
+                Assert.IsNotNull(topics[0].topic);
+            }
+        }   
 
         [TestMethod()]
         public void SearchNoneTopicTest()
@@ -69,6 +72,8 @@ namespace mstube.Controllers.Tests
             string topic = "NoneTopic";
             var result = controller.SearchTopic(topic);
             Assert.IsInstanceOfType(result, typeof(JsonResult));
+            List<Item.Item> items = JsonConvert.DeserializeObject<List<Item.Item>>(JsonConvert.SerializeObject(result.Data));
+            Assert.AreEqual(items.Count, 0);
         }
 
         [TestMethod()]
@@ -78,23 +83,14 @@ namespace mstube.Controllers.Tests
             var listResult = controller.ListTopic();
             List<Item.Topic> topics = JsonConvert.DeserializeObject<List<Item.Topic>>(JsonConvert.SerializeObject(listResult.Data));
             Assert.IsNotNull(topics);
-            string topic = topics[0].topic;
+            int counts = topics.Count;
+            string topic = topics[new Random().Next(counts)].topic;
+
             var searchResult = controller.SearchTopic(topic);
             Assert.IsInstanceOfType(searchResult, typeof(JsonResult));
             List<Item.Item> items = JsonConvert.DeserializeObject<List<Item.Item>>(JsonConvert.SerializeObject(searchResult.Data));
-            Assert.IsNotNull(items);
-        }
-
-        [TestMethod()]
-        public void PreferenceTest()
-        {
-            //Assert.Fail();
-        }
-
-        [TestMethod()]
-        public void UpdateDBTest()
-        {
-            //Assert.Fail();
+            Assert.AreNotEqual(items.Count, 0);
+            Assert.IsNotNull(items[new Random().Next(items.Count)].item_id);
         }
     }
 }
