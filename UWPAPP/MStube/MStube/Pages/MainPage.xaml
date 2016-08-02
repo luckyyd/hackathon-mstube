@@ -9,71 +9,91 @@
     mc:Ignorable="d">
 
     <Grid x:Name="OuterContainer" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <Grid Margin="5,5,5,5">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" MaxHeight="20"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <Grid Grid.Row="0">
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Image Source="/Assets/Square44x44Logo.scale-100.png" VerticalAlignment="Center"/>
-                    <TextBlock Margin="15" Text="MStube" FontSize="24" VerticalAlignment="Center" Style="{StaticResource HeaderTextBlockStyle}" />
+        <SplitView x:Name="SplitView"
+                   DisplayMode="CompactOverlay"
+                   IsPaneOpen="False"
+                   CompactPaneLength="50"
+                   OpenPaneLength="200">
+            <SplitView.Pane>
+                <StackPanel Background="DarkGray">
+                    <Button x:Name="Menu" FontFamily="Segoe MDL2 Assets" Content="&#xE700;"
+                   Width="50" Height="50" Background="Transparent" Click="Menu_Click"/>
+                    <StackPanel Background="DarkGray" Orientation="Horizontal">
+                        <Button x:Name="SendFeedback" FontFamily="Segoe MDL2 Assets" Content="&#xE170;"
+                   Width="50" Height="50" Background="Transparent" Click="SendFeedback_Click"/>
+                        <TextBlock Text="Send Feedback" FontSize="12" VerticalAlignment="Center" />
+                    </StackPanel>
                 </StackPanel>
-            </Grid>
-            <Grid Grid.Row="1">
-                <pr:PullToRefreshBox RefreshInvoked="PullToRefreshBox_RefreshInvoked">
-                    <pr:PullToRefreshBox.TopIndicatorTemplate>
-                        <DataTemplate>
-                            <pr:PullRefreshProgressControl PullToRefreshText="Pull" ReleaseToRefreshText="Release" Progress="{Binding}"/>
-                        </DataTemplate>
-                    </pr:PullToRefreshBox.TopIndicatorTemplate>
-                    <ListView 
+            </SplitView.Pane>
+            <SplitView.Content>
+                <Grid Margin="5,5,5,5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" MaxHeight="20"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Image Source="/Assets/Square44x44Logo.scale-100.png" VerticalAlignment="Center"/>
+                            <TextBlock Margin="15" Text="MStube" FontSize="24" VerticalAlignment="Center" Style="{StaticResource HeaderTextBlockStyle}" />
+                        </StackPanel>
+                    </Grid>
+                    <Grid Grid.Row="1">
+                        <pr:PullToRefreshBox RefreshInvoked="PullToRefreshBox_RefreshInvoked">
+                            <pr:PullToRefreshBox.TopIndicatorTemplate>
+                                <DataTemplate>
+                                    <pr:PullRefreshProgressControl PullToRefreshText="Pull" ReleaseToRefreshText="Release" Progress="{Binding}"/>
+                                </DataTemplate>
+                            </pr:PullToRefreshBox.TopIndicatorTemplate>
+                            <ListView 
                         x:Name="VideoBriefList"
                         HorizontalAlignment="Left"
                         Margin="0,5,0,10"
                         VerticalAlignment="Top"
                         IsItemClickEnabled="True" 
                         ItemClick="ItemClicked">
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <Grid Margin="5,5,5,5" MaxHeight="120">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <Image Grid.Row="0" Grid.Column="0" Width="100" Height="100" HorizontalAlignment="Left" 
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="5,5,5,5" MaxHeight="120">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Image Grid.Row="0" Grid.Column="0" Width="100" Height="100" HorizontalAlignment="Left" 
                                            VerticalAlignment="Center" Source="{Binding ImageSourceUri}" Stretch="UniformToFill"/>
-                                    <Grid Grid.Row="0" Grid.Column="1" Margin="10">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="*"/>
-                                            <RowDefinition Height="*"/>
-                                        </Grid.RowDefinitions>
-                                        <TextBlock x:Name="titleText" Grid.Row="0" MaxLines="2"
+                                            <Grid Grid.Row="0" Grid.Column="1" Margin="10">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="*"/>
+                                                    <RowDefinition Height="*"/>
+                                                </Grid.RowDefinitions>
+                                                <TextBlock x:Name="titleText" Grid.Row="0" MaxLines="2"
                                             Padding="5,5,5,5" Style="{StaticResource BodyTextBlockStyle}"
                                             Text="{Binding Title}" FontSize="16"/>
-                                        <StackPanel Grid.Row="1" Orientation="Horizontal">
-                                            <TextBlock Text="&#xe600;" FontFamily="/Assets/iconfont.ttf#iconfont" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                            <TextBlock Margin="5" Text="{Binding Views}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-                                        </StackPanel>
-                                        <StackPanel Grid.Row="2" Orientation="Horizontal">
-                                            <TextBlock Text="&#xe606;" FontFamily="/Assets/iconfont.ttf#iconfont" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                            <TextBlock Margin="5" Text="{Binding UploadDate}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-                                        </StackPanel>
-                                        <TextBlock Grid.Row="2" Text="{Binding BrandIcon}" FontFamily="/Assets/iconfont.ttf#iconfont" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,25,0" />
-                                    </Grid>
-                                </Grid>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                        <ListView.ItemContainerStyle>
-                            <Style TargetType="ListViewItem">
-                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                            </Style>
-                        </ListView.ItemContainerStyle>
-                    </ListView>
-                </pr:PullToRefreshBox>
-                <ProgressRing x:Name="LoadingProgressRing" IsActive="True" Height="80" Width="80"/>
-            </Grid>
-        </Grid>
+                                                <StackPanel Grid.Row="1" Orientation="Horizontal">
+                                                    <TextBlock Text="&#xe600;" FontFamily="/Assets/iconfont.ttf#iconfont" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                    <TextBlock Margin="5" Text="{Binding Views}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                                </StackPanel>
+                                                <StackPanel Grid.Row="2" Orientation="Horizontal">
+                                                    <TextBlock Text="&#xe606;" FontFamily="/Assets/iconfont.ttf#iconfont" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                    <TextBlock Margin="5" Text="{Binding UploadDate}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                                </StackPanel>
+                                                <TextBlock Grid.Row="2" Text="{Binding BrandIcon}" FontFamily="/Assets/iconfont.ttf#iconfont" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,25,0" />
+                                            </Grid>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="ListViewItem">
+                                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                    </Style>
+                                </ListView.ItemContainerStyle>
+                            </ListView>
+                        </pr:PullToRefreshBox>
+                        <ProgressRing x:Name="LoadingProgressRing" IsActive="True" Height="80" Width="80"/>
+                    </Grid>
+                </Grid>
+            </SplitView.Content>
+        </SplitView>
+        
     </Grid>
 </Page>

@@ -129,5 +129,15 @@ namespace MStube
         {
             InitializeValues();
         }
+
+        private async void SendFeedback_Click(object sender, RoutedEventArgs e)
+        {
+            //await Microsoft.Services.Store.Engagement.Feedback.LaunchFeedbackAsync();
+        }
+
+        private void Menu_Click(object sender, RoutedEventArgs e)
+        {
+            SplitView.IsPaneOpen = !SplitView.IsPaneOpen;
+        }
     }
 }
