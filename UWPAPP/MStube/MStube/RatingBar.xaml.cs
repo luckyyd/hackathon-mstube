@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI;
+using Windows.UI.Notifications;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -224,6 +226,30 @@ namespace MStube
             if (GetRatingBarValue != null) {
                 GetRatingBarValue(RatingValue);
             }
+            ShowMsg();
+        }
+
+        private IAsyncOperation<IUICommand> dialogTask;
+        private async void ShowMsg() {
+            MessageDialog msg = new Windows.UI.Popups.MessageDialog("Thanks for voting!");
+            try
+            {
+                dialogTask = msg.ShowAsync();
+            }
+            catch
+            {
+
+            }
+            DispatcherTimer dt = new DispatcherTimer();
+            dt.Interval = TimeSpan.FromSeconds(1);
+            dt.Tick += dt_Tick;
+            dt.Start();
+        }
+
+        void dt_Tick(object sender, object e)
+        {
+            (sender as DispatcherTimer).Stop();
+            dialogTask.Cancel();
         }
 
         public void ToggleButton_DragEnter(object sender, PointerRoutedEventArgs e)
