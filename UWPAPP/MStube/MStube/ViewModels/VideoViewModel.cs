@@ -8,7 +8,8 @@ namespace MStube.ViewModels
 {
     public class VideoViewModel
     {
-        public int Id { get; set; }
+        public long user_id { get; set; }
+        public long item_id { get; set; }
         public string Title { get; set; }
         public string Topic { get; set; }
         public string ImageSourceUri { get; set; }

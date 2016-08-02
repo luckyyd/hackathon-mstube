@@ -17,6 +17,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="2*"/>
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="3*"/>
             </Grid.RowDefinitions>
             <TextBlock x:Name="textTitle" 
@@ -38,11 +39,24 @@
                             Source="{x:Bind VideoDetail.VideoSourceUri}"
                             AreTransportControlsEnabled="True">
             </MediaElement>
+
+            <local:RatingBar x:Name="RatingBar"   
+                             Grid.Row="2" 
+                             Grid.Column="1" 
+                             VerticalAlignment="Center" 
+                             HorizontalAlignment="Center" 
+                             Margin="0,15,0,10"
+                             NumberOfStars="5" 
+                             RatingValue="3" 
+                             StarForegroundColor="#cccc33" 
+                             HeightValue="25" 
+                             />
+            
             <TextBlock x:Name="textDescription" 
-                        Grid.Row="2" 
+                        Grid.Row="3" 
                         Grid.Column="1" 
                         TextWrapping="Wrap" 
-                        Margin="10,30,10,10"
+                        Margin="10,20,10,10"
                         Text="{x:Bind VideoDetail.Description}" 
                         HorizontalAlignment="Left" 
                         VerticalAlignment="Top"/>

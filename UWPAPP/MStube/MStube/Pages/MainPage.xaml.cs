@@ -27,7 +27,7 @@ namespace MStube
     {
         private VideoList listOfVideoBrief = VideoList.Instance;
         private DeviceInfo device = DeviceInfo.Instance;
-        private int user_id = 0;
+        private long user_id = 0;
         public MainPage()
         {
             this.InitializeComponent();
@@ -43,7 +43,7 @@ namespace MStube
             {
                 listOfVideoBrief.Add(new VideoViewModel
                 {
-                    Id = item.item_id,
+                    item_id = item.item_id,
                     Title = item.title,
                     ImageSourceUri = item.image_src,
                     VideoSourceUri = item.video_src,
@@ -109,46 +109,14 @@ namespace MStube
         private void ItemClicked(object sender, ItemClickEventArgs e)
         {
             VideoViewModel clickedItem = e.ClickedItem as VideoViewModel;
-            Debug.WriteLine(clickedItem.Id);
-            HockeyClient.Current.TrackEvent("Item Clicked: " +clickedItem.Id.ToString());
-            Task.Run(()=>SendPreference(clickedItem.Id));
+            clickedItem.user_id = user_id;
+            Debug.WriteLine(clickedItem.item_id);
+            HockeyClient.Current.TrackEvent("Item Clicked: " +clickedItem.item_id.ToString());
+            Task.Run(()=>Utils.SendPreference.SendPreferenceToServer(clickedItem.user_id ,clickedItem.item_id, 4));
             Frame rootFrame = Window.Current.Content as Frame;
             rootFrame.Navigate(typeof(VideoPage), e.ClickedItem);
         }
 
-        private async void SendPreference(int item_id)
-        {
-            Int32 unixTimestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
-            Prefrence preference = new Prefrence
-            {
-                user_id = this.user_id,
-                item_id = item_id,
-                score = 4,
-                timestamp = unixTimestamp
-            };
-            var uri = new Uri("http://mstubedotnet.azurewebsites.net/api/Preference");
-            string uploadPerference = JsonConvert.SerializeObject(preference);
-            Debug.WriteLine(uploadPerference);
-            HttpClient httpClient = new HttpClient();
-            try
-            {
-                HttpRequestMessage mSent = new HttpRequestMessage(HttpMethod.Post, uri);
-                mSent.Content = new HttpStringContent(String.Format("{0}", uploadPerference),
-                    Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json");
-                HttpResponseMessage mReceived = await httpClient.SendRequestAsync(mSent,
-                                                   HttpCompletionOption.ResponseContentRead);
-                Debug.WriteLine(mReceived);
-            }
-            catch (Exception error)
-            {
-                Debug.WriteLine(error);
-                HockeyClient.Current.TrackException(error);
-            }
-            finally
-            {
-                httpClient.Dispose();
-            }
-        }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {

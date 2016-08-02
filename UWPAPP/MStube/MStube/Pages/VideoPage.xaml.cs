@@ -28,6 +28,7 @@ namespace MStube
     public sealed partial class VideoPage : Page
     {
         public VideoViewModel VideoDetail { get; set; }
+        public long user_id { get; set; }
 
         public VideoPage()
         {
@@ -49,6 +50,17 @@ namespace MStube
             {
                 SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
             }
+
+            RatingBar.GetRatingBarValue += new RatingBar.RatingBarDelegate(RatingBar_GetRatingBarValue);
         }
+
+        private void RatingBar_GetRatingBarValue(int RatingValue)
+        {
+            long user_id = VideoDetail.user_id;
+            long item_id = VideoDetail.item_id;
+            Task.Run(() => Utils.SendPreference.SendPreferenceToServer(user_id, item_id, RatingValue));
+            Debug.WriteLine("Send Preference" + user_id.ToString() + item_id.ToString() + RatingValue.ToString());
+        }
+
     }
 }
