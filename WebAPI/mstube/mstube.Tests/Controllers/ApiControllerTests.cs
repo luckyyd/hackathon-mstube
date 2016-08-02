@@ -38,16 +38,7 @@ namespace mstube.Controllers.Tests
         public async Task CandidatesTest()
         {
             var controller = new ApiController();
-            long user_id = 30001;
-            var result = await controller.Candidates(user_id);
-            Assert.IsInstanceOfType(result, typeof(JsonResult));
-        }
-
-        [TestMethod()]
-        public async Task LoadCandidatesTest()
-        {
-            var controller = new ApiController();
-            var result = await controller.Candidates(new Random().Next(50000,60000));
+            var result = await controller.Candidates(new Random().Next(50000, 60000));
             Assert.IsInstanceOfType(result, typeof(JsonResult));
         }
 
