@@ -132,7 +132,9 @@ namespace MStube
 
         private async void SendFeedback_Click(object sender, RoutedEventArgs e)
         {
-            //await Microsoft.Services.Store.Engagement.Feedback.LaunchFeedbackAsync();
+            if (Microsoft.Services.Store.Engagement.Feedback.IsSupported) {
+                await Microsoft.Services.Store.Engagement.Feedback.LaunchFeedbackAsync();
+            }
         }
 
         private void Menu_Click(object sender, RoutedEventArgs e)
