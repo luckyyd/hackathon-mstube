@@ -125,25 +125,52 @@ namespace mstube.Controllers
             }
             return resultList;
         }
-        private async Task<List<Item.Item>> GetPopularityItems(int nums)
+
+        private async Task<List<Item.Item>> GetPopularItemsFromSQLServer(int choices = 50, int top = 5)
         {
-            const int max_item_id = 5000;
-            List<string> popularityCandidates = new List<string>();
-            HashSet<int> randSet = GenerateRandomSet(nums, max_item_id);
-            List<Item.Item> popularityList = new List<Item.Item>();
-
-            foreach (int key in randSet)
+            List<Item.Item> resultList = new List<Item.Item>();
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["MstubeConnection"].ToString());
+            try
             {
-                popularityCandidates.Add(key.ToString());
+                connection.Open();
+                SqlCommand command = new SqlCommand();
+                command.Connection = connection;
+                command.CommandType = CommandType.Text;
+                command.CommandText = "SELECT top 5 * FROM Item WHERE item_id IN (SELECT TOP 50 item_id FROM Item ORDER BY NewID() ) ORDER BY cast(views as int) DESC";
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        Item.Item item = new Item.Item
+                        {
+                            item_id = Convert.ToInt64(reader["item_id"]),
+                            image_src = reader["image_src"].ToString(),
+                            video_src = reader["video_src"].ToString(),
+                            title = reader["title"].ToString(),
+                            url = reader["url"].ToString(),
+                            description = reader["description"].ToString(),
+                            topic = reader["topic"].ToString(),
+                            category = reader["category"].ToString(),
+                            full_description = reader["full_description"].ToString(),
+                            posted_time = reader["posted_time"].ToString(),
+                            views = Convert.ToInt32(reader["views"]),
+                            quality = Convert.ToDouble(reader["quality"]),
+                            brand = 3,
+                        };
+                        string item_id = item.item_id.ToString();
+                        resultList.Add(item);
+                    }
+                }
             }
-            popularityList = GetItemsFromSQLServer(popularityCandidates);
-
-            // Add brand tag
-            foreach (Item.Item item in popularityList)
+            catch (SqlException err)
             {
-                item.brand = 3;
+                Debug.WriteLine(err);
             }
-            return popularityList;
+            finally
+            {
+                connection.Close();
+            }
+            return resultList;
         }
         private async Task<List<string>> ItemFilter(long user_id, List<string> itemsToFilter, IDatabase cachefilter)
         {
@@ -161,26 +188,6 @@ namespace mstube.Controllers
                     }
                 }
             }
-            Debug.WriteLine("Filter Time: {0} ms", timer.ElapsedMilliseconds);
-            return result;
-        }
-        private async Task<List<Item.Item>> ItemFilter(long user_id, List<Item.Item> itemsToFilter, IDatabase cachefilter)
-        {
-            Stopwatch timer = new Stopwatch();
-            timer.Start();
-            List<Item.Item> result = new List<Item.Item>(itemsToFilter);
-            if (result.Count > 0)
-            {
-                foreach (Item.Item item in result)
-                {
-                    if (cachefilter.SetContains(user_id.ToString(), item.item_id.ToString()))
-                    {
-                        result.Remove(item);
-
-                    }
-                }
-            }
-            timer.Stop();
             Debug.WriteLine("Filter Time: {0} ms", timer.ElapsedMilliseconds);
             return result;
         }
@@ -213,15 +220,8 @@ namespace mstube.Controllers
             timer.Stop();
             long timerConnectHistory = timer.ElapsedMilliseconds;
 
-            // Connect to Redis
-            timer.Restart();
-            ConnectionMultiplexer ContentBasedRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisLastItem);
-            IDatabase cacheid = ContentBasedRedis.GetDatabase();
-            timer.Stop();
-            long timerConnectRedisLastItem = timer.ElapsedMilliseconds;
-
             // Run get popularity items task
-            Task<List<Item.Item>> taskGetPopularityItems = Task.Run(() => GetPopularityItems(50));
+            Task<List<Item.Item>> taskGetPopularityItems = Task.Run(() => GetPopularItemsFromSQLServer(50, 5));
 
             // Get CF result
             timer.Restart();
@@ -236,9 +236,16 @@ namespace mstube.Controllers
             collaborativeFilteringCandidates.RemoveAt(0);
             Task<List<string>> taskFilterCFCandidates = Task.Run(() => ItemFilter(user_id, collaborativeFilteringCandidates, cachefilter));
 
+            // Connect to Redis
+            timer.Restart();
+            ConnectionMultiplexer ContentBasedRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisLastItem);
+            IDatabase cacheid = ContentBasedRedis.GetDatabase();
+            timer.Stop();
+            long timerConnectRedisLastItem = timer.ElapsedMilliseconds;
+
             // Get last item 
             string last_item_id = cacheid.StringGet(user_id.ToString());
-            Debug.WriteLine("Last item id is + ", last_item_id);
+            Debug.WriteLine("Last item id is " + last_item_id);
 
             // Get Content-based result
             timer.Restart();
@@ -256,12 +263,6 @@ namespace mstube.Controllers
             // Filter Contect-based items
             timer.Restart();
             Task<List<string>> taskFilterContentBasedCandidates = Task.Run(() => ItemFilter(user_id, contentBasedCandidates, cachefilter));
-
-            // Filter Popularity List
-            List<Item.Item> popularityList = taskGetPopularityItems.Result;
-            popularityList = popularityList.OrderByDescending(o => o.views).ToList();
-            popularityList = popularityList.Take(10).ToList();
-            Task<List<Item.Item>> taskFilterPopularityList = Task.Run(() => ItemFilter(user_id, popularityList, cachefilter));
 
             // Get task results
             contentBasedCandidates = taskFilterContentBasedCandidates.Result.Take(5).ToList();
@@ -291,7 +292,7 @@ namespace mstube.Controllers
             List<Item.Item> distinctList = resultList.GroupBy(x => x.item_id).Select(g => g.First()).ToList();
 
             // Add popularity list
-            popularityList = taskFilterPopularityList.Result.Take(5).ToList();
+            List<Item.Item> popularityList = taskGetPopularityItems.Result;
             distinctList.AddRange(popularityList);
             distinctList = distinctList.Take(10).ToList();
             distinctList.Shuffle();
