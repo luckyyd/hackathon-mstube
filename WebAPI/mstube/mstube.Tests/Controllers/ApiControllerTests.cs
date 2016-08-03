@@ -54,7 +54,7 @@ namespace mstube.Controllers.Tests
             {
                 Assert.IsNotNull(topics[0].topic);
             }
-        }   
+        }
 
         [TestMethod()]
         public void SearchNoneTopicTest()

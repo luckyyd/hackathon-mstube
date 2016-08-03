@@ -17,7 +17,6 @@ namespace mstube.Utils
             {
                 var scoreRequest = new
                 {
-
                     Inputs = new Dictionary<string, StringTable>() {
                         {
                             "input1",
@@ -34,13 +33,10 @@ namespace mstube.Utils
                 };
                 string apiKey = Properties.Settings.Default.AzureMLContentBasedApiKey;
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
-
                 client.BaseAddress = new Uri(Properties.Settings.Default.AzureMLContentBasedUri);
-
                 HttpResponseMessage response = await client.PostAsJsonAsync("", scoreRequest);
 
                 string result = "";
-
                 if (response.IsSuccessStatusCode)
                 {
                     result = await response.Content.ReadAsStringAsync();
@@ -55,14 +51,9 @@ namespace mstube.Utils
                     string responseContent = await response.Content.ReadAsStringAsync();
                     Console.WriteLine(responseContent);
                 }
-
                 return result;
             }
 
         }
     }
-
-    
-
-
 }

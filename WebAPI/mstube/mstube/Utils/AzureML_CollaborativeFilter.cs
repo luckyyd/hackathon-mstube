@@ -23,7 +23,6 @@ namespace mstube.Utils
             {
                 var scoreRequest = new
                 {
-
                     Inputs = new Dictionary<string, StringTable>() {
                         {
                             "ScoringInput",
@@ -40,13 +39,10 @@ namespace mstube.Utils
                 };
                 string apiKey = Properties.Settings.Default.AzureMLCollaborativeFilterApiKey;
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
-
                 client.BaseAddress = new Uri(Properties.Settings.Default.AzureMLCollaborativeFilterUri);
-
                 HttpResponseMessage response = await client.PostAsJsonAsync("", scoreRequest);
 
                 string result = "";
-
                 if (response.IsSuccessStatusCode)
                 {
                     result = await response.Content.ReadAsStringAsync();
@@ -55,20 +51,13 @@ namespace mstube.Utils
                 else
                 {
                     Console.WriteLine(string.Format("The request failed with status code: {0}", response.StatusCode));
-
                     Console.WriteLine(response.Headers.ToString());
-
                     string responseContent = await response.Content.ReadAsStringAsync();
                     Console.WriteLine(responseContent);
                 }
-
                 return result;
             }
 
         }
     }
-
-    
-
-
 }
