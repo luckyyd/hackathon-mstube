@@ -9,19 +9,35 @@
     mc:Ignorable="d">
 
     <Grid x:Name="OuterContainer" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        
+        <!--<ToggleButton x:Name="TogglePaneButton" 
+                      Visibility="{x:Bind ViewModel.IsInDetailsMode, Mode=OneWay, ConverterParameter=Reverse, Converter={StaticResource BooleanToVisibilityConverter}}"
+                      Margin="0"
+                      TabIndex="1"
+                      Checked="{x:Bind CheckTogglePaneButtonSizeChanged}"
+                      Unchecked="{x:Bind CheckTogglePaneButtonSizeChanged}"
+                      IsChecked="{Binding IsPaneOpen, ElementName=SplitView, Mode=TwoWay}"
+                      AutomationProperties.Name="Menu" ToolTipService.ToolTip="Menu"
+                      />-->
+        
         <SplitView x:Name="SplitView"
                    DisplayMode="CompactOverlay"
                    IsPaneOpen="False"
                    CompactPaneLength="50"
                    OpenPaneLength="200">
             <SplitView.Pane>
-                <StackPanel Background="DarkGray">
+                <StackPanel Background="#333533">
                     <Button x:Name="Menu" FontFamily="Segoe MDL2 Assets" Content="&#xE700;"
                    Width="50" Height="50" Background="Transparent" Click="Menu_Click"/>
-                    <StackPanel Background="DarkGray" Orientation="Horizontal">
+                    <StackPanel Background="#505450" Orientation="Horizontal">
+                        <Button x:Name="Home" FontFamily="Segoe MDL2 Assets" Content="&#xE10F;"
+                   Width="50" Height="50" Background="Transparent" Click="Home_Click"/>
+                        <TextBlock x:Name="HomeTextBlock" Text="Home" FontSize="12" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <StackPanel Background="#505450" Orientation="Horizontal">
                         <Button x:Name="SendFeedback" FontFamily="Segoe MDL2 Assets" Content="&#xE170;"
                    Width="50" Height="50" Background="Transparent" Click="SendFeedback_Click"/>
-                        <TextBlock Text="Send Feedback" FontSize="12" VerticalAlignment="Center" />
+                        <TextBlock x:Name="SendFeedbackTextBlock" Text="Send Feedback" FontSize="12" VerticalAlignment="Center" />
                     </StackPanel>
                 </StackPanel>
             </SplitView.Pane>
