@@ -20,6 +20,15 @@ namespace mstube.Controllers
 {
     public class ApiController : Controller
     {
+        private IDatabase cachefilter;
+        private IDatabase cacheid;
+        public ApiController()
+        {
+            ConnectionMultiplexer FilterRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisPostHistory);
+            cachefilter = FilterRedis.GetDatabase();
+            ConnectionMultiplexer ContentBasedRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisLastItem);
+            cacheid = ContentBasedRedis.GetDatabase();
+        }
         public ActionResult Index()
         {
             return View();
@@ -125,7 +134,6 @@ namespace mstube.Controllers
             }
             return resultList;
         }
-
         private async Task<List<Item.Item>> GetPopularItemsFromSQLServer(int choices = 50, int top = 5)
         {
             List<Item.Item> resultList = new List<Item.Item>();
@@ -172,7 +180,7 @@ namespace mstube.Controllers
             }
             return resultList;
         }
-        private async Task<List<string>> ItemFilter(long user_id, List<string> itemsToFilter, IDatabase cachefilter)
+        private async Task<List<string>> ItemFilter(long user_id, List<string> itemsToFilter)
         {
             Stopwatch timer = new Stopwatch();
             timer.Start();
@@ -191,7 +199,7 @@ namespace mstube.Controllers
             Debug.WriteLine("Filter Time: {0} ms", timer.ElapsedMilliseconds);
             return result;
         }
-        private void LogRecommendHistory(long user_id, List<Item.Item> items, IDatabase cachefilter)
+        private void LogRecommendHistory(long user_id, List<Item.Item> items)
         {
             foreach (var v in items)
             {
@@ -213,13 +221,6 @@ namespace mstube.Controllers
             List<string> contentBasedCandidates = new List<string>();
             List<string> popularityCandidates = new List<string>();
 
-            // Connect to Redis
-            timer.Start();
-            ConnectionMultiplexer FilterRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisPostHistory);
-            IDatabase cachefilter = FilterRedis.GetDatabase();
-            timer.Stop();
-            long timerConnectHistory = timer.ElapsedMilliseconds;
-
             // Run get popularity items task
             Task<List<Item.Item>> taskGetPopularityItems = Task.Run(() => GetPopularItemsFromSQLServer(50, 5));
 
@@ -234,14 +235,7 @@ namespace mstube.Controllers
             JArray values = (JArray)jsonObj.Results.ScoringOutput.value.Values[0];
             collaborativeFilteringCandidates = values.ToObject<List<string>>();
             collaborativeFilteringCandidates.RemoveAt(0);
-            Task<List<string>> taskFilterCFCandidates = Task.Run(() => ItemFilter(user_id, collaborativeFilteringCandidates, cachefilter));
-
-            // Connect to Redis
-            timer.Restart();
-            ConnectionMultiplexer ContentBasedRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisLastItem);
-            IDatabase cacheid = ContentBasedRedis.GetDatabase();
-            timer.Stop();
-            long timerConnectRedisLastItem = timer.ElapsedMilliseconds;
+            Task<List<string>> taskFilterCFCandidates = Task.Run(() => ItemFilter(user_id, collaborativeFilteringCandidates));
 
             // Get last item 
             string last_item_id = cacheid.StringGet(user_id.ToString());
@@ -262,7 +256,7 @@ namespace mstube.Controllers
 
             // Filter Contect-based items
             timer.Restart();
-            Task<List<string>> taskFilterContentBasedCandidates = Task.Run(() => ItemFilter(user_id, contentBasedCandidates, cachefilter));
+            Task<List<string>> taskFilterContentBasedCandidates = Task.Run(() => ItemFilter(user_id, contentBasedCandidates));
 
             // Get task results
             contentBasedCandidates = taskFilterContentBasedCandidates.Result.Take(5).ToList();
@@ -298,14 +292,12 @@ namespace mstube.Controllers
             distinctList.Shuffle();
 
             // Post History
-            Task logRecommendHistory = Task.Run(() => LogRecommendHistory(user_id, distinctList, cachefilter));
+            Task logRecommendHistory = Task.Run(() => LogRecommendHistory(user_id, distinctList));
 
             timerTotal.Stop();
             Debug.WriteLine("Content based item count: {0}", contentBasedCandidates.Count);
             Debug.WriteLine("total candidates:         {0}", distinctList.Count);
             Debug.WriteLine("");
-            Debug.WriteLine("Connect Redis Post History time: {0} ms", timerConnectHistory);
-            Debug.WriteLine("Connect to Redis last item time: {0} ms", timerConnectRedisLastItem);
             Debug.WriteLine("Get CF result time:              {0} ms", timerConnectAzureCF);
             Debug.WriteLine("Get content-base result time:    {0} ms", timerAzureMLcontent);
             Debug.WriteLine("Waiting filter time:             {0} ms", timerWaitingFilter);
