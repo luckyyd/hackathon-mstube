@@ -15,6 +15,7 @@ using Windows.UI.Xaml.Navigation;
 using Windows.Web.Http;
 using Windows.Web.Http.Headers;
 using Microsoft.HockeyApp;
+using Windows.Foundation;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -129,5 +130,38 @@ namespace MStube
         {
             InitializeValues();
         }
+
+        private async void SendFeedback_Click(object sender, RoutedEventArgs e)
+        {
+            if (Microsoft.Services.Store.Engagement.Feedback.IsSupported) {
+                await Microsoft.Services.Store.Engagement.Feedback.LaunchFeedbackAsync();
+            }
+        }
+
+        private void Menu_Click(object sender, RoutedEventArgs e)
+        {
+            SplitView.IsPaneOpen = !SplitView.IsPaneOpen;
+        }
+
+        private void Home_Click(object sender, RoutedEventArgs e)
+        {
+            InitializeValues();
+        }
+
+    //    public Rect TogglePaneButtonRect { get; private set; }
+
+    //    public event TypedEventHandler<MainPage, Rect> TogglePaneButtonRectChanged;
+
+    //    private void CheckTogglePaneButtonSizeChanged()
+    //    {
+    //        TogglePaneButtonRect = SplitView.DisplayMode == SplitViewDisplayMode.Inline ||
+    //                                SplitView.DisplayMode == SplitViewDisplayMode.Overlay
+    //                                ? TogglePaneButton.TransformToVisual(this).TransformBounds(
+    //                                    new Rect(0, 0, TogglePaneButton.ActualWidth, TogglePaneButton.ActualHeight))
+    //                                    : new Rect();
+    //        TogglePaneButtonRectChanged?.Invoke(this, this.TogglePaneButtonRect);
+    //    }
+
+    //    private void Root_SizeChanged(object sender, SizeChangedEventArgs e) => CheckTogglePaneButtonSizeChanged();
     }
 }

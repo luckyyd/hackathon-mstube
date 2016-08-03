@@ -230,7 +230,7 @@ namespace MStube
         }
 
         private IAsyncOperation<IUICommand> dialogTask;
-        private async void ShowMsg() {
+        private void ShowMsg() {
             MessageDialog msg = new Windows.UI.Popups.MessageDialog("Thanks for voting!");
             try
             {
