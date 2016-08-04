@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,5 +23,6 @@ namespace MStube.Items
         public float quality { get; set;}
         public int views { get; set; }
         public int brand { get; set; }
+
     }
 }

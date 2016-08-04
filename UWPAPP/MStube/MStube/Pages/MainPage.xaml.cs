@@ -16,6 +16,8 @@ using Windows.Web.Http;
 using Windows.Web.Http.Headers;
 using Microsoft.HockeyApp;
 using Windows.Foundation;
+using System.ComponentModel;
+using System.Collections.ObjectModel;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -24,9 +26,21 @@ namespace MStube
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class MainPage : Page
+    public sealed partial class MainPage : Page, INotifyPropertyChanged
     {
-        private VideoList listOfVideoBrief = VideoList.Instance;
+        //private VideoList videoListCandidates = VideoList.Instance;
+        private ObservableCollection<VideoViewModel> _videoListCandidates = new ObservableCollection<VideoViewModel>();
+        public ObservableCollection<VideoViewModel> videoListCandidates {
+            get { return _videoListCandidates; }
+            set
+            {
+                if (value != _videoListCandidates) {
+                    _videoListCandidates = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
         private DeviceInfo device = DeviceInfo.Instance;
         private long user_id = 0;
         public MainPage()
@@ -38,11 +52,12 @@ namespace MStube
         {
             LoadingProgressRing.IsActive = true;
             user_id = await GetUserId(this.device);
-            List<VideoDetailItem> new_items = await GetVideoJson();
-            new_items.Reverse();
-            foreach (VideoDetailItem item in new_items)
+            List<VideoDetailItem> newVideoListCandidates = await GetVideoJson();
+
+            //newVideoListCandidates.Reverse();
+            foreach (VideoDetailItem item in newVideoListCandidates)
             {
-                listOfVideoBrief.Add(new VideoViewModel
+                videoListCandidates.Insert(0, new VideoViewModel
                 {
                     item_id = item.item_id,
                     Title = item.title,
@@ -56,8 +71,10 @@ namespace MStube
                 });
             }
             LoadingProgressRing.IsActive = false;
-            VideoBriefList.ItemsSource = listOfVideoBrief.GetList();
+            VideoBriefList.ItemsSource = videoListCandidates;
         }
+
+
 
         private async Task<int> GetUserId(Utils.DeviceInfo device)
         {
@@ -148,20 +165,31 @@ namespace MStube
             InitializeValues();
         }
 
-    //    public Rect TogglePaneButtonRect { get; private set; }
+        //    public Rect TogglePaneButtonRect { get; private set; }
 
-    //    public event TypedEventHandler<MainPage, Rect> TogglePaneButtonRectChanged;
+        //    public event TypedEventHandler<MainPage, Rect> TogglePaneButtonRectChanged;
 
-    //    private void CheckTogglePaneButtonSizeChanged()
-    //    {
-    //        TogglePaneButtonRect = SplitView.DisplayMode == SplitViewDisplayMode.Inline ||
-    //                                SplitView.DisplayMode == SplitViewDisplayMode.Overlay
-    //                                ? TogglePaneButton.TransformToVisual(this).TransformBounds(
-    //                                    new Rect(0, 0, TogglePaneButton.ActualWidth, TogglePaneButton.ActualHeight))
-    //                                    : new Rect();
-    //        TogglePaneButtonRectChanged?.Invoke(this, this.TogglePaneButtonRect);
-    //    }
+        //    private void CheckTogglePaneButtonSizeChanged()
+        //    {
+        //        TogglePaneButtonRect = SplitView.DisplayMode == SplitViewDisplayMode.Inline ||
+        //                                SplitView.DisplayMode == SplitViewDisplayMode.Overlay
+        //                                ? TogglePaneButton.TransformToVisual(this).TransformBounds(
+        //                                    new Rect(0, 0, TogglePaneButton.ActualWidth, TogglePaneButton.ActualHeight))
+        //                                    : new Rect();
+        //        TogglePaneButtonRectChanged?.Invoke(this, this.TogglePaneButtonRect);
+        //    }
 
-    //    private void Root_SizeChanged(object sender, SizeChangedEventArgs e) => CheckTogglePaneButtonSizeChanged();
+        //    private void Root_SizeChanged(object sender, SizeChangedEventArgs e) => CheckTogglePaneButtonSizeChanged();
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        // PropertyChanged event triggering method.
+        private void NotifyPropertyChanged(String propertyName = "")
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
     }
 }
