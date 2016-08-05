@@ -25,6 +25,7 @@ namespace mstube.Item
         public double quality { get; set; }
         public List<string> tags { get; set; }
         public double score { get; set; }
+        public string source { get; set; }
         public int brand { get; set; }
     }
 }

@@ -145,7 +145,6 @@ namespace MStube
             
         }
 
-
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
@@ -160,9 +159,11 @@ namespace MStube
 
         private async void SendFeedback_Click(object sender, RoutedEventArgs e)
         {
-            if (Microsoft.Services.Store.Engagement.Feedback.IsSupported) {
-                await Microsoft.Services.Store.Engagement.Feedback.LaunchFeedbackAsync();
-            }
+            //if (Microsoft.Services.Store.Engagement.Feedback.IsSupported) {
+            //    await Microsoft.Services.Store.Engagement.Feedback.LaunchFeedbackAsync();
+            //}
+            var mailto = new Uri(@"mailto:?to=mstube@microsoft.com&subject=MStube%20Feedback&body=");
+            await Windows.System.Launcher.LaunchUriAsync(mailto);
         }
 
         private void Menu_Click(object sender, RoutedEventArgs e)
