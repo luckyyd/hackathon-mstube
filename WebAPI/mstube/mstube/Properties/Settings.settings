@@ -29,5 +29,17 @@
     <Setting Name="AzureMLCollaborativeFilterApiKey" Type="System.String" Scope="Application">
       <Value Profile="(Default)">wDJrd0QXCPH7bo6r0a+3zKjdSpnvMxw8LZp0wTMvdDVeslUmdDohgbwylT+7oOQLQBx/TDe8K2O8ujGf2fz8sw==</Value>
     </Setting>
+    <Setting Name="AzureMLRetrainApiKey" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">bqJI6kjh8otOSbB7Px6KrjN7Jp3Qrn+3msZxYmqmoSzDufuzOJiXerN39FPH2YXFT3PxTeWnjRtd1CiFbJB6MA==</Value>
+    </Setting>
+    <Setting Name="AzureMLRetrainBaseUrl" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://asiasoutheast.services.azureml.net/workspaces/0cd16c9abdb94e249ae6f6fb27b76402/services/55aab8a6811848929c5daa6468b554a0/jobs</Value>
+    </Setting>
+    <Setting Name="AzureMLOverwriteApiKey" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">VyAFByLVCp0+wioHMVnP0TvBTid+ygzRMLxLj12F9pzsOto1M7RNSQk81Y04XeZt11iap+HdvxChLup9G9s9/g==</Value>
+    </Setting>
+    <Setting Name="AzureMLOverwriteUrl" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://asiasoutheast.management.azureml.net/workspaces/0cd16c9abdb94e249ae6f6fb27b76402/webservices/607c26dec08e4d688330be768bc03ea5/endpoints/update-endpoint</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

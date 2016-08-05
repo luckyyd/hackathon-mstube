@@ -57,7 +57,6 @@ namespace mstube.Utils
                 }
                 return result;
             }
-
         }
     }
 }

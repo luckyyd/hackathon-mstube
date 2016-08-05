@@ -158,12 +158,12 @@ namespace mstube.Utils
             // 2. Upload the file to an Azure blob - you'd need an Azure storage account
             // 3. Call the Batch Execution Service to process the data in the blob. Any output is written to Azure blobs.
             // 4. Download the output blob, if any, to local file
-            const string BaseUrl = "https://asiasoutheast.services.azureml.net/workspaces/0cd16c9abdb94e249ae6f6fb27b76402/services/55aab8a6811848929c5daa6468b554a0/jobs";
+            string BaseUrl = Properties.Settings.Default.AzureMLRetrainBaseUrl;
 
             const string StorageAccountName = "mstubeblob"; // Replace this with your Azure Storage Account name
             const string StorageContainerName = "mstube-container"; // Replace this with your Azure Storage Container name
             string StorageAccountKey = Properties.Settings.Default.StorageAccountKey;
-            string apiKey = "bqJI6kjh8otOSbB7Px6KrjN7Jp3Qrn+3msZxYmqmoSzDufuzOJiXerN39FPH2YXFT3PxTeWnjRtd1CiFbJB6MA=="; // Replace this with the API key for the web service
+            string apiKey = Properties.Settings.Default.AzureMLRetrainApiKey; // Replace this with the API key for the web service
 
             // set a time out for polling status
             const int TimeOutInMilliseconds = 120 * 1000; // Set a timeout of 2 minutes
@@ -321,8 +321,8 @@ namespace mstube.Utils
 
         private static async Task OverwriteModel(string BaseLocation, string RelativeLocation, string SasBlobToken)
         {
-            const string apiKey = "VyAFByLVCp0+wioHMVnP0TvBTid+ygzRMLxLj12F9pzsOto1M7RNSQk81Y04XeZt11iap+HdvxChLup9G9s9/g==";
-            const string endpointUrl = "https://asiasoutheast.management.azureml.net/workspaces/0cd16c9abdb94e249ae6f6fb27b76402/webservices/607c26dec08e4d688330be768bc03ea5/endpoints/update-endpoint";
+            string apiKey = Properties.Settings.Default.AzureMLOverwriteApiKey;
+            string endpointUrl = Properties.Settings.Default.AzureMLOverwriteUrl;
             var resourceLocations = new
             {
                 Resources = new[]

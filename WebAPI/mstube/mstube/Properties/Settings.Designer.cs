@@ -113,5 +113,45 @@ namespace mstube.Properties {
                 return ((string)(this["AzureMLCollaborativeFilterApiKey"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("bqJI6kjh8otOSbB7Px6KrjN7Jp3Qrn+3msZxYmqmoSzDufuzOJiXerN39FPH2YXFT3PxTeWnjRtd1CiFb" +
+            "JB6MA==")]
+        public string AzureMLRetrainApiKey {
+            get {
+                return ((string)(this["AzureMLRetrainApiKey"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://asiasoutheast.services.azureml.net/workspaces/0cd16c9abdb94e249ae6f6fb27b" +
+            "76402/services/55aab8a6811848929c5daa6468b554a0/jobs")]
+        public string AzureMLRetrainBaseUrl {
+            get {
+                return ((string)(this["AzureMLRetrainBaseUrl"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("VyAFByLVCp0+wioHMVnP0TvBTid+ygzRMLxLj12F9pzsOto1M7RNSQk81Y04XeZt11iap+HdvxChLup9G" +
+            "9s9/g==")]
+        public string AzureMLOverwriteApiKey {
+            get {
+                return ((string)(this["AzureMLOverwriteApiKey"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://asiasoutheast.management.azureml.net/workspaces/0cd16c9abdb94e249ae6f6fb2" +
+            "7b76402/webservices/607c26dec08e4d688330be768bc03ea5/endpoints/update-endpoint")]
+        public string AzureMLOverwriteUrl {
+            get {
+                return ((string)(this["AzureMLOverwriteUrl"]));
+            }
+        }
     }
 }

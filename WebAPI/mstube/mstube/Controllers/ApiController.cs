@@ -38,8 +38,6 @@ namespace mstube.Controllers
         public JsonResult UserId(string uuid)
         {
             //Get user_id for uuid
-            ConnectionMultiplexer connection = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisUserId);
-            IDatabase cacheid = connection.GetDatabase();
             string dbsize = cacheid.StringGet("RedisSize");
             if (dbsize == null)
             {
@@ -77,15 +75,23 @@ namespace mstube.Controllers
                 command.Connection = connection;
                 command.CommandType = CommandType.Text;
 
-                string itemsSet = "";
-                foreach (var item_id in choicedItems)
+                switch (brand)
                 {
-                    itemsSet += item_id.ToString();
-                    itemsSet += ',';
+                    case 1:
+                    case 2:
+                        string itemsSet = "";
+                        foreach (var item_id in choicedItems)
+                        {
+                            itemsSet += item_id.ToString();
+                            itemsSet += ',';
+                        }
+                        itemsSet = itemsSet.TrimEnd(',');
+                        command.CommandText = "SELECT * FROM Item WHERE item_id in (" + itemsSet + ")";
+                        break;
+                    case 3:
+                        command.CommandText = "SELECT top 10 * FROM Item WHERE item_id IN (SELECT TOP 50 item_id FROM Item ORDER BY NewID() ) ORDER BY cast(views as int) DESC";
+                        break;
                 }
-                itemsSet = itemsSet.TrimEnd(',');
-                command.CommandText = "SELECT * FROM Item WHERE item_id in (" + itemsSet + ")";
-
                 using (SqlDataReader reader = await command.ExecuteReaderAsync())
                 {
                     while (reader.Read())
@@ -126,12 +132,14 @@ namespace mstube.Controllers
             Stopwatch timer = new Stopwatch();
             timer.Start();
             List<string> result = new List<string>(itemsToFilter);
+            string key = user_id.ToString();
+            var historySet = await cachefilter.SetMembersAsync(key);
             if (result.Count > 0)
             {
                 for (int i = result.Count - 1; i >= 0; --i)
                 {
                     string item_id = result[i];
-                    if (cachefilter.SetContains(user_id.ToString(), item_id))
+                    if (historySet.Contains(item_id))
                     {
                         result.Remove(item_id);
                     }
@@ -145,17 +153,24 @@ namespace mstube.Controllers
         {
             Stopwatch timer = new Stopwatch();
             timer.Start();
-            // Get CF result
+
             List<string> collaborativeFilteringCandidates = new List<string>();
+            List<Item.Item> collaborativeFilteringList = new List<Item.Item>();
+
+            // Get CF result
             string result = await AzureML_CollaborativeFilter.SendPOSTRequest(user_id);
+
             // Filter CF result;
             dynamic jsonObj = JsonConvert.DeserializeObject(result);
             JArray values = (JArray)jsonObj.Results.ScoringOutput.value.Values[0];
             collaborativeFilteringCandidates = values.ToObject<List<string>>();
             collaborativeFilteringCandidates.RemoveAt(0);
 
-            collaborativeFilteringCandidates = (await ItemFilterAsync(user_id, collaborativeFilteringCandidates)).Take(5).ToList();
-            List<Item.Item> collaborativeFilteringList = await GetItemsFromSQLServerAsync(collaborativeFilteringCandidates, 1);
+            if (collaborativeFilteringCandidates.Count > 0)
+            {
+                collaborativeFilteringCandidates = (await ItemFilterAsync(user_id, collaborativeFilteringCandidates)).Take(5).ToList();
+                collaborativeFilteringList = await GetItemsFromSQLServerAsync(collaborativeFilteringCandidates, 1);
+            }
             timer.Stop();
             Debug.WriteLine("Get Collaborative Filter items time: {0} ms", timer.ElapsedMilliseconds);
             return collaborativeFilteringList;
@@ -164,8 +179,11 @@ namespace mstube.Controllers
         {
             Stopwatch timer = new Stopwatch();
             timer.Start();
-            // Get last item 
+
             List<string> contentBasedCandidates = new List<string>();
+            List<Item.Item> contentBasedList = new List<Item.Item>();
+
+            // Get last item 
             string last_item_id = cacheid.StringGet(user_id.ToString());
             Debug.WriteLine("Last item id is " + last_item_id);
 
@@ -174,65 +192,27 @@ namespace mstube.Controllers
             {
                 string contentbasedResult = await AzureML_ContentBasedFilter.SendPOSTRequest(user_id, Convert.ToInt64(last_item_id), 3);
                 dynamic jsonContentbasedResultObj = JsonConvert.DeserializeObject(contentbasedResult);
-                JArray valuesContentbasedResult = (JArray)jsonContentbasedResultObj.Results.output1.value.Values[0];
-                contentBasedCandidates = valuesContentbasedResult.ToObject<List<string>>();
+                JArray values = (JArray)jsonContentbasedResultObj.Results.output1.value.Values[0];
+                contentBasedCandidates = values.ToObject<List<string>>();
                 contentBasedCandidates.RemoveAt(0);
             }
 
             // Filter Contect-based items
-            contentBasedCandidates = (await ItemFilterAsync(user_id, contentBasedCandidates)).Take(5).ToList();
+            if (contentBasedCandidates.Count > 0)
+            {
+                contentBasedCandidates = (await ItemFilterAsync(user_id, contentBasedCandidates)).Take(5).ToList();
+                contentBasedList = await GetItemsFromSQLServerAsync(contentBasedCandidates, 2);
+            }
 
-            List<Item.Item> contentBasedList = await GetItemsFromSQLServerAsync(contentBasedCandidates, 2);
             timer.Stop();
             Debug.WriteLine("Get Content based items time: {0} ms", timer.ElapsedMilliseconds);
             return contentBasedList;
         }
-        private async Task<List<Item.Item>> GetPopularItemsFromSQLServerAsync(int choices = 50, int top = 5)
+        private async Task<List<Item.Item>> GetPopularItemsAsync(int choices = 50, int top = 10)
         {
             Stopwatch timer = new Stopwatch();
             timer.Start();
-            List<Item.Item> resultList = new List<Item.Item>();
-            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["MstubeConnection"].ToString());
-            try
-            {
-                connection.Open();
-                SqlCommand command = new SqlCommand();
-                command.Connection = connection;
-                command.CommandType = CommandType.Text;
-                command.CommandText = "SELECT top 5 * FROM Item WHERE item_id IN (SELECT TOP 50 item_id FROM Item ORDER BY NewID() ) ORDER BY cast(views as int) DESC";
-                using (SqlDataReader reader = await command.ExecuteReaderAsync())
-                {
-                    while (reader.Read())
-                    {
-                        Item.Item item = new Item.Item
-                        {
-                            item_id = Convert.ToInt64(reader["item_id"]),
-                            image_src = reader["image_src"].ToString(),
-                            video_src = reader["video_src"].ToString(),
-                            title = reader["title"].ToString(),
-                            url = reader["url"].ToString(),
-                            description = reader["description"].ToString(),
-                            topic = reader["topic"].ToString(),
-                            category = reader["category"].ToString(),
-                            full_description = reader["full_description"].ToString(),
-                            posted_time = reader["posted_time"].ToString(),
-                            views = Convert.ToInt32(reader["views"]),
-                            quality = Convert.ToDouble(reader["quality"]),
-                            brand = 3,
-                        };
-                        string item_id = item.item_id.ToString();
-                        resultList.Add(item);
-                    }
-                }
-            }
-            catch (SqlException err)
-            {
-                Debug.WriteLine(err);
-            }
-            finally
-            {
-                connection.Close();
-            }
+            List<Item.Item> resultList = await GetItemsFromSQLServerAsync(new List<string>(), 3);
             timer.Stop();
             Debug.WriteLine("Get popular items time: {0} ms", timer.ElapsedMilliseconds);
             return resultList;
@@ -244,7 +224,7 @@ namespace mstube.Controllers
                 cachefilter.SetAdd(user_id.ToString(), v.item_id.ToString());
             }
         }
-     
+
         [HttpGet]
         public async Task<JsonResult> Candidates(long user_id)
         {
@@ -252,14 +232,14 @@ namespace mstube.Controllers
             timerTotal.Start();
 
             List<Item.Item> collaborativeFilteringList = new List<Item.Item>();
-            List<Item.Item> contentBasedList= new List<Item.Item>();
+            List<Item.Item> contentBasedList = new List<Item.Item>();
             List<Item.Item> popularityList = new List<Item.Item>();
             List<Item.Item> resultList = new List<Item.Item>();
 
             // Run get popularity items task
             Task<List<Item.Item>> taskGetCollaborativeFilterItems = GetCollaborativeFilterItemsAsync(user_id);
             Task<List<Item.Item>> taskGetContentBasedItems = GetContentBasedItemsAsync(user_id);
-            Task<List<Item.Item>> taskGetPopularityItems = GetPopularItemsFromSQLServerAsync(50, 5);
+            Task<List<Item.Item>> taskGetPopularityItems = GetPopularItemsAsync(50, 10);
 
             // Get task results
             contentBasedList = await taskGetContentBasedItems;
@@ -273,10 +253,6 @@ namespace mstube.Controllers
 
             // Get distinct items
             List<Item.Item> distinctList = resultList.GroupBy(x => x.item_id).Select(g => g.First()).ToList();
-            distinctList = distinctList.Take(10).ToList();
-            distinctList.Shuffle();
-
-            // Add popularity list
             distinctList = distinctList.Take(10).ToList();
             distinctList.Shuffle();
 

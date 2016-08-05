@@ -45,15 +45,12 @@ namespace mstube.Utils
                 else
                 {
                     Console.WriteLine(string.Format("The request failed with status code: {0}", response.StatusCode));
-
                     Console.WriteLine(response.Headers.ToString());
-
                     string responseContent = await response.Content.ReadAsStringAsync();
                     Console.WriteLine(responseContent);
                 }
                 return result;
             }
-
         }
     }
 }
