@@ -22,6 +22,7 @@ namespace MStube.Items
         public string posted_time { get; set; }
         public float quality { get; set;}
         public int views { get; set; }
+        public string source { get; set; }
         public int brand { get; set; }
 
     }

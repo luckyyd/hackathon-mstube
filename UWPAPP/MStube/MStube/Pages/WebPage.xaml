@@ -1,0 +1,63 @@
+﻿<Page
+    x:Class="MStube.WebPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:MStube"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid Margin="5,5,5,5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="10"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="2*"/>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="3*"/>
+            </Grid.RowDefinitions>
+            <TextBlock x:Name="textTitle" 
+                        Grid.Row="0"
+                        Grid.Column="1" 
+                        Height="Auto" 
+                        Margin="5,20,5,20" 
+                        TextWrapping="Wrap"
+                        Text="{x:Bind WebDetail.Title}" 
+                        Style="{StaticResource SubtitleTextBlockStyle}"
+                        VerticalAlignment="Center"
+                        Width="Auto"
+                        HorizontalAlignment="Center"/>
+            <WebView x:Name="mediaWebview"
+                     Grid.Row="1"
+                     Grid.Column="1"
+                     Margin="5,10,5,10"
+                     />
+
+            <local:RatingBar x:Name="RatingBar"   
+                             Grid.Row="2" 
+                             Grid.Column="1" 
+                             VerticalAlignment="Center" 
+                             HorizontalAlignment="Center" 
+                             Margin="0,15,0,10"
+                             NumberOfStars="5" 
+                             RatingValue="3" 
+                             StarForegroundColor="#cccc33" 
+                             HeightValue="25" 
+                             />
+
+            <TextBlock x:Name="textDescription" 
+                        Grid.Row="3" 
+                        Grid.Column="1" 
+                        TextWrapping="Wrap" 
+                        Margin="10,20,10,10"
+                        Text="{x:Bind WebDetail.Description}" 
+                        HorizontalAlignment="Left" 
+                        VerticalAlignment="Top"/>
+            <ProgressRing x:Name="LoadingProgressRing" IsActive="True" Height="80" Width="80" Grid.Row="1" Grid.Column="1"/>
+        </Grid>
+    </Grid>
+</Page>

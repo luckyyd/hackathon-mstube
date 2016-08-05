@@ -55,6 +55,7 @@ namespace MStube
             List<VideoDetailItem> newVideoListCandidates = await GetVideoJson();
 
             //newVideoListCandidates.Reverse();
+
             foreach (VideoDetailItem item in newVideoListCandidates)
             {
                 videoListCandidates.Insert(0, new VideoViewModel
@@ -65,16 +66,17 @@ namespace MStube
                     VideoSourceUri = item.video_src,
                     Description = item.description,
                     FullDescription = item.full_description,
+                    Url = item.url,
                     Views = item.views,
                     UploadDate = item.posted_time,
+                    Source = item.source,
                     Brand = item.brand
                 });
             }
+
             LoadingProgressRing.IsActive = false;
             VideoBriefList.ItemsSource = videoListCandidates;
         }
-
-
 
         private async Task<int> GetUserId(Utils.DeviceInfo device)
         {
@@ -132,7 +134,15 @@ namespace MStube
             HockeyClient.Current.TrackEvent("Item Clicked: " +clickedItem.item_id.ToString());
             Task.Run(()=>Utils.SendPreference.SendPreferenceToServer(clickedItem.user_id ,clickedItem.item_id, 4));
             Frame rootFrame = Window.Current.Content as Frame;
-            rootFrame.Navigate(typeof(VideoPage), e.ClickedItem);
+            if (clickedItem.Source == "channel9")
+            {
+                rootFrame.Navigate(typeof(VideoPage), e.ClickedItem);
+            }
+            else if (clickedItem.Source == "vimeo")
+            {
+                rootFrame.Navigate(typeof(WebPage), e.ClickedItem);
+            }
+            
         }
 
 
