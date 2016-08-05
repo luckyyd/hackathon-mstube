@@ -74,7 +74,6 @@ namespace mstube.Controllers
                 SqlCommand command = new SqlCommand();
                 command.Connection = connection;
                 command.CommandType = CommandType.Text;
-
                 switch (brand)
                 {
                     case 1:
@@ -89,13 +88,14 @@ namespace mstube.Controllers
                         command.CommandText = "SELECT * FROM Item WHERE item_id in (" + itemsSet + ")";
                         break;
                     case 3:
-                        command.CommandText = "SELECT top 10 * FROM Item WHERE item_id IN (SELECT TOP 50 item_id FROM Item ORDER BY NewID() ) ORDER BY cast(views as int) DESC";
+                        command.CommandText = "SELECT top 5 * FROM Item WHERE item_id IN (SELECT TOP 50 item_id FROM Item ORDER BY NewID() ) ORDER BY cast(views as int) DESC";
                         break;
                 }
                 using (SqlDataReader reader = await command.ExecuteReaderAsync())
                 {
                     while (reader.Read())
                     {
+                        Debug.WriteLine(reader["item_id"]);
                         Item.Item item = new Item.Item
                         {
                             item_id = Convert.ToInt64(reader["item_id"]),
@@ -110,14 +110,18 @@ namespace mstube.Controllers
                             posted_time = reader["posted_time"].ToString(),
                             views = Convert.ToInt32(reader["views"]),
                             quality = Convert.ToDouble(reader["quality"]),
+                            source = reader["source"].ToString(),
                             brand = brand,
                         };
-                        string item_id = item.item_id.ToString();
                         resultList.Add(item);
                     }
                 }
             }
             catch (SqlException err)
+            {
+                Debug.WriteLine(err);
+            }
+            catch (InvalidOperationException err)
             {
                 Debug.WriteLine(err);
             }
@@ -157,10 +161,8 @@ namespace mstube.Controllers
             List<string> collaborativeFilteringCandidates = new List<string>();
             List<Item.Item> collaborativeFilteringList = new List<Item.Item>();
 
-            // Get CF result
             string result = await AzureML_CollaborativeFilter.SendPOSTRequest(user_id);
 
-            // Filter CF result;
             dynamic jsonObj = JsonConvert.DeserializeObject(result);
             JArray values = (JArray)jsonObj.Results.ScoringOutput.value.Values[0];
             collaborativeFilteringCandidates = values.ToObject<List<string>>();
@@ -185,7 +187,6 @@ namespace mstube.Controllers
 
             // Get last item 
             string last_item_id = cacheid.StringGet(user_id.ToString());
-            Debug.WriteLine("Last item id is " + last_item_id);
 
             // Get Content-based result
             if (last_item_id != null)
@@ -208,7 +209,7 @@ namespace mstube.Controllers
             Debug.WriteLine("Get Content based items time: {0} ms", timer.ElapsedMilliseconds);
             return contentBasedList;
         }
-        private async Task<List<Item.Item>> GetPopularItemsAsync(int choices = 50, int top = 10)
+        private async Task<List<Item.Item>> GetPopularItemsAsync(int choices = 50, int top = 5)
         {
             Stopwatch timer = new Stopwatch();
             timer.Start();
@@ -239,7 +240,7 @@ namespace mstube.Controllers
             // Run get popularity items task
             Task<List<Item.Item>> taskGetCollaborativeFilterItems = GetCollaborativeFilterItemsAsync(user_id);
             Task<List<Item.Item>> taskGetContentBasedItems = GetContentBasedItemsAsync(user_id);
-            Task<List<Item.Item>> taskGetPopularityItems = GetPopularItemsAsync(50, 10);
+            Task<List<Item.Item>> taskGetPopularityItems = GetPopularItemsAsync(50, 5);
 
             // Get task results
             contentBasedList = await taskGetContentBasedItems;
@@ -253,8 +254,8 @@ namespace mstube.Controllers
 
             // Get distinct items
             List<Item.Item> distinctList = resultList.GroupBy(x => x.item_id).Select(g => g.First()).ToList();
-            distinctList = distinctList.Take(10).ToList();
             distinctList.Shuffle();
+            distinctList = distinctList.Take(10).ToList();
 
             // Post History
             Task logRecommendHistory = Task.Run(() => LogRecommendHistory(user_id, distinctList));
