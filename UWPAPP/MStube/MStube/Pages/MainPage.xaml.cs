@@ -74,8 +74,6 @@ namespace MStube
             VideoBriefList.ItemsSource = videoListCandidates;
         }
 
-
-
         private async Task<int> GetUserId(Utils.DeviceInfo device)
         {
             HttpClient httpClient = new HttpClient();
@@ -135,7 +133,6 @@ namespace MStube
             rootFrame.Navigate(typeof(VideoPage), e.ClickedItem);
         }
 
-
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
@@ -150,9 +147,11 @@ namespace MStube
 
         private async void SendFeedback_Click(object sender, RoutedEventArgs e)
         {
-            if (Microsoft.Services.Store.Engagement.Feedback.IsSupported) {
-                await Microsoft.Services.Store.Engagement.Feedback.LaunchFeedbackAsync();
-            }
+            //if (Microsoft.Services.Store.Engagement.Feedback.IsSupported) {
+            //    await Microsoft.Services.Store.Engagement.Feedback.LaunchFeedbackAsync();
+            //}
+            var mailto = new Uri(@"mailto:?to=mstube@microsoft.com&subject=MStube%20Feedback&body=");
+            await Windows.System.Launcher.LaunchUriAsync(mailto);
         }
 
         private void Menu_Click(object sender, RoutedEventArgs e)
