@@ -27,10 +27,10 @@ namespace MStube.ViewModels
             {
                 if (Brand == 1)
                     // CF recommend
-                    return "\xe60a";
+                    return "\xe609";
                 if (Brand == 2)
                     // Content-based recommend
-                    return "\xe609";
+                    return "\xe60a";
                 if (Brand == 3)
                     // Random recommend
                     return "\xe60b";

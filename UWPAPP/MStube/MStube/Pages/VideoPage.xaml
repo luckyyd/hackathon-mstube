@@ -17,8 +17,9 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="2*"/>
-                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="3*"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <TextBlock x:Name="textTitle" 
                         Grid.Row="0"
@@ -31,6 +32,7 @@
                         VerticalAlignment="Center"
                         Width="Auto"
                         HorizontalAlignment="Center"/>
+            
             <MediaElement x:Name="mediaElement" 
                             Grid.Row="1" 
                             Grid.Column="1"
@@ -51,7 +53,7 @@
                              StarForegroundColor="#cccc33" 
                              HeightValue="25" 
                              />
-            
+
             <TextBlock x:Name="textDescription" 
                         Grid.Row="3" 
                         Grid.Column="1" 
@@ -59,7 +61,19 @@
                         Margin="10,20,10,10"
                         Text="{x:Bind VideoDetail.Description}" 
                         HorizontalAlignment="Left" 
-                        VerticalAlignment="Top"/>
+                        VerticalAlignment="Top">
+            </TextBlock>
+            
+            <TextBlock x:Name="textReadMore"
+                       Grid.Row="4"
+                       Grid.Column="1"
+                       Margin="10,0,0,20"
+                       VerticalAlignment="Bottom" 
+                       HorizontalAlignment="Left">
+                       <Hyperlink NavigateUri="{x:Bind VideoDetail.Url}" UnderlineStyle="None">
+                           Read More
+                       </Hyperlink>
+            </TextBlock>
         </Grid>
     </Grid>
 </Page>
