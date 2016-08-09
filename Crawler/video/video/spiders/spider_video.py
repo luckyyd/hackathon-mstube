@@ -81,13 +81,6 @@ class VideoSpider(scrapy.Spider):
             self.log("Crawl done with topic: " + topic)
 
     def parse_video_detail(self, response):
-        pattern_video_src = re.compile(r'<a class="video".*?href="(.*\.mp4)"')
-        pattern_tags = re.compile(r'<a href="/Tags.*?">(.*)</a>')
-        # TODO:
-        pattern_views = re.compile(r'<span class="count">(\d*)</span>')
-        pattern_upload_date = re.compile(r'"uploadDate":"([\d-]*)T')
-        pattern_avg_rating = re.compile(r'<p class="avg-rating">.*?([\d.]+)</p>')
-        pattern_full_description = re.compile(r'<div id="entry-body">\s*(.*)\s*</div>')
         try:
             tags = response.xpath('//div[@id="entry-tags"]/ul/li/a/text()').extract()
         except Exception:
