@@ -33,19 +33,24 @@ class VimeodetailSpider(scrapy.Spider):
 		
 	#for info in hxs.xpath('//div[@class="iris_grid-content"]'):
 	item = VimeodetailItem()
-	item['item_id'] = str(self.counter)
-	self.counter += 1
-	item['url'] = hxs.xpath('//meta[@property="og:url"]/@content').extract()
-	item['video_src'] = hxs.xpath('//meta[@property="og:url"]/@content').extract()
-	item['image_src'] = hxs.xpath('//meta[@name="twitter:image"]/@content').extract()
-	item['title'] = hxs.xpath('//meta[@name="twitter:title"]/@content').extract()
-	item['description'] = hxs.xpath('//meta[@name="description"]/@content').extract()
-	item['full_description'] = hxs.xpath('//meta[@name="description"]/@content').extract()
-	item['topic'] = str("Microsoft")
-	item['posted_time'] = hxs.xpath('//span[@class="clip_info-time"]/time/@datetime').extract()
-	item['views'] = hxs.xpath('//script[@type="application/ld+json"]/text()').re(r'"interactionCount":(\d*)')
+	item['url'] = hxs.xpath('//meta[@property="og:url"]/@content').extract()[0]
+	item['video_src'] = hxs.xpath('//meta[@property="og:url"]/@content').extract()[0]
+	item['image_src'] = hxs.xpath('//meta[@name="twitter:image"]/@content').extract()[0]
+	item['title'] = hxs.xpath('//meta[@name="twitter:title"]/@content').extract()[0]
+	item['description'] = hxs.xpath('//meta[@name="description"]/@content').extract()[0]
+	item['full_description'] = hxs.xpath('//meta[@name="description"]/@content').extract()[0]
+	try:
+	    item['topic'] = hxs.xpath('//meta[@property="video:tag"]/@content').extract()[0]
+	except:
+	    item['topic'] = hxs.xpath('//meta[@property="article:tag"]/@content').extract()[0]
+	item['posted_time'] = hxs.xpath('//span[@class="clip_info-time"]/time/@datetime').re(r'([\d-]*)T')[0]
+	try:
+	    item['views'] = int(hxs.xpath('//script[@type="application/ld+json"]/text()').re(r'"interactionCount":(\d*)')[0])
+	except:
+	    item['views'] = int(100)
 	item['category'] = str("video")
 	item['source'] = str("vimeo")
+	item['quality'] = int(4)
 	yield item
 
 
