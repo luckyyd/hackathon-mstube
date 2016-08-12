@@ -18,8 +18,14 @@ class SQLServerPipeline(object):
     def process_item(self, item, spider):
         try:
             self.cursor.execute(
-                "INSERT INTO TestItem(item_id, title, video_src, image_src, url, views, category, posted_time, description, full_description, source) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                (item['item_id'], item['title'], item['video_src'], item['image_src'], item['url'], item['views'], item['category'], item['upload_date'], item['description'], item['full_description'], "youtube"))
+                "IF NOT EXISTS (SELECT * FROM TestItem Where url = %s) \
+                 INSERT INTO TestItem(title, video_src, image_src, url, \
+                views, category, posted_time, description, full_description, source) \
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                (item['url'], item['title'], item['video_src'], item['image_src'],
+                 item['url'], item['views'], item[
+                     'category'], item['upload_date'],
+                 item['description'], item['full_description'], "youtube"))
             self.conn.commit()
         except pymssql.Error as e:
             print("Error with pymssql: " + str(e))

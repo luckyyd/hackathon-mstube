@@ -14,7 +14,7 @@ class YoutubeSpider(scrapy.Spider):
 
     def __init__(self):
         self.counter = 0
-        self.main_url = 'https://www.youtube.com/'
+        self.main_url = 'https://www.youtube.com'
 
     def parse(self, response):
         try:
@@ -33,9 +33,13 @@ class YoutubeSpider(scrapy.Spider):
                 title = entry.xpath('.//h3/a/text()').extract()[0]
                 url = self.main_url + entry.xpath('.//h3/a/@href').extract()[0]
                 image_src = entry.xpath('.//img/@data-thumb').extract()[0]
-                description = entry.xpath(
-                    './/div[contains(@class, "yt-lockup-description")]/text()').extract()[0]
-                description = description.strip('\n').strip()
+                image_src = re.findall('(.*\.jpg)\?', image_src)[0]
+                try:
+                    description = entry.xpath(
+                        './/div[contains(@class, "yt-lockup-description")]/text()').extract()[0]
+                    description = description.strip('\n').strip()
+                except:
+                    description = ''
                 req = scrapy.Request(url, callback=self.parse_video)
                 req.meta['title'] = title
                 req.meta['url'] = url
@@ -51,7 +55,7 @@ class YoutubeSpider(scrapy.Spider):
         except:
             sel = Selector(response=response)
         try:
-            url = "https://www.youtube.com" + \
+            url = self.main_url + \
                 sel.xpath(
                     '//button[contains(@class,"load-more-button")]/@data-uix-load-more-href').extract()[0]
             print('Scrawl next: (ajax)', url)
