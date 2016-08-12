@@ -226,31 +226,31 @@ namespace MStube
             if (GetRatingBarValue != null) {
                 GetRatingBarValue(RatingValue);
             }
-            ShowMsg();
+            //ShowMsg();
         }
 
-        private IAsyncOperation<IUICommand> dialogTask;
-        private void ShowMsg() {
-            MessageDialog msg = new Windows.UI.Popups.MessageDialog("Thanks for voting!");
-            try
-            {
-                dialogTask = msg.ShowAsync();
-            }
-            catch
-            {
+        //private IAsyncOperation<IUICommand> dialogTask;
+        //private void ShowMsg() {
+        //    MessageDialog msg = new Windows.UI.Popups.MessageDialog("Thanks for voting!");
+        //    try
+        //    {
+        //        dialogTask = msg.ShowAsync();
+        //    }
+        //    catch
+        //    {
 
-            }
-            DispatcherTimer dt = new DispatcherTimer();
-            dt.Interval = TimeSpan.FromSeconds(1);
-            dt.Tick += dt_Tick;
-            dt.Start();
-        }
+        //    }
+        //    DispatcherTimer dt = new DispatcherTimer();
+        //    dt.Interval = TimeSpan.FromSeconds(1);
+        //    dt.Tick += dt_Tick;
+        //    dt.Start();
+        //}
 
-        void dt_Tick(object sender, object e)
-        {
-            (sender as DispatcherTimer).Stop();
-            dialogTask.Cancel();
-        }
+        //void dt_Tick(object sender, object e)
+        //{
+        //    (sender as DispatcherTimer).Stop();
+        //    dialogTask.Cancel();
+        //}
 
         public void ToggleButton_DragEnter(object sender, PointerRoutedEventArgs e)
         {
