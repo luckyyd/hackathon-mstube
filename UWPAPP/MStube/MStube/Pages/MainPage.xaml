@@ -47,11 +47,16 @@
                         <RowDefinition Height="Auto" MaxHeight="20"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <Grid Grid.Row="0">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <Image Source="/Assets/Square44x44Logo.scale-100.png" VerticalAlignment="Center"/>
-                            <TextBlock Margin="15" Text="MStube" FontSize="24" VerticalAlignment="Center" Style="{StaticResource HeaderTextBlockStyle}" />
-                        </StackPanel>
+                    <Grid Grid.Row="0" >
+                        <AutoSuggestBox 
+                                Margin="5,5,5,5"
+                                Width="Auto"
+                                PlaceholderText="Search"
+                                QueryIcon="Find" 
+                                TextChanged="AutoSuggestBox_TextChanged"
+                                QuerySubmitted="AutoSuggestBox_QuerySubmitted"
+                                SuggestionChosen="AutoSuggestBox_SuggestionChosen"
+                            />
                     </Grid>
                     <Grid Grid.Row="1">
                         <pr:PullToRefreshBox RefreshInvoked="PullToRefreshBox_RefreshInvoked">

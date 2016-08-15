@@ -393,19 +393,20 @@ namespace mstube.Controllers
         [HttpGet]
         public JsonResult UpdateDB()
         {
-            StreamReader sr = new StreamReader(Server.MapPath(@"~/App_Data/items_full.json"));
+            StreamReader sr = new StreamReader(Server.MapPath(@"~/App_Data/vimeo.json"));
             List<Item.Item> jsonItem = JsonConvert.DeserializeObject<List<Item.Item>>(sr.ReadToEnd());
 
             foreach (var item in jsonItem)
             {
-                SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["MstubeConnection"].ToString());
+                SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["MstubeConnectionVimeo"].ToString());
                 using (SqlCommand command = new SqlCommand())
                 {
                     command.Connection = connection;
                     command.CommandType = CommandType.Text;
-                    command.CommandText = "INSERT INTO Item (item_id, image_src, video_src, title, url, description, topic, category, full_description, posted_time, views, quality)"
-                                            + "VALUES (@item_id, @image_src, @video_src, @title, @url, @description, @topic, @category, @full_description, @posted_time, @views, @quality)";
-                    command.Parameters.AddWithValue("@item_id", item.item_id);
+                    command.CommandText = "IF NOT EXISTS (SELECT * FROM TestItem WHERE url = @url) "
+                                            + "INSERT INTO TestItem (image_src, video_src, title, url, description, topic, category, full_description, posted_time, views, quality)"
+                                            + "VALUES (@image_src, @video_src, @title, @url, @description, @topic, @category, @full_description, @posted_time, @views, @quality)";
+                    //command.Parameters.AddWithValue("@item_id", item.item_id);
                     command.Parameters.AddWithValue("@image_src", item.image_src);
                     command.Parameters.AddWithValue("@video_src", item.video_src);
                     command.Parameters.AddWithValue("@title", item.title);

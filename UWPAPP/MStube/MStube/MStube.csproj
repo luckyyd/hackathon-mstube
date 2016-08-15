@@ -120,6 +120,7 @@
     </Compile>
     <Compile Include="Utils\DeviceInfo.cs" />
     <Compile Include="Common\VideoList.cs" />
+    <Compile Include="Utils\GetQuery.cs" />
     <Compile Include="Utils\SendPreference.cs" />
     <Compile Include="ViewModels\VideoViewModel.cs" />
   </ItemGroup>
