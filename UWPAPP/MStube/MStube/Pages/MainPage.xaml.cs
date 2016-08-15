@@ -18,6 +18,7 @@ using Microsoft.HockeyApp;
 using Windows.Foundation;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
+using VideoLibrary;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -136,6 +137,12 @@ namespace MStube
             Frame rootFrame = Window.Current.Content as Frame;
             if (clickedItem.Source == "channel9")
             {
+                rootFrame.Navigate(typeof(VideoPage), e.ClickedItem);
+            }
+            else if (clickedItem.Source == "youtube") {
+                var youTube = YouTube.Default;
+                var video = youTube.GetVideo(clickedItem.Url);
+                clickedItem.Url = video.Uri;
                 rootFrame.Navigate(typeof(VideoPage), e.ClickedItem);
             }
             else if (clickedItem.Source == "vimeo")
