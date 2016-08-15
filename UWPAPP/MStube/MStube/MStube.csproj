@@ -19,7 +19,7 @@
     <PackageCertificateKeyFile>MStube_TemporaryKey.pfx</PackageCertificateKeyFile>
     <PackageCertificateThumbprint>C334343DC5E1D7886C7D91DFA95085B0A238F437</PackageCertificateThumbprint>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
-    <AppxBundle>Never</AppxBundle>
+    <AppxBundle>Always</AppxBundle>
     <AppxBundlePlatforms>x86|x64|arm</AppxBundlePlatforms>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">

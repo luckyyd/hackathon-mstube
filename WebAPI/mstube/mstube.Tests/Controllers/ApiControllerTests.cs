@@ -43,7 +43,8 @@ namespace mstube.Controllers.Tests
         }
 
         [TestMethod()]
-        public async Task RandomCandidatesTest() {
+        public async Task RandomCandidatesTest()
+        {
             var controller = new ApiController();
             var result = await controller.Candidates(new Random().Next(50000, 60000));
             Assert.IsInstanceOfType(result, typeof(JsonResult));
@@ -89,6 +90,26 @@ namespace mstube.Controllers.Tests
             List<Item.Item> items = JsonConvert.DeserializeObject<List<Item.Item>>(JsonConvert.SerializeObject(searchResult.Data));
             Assert.AreNotEqual(items.Count, 0);
             Assert.IsNotNull(items[new Random().Next(items.Count)].item_id);
+        }
+        [TestMethod()]
+        public void SearchAzureTopicTest()
+        {
+            var controller = new ApiController();
+            string topic = "Azure";
+            var result = controller.SearchTopic(topic);
+            Assert.IsInstanceOfType(result, typeof(JsonResult));
+            List<Item.Item> items = JsonConvert.DeserializeObject<List<Item.Item>>(JsonConvert.SerializeObject(result.Data));
+            Assert.AreNotEqual(items.Count, 0);
+        }
+        [TestMethod()]
+        public void SearchAzureTitleTest()
+        {
+            var controller = new ApiController();
+            string title = "Azure";
+            var result = controller.SearchTopic(title);
+            Assert.IsInstanceOfType(result, typeof(JsonResult));
+            List<Item.Item> items = JsonConvert.DeserializeObject<List<Item.Item>>(JsonConvert.SerializeObject(result.Data));
+            Assert.AreNotEqual(items.Count, 0);
         }
     }
 }

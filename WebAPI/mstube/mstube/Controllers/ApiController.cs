@@ -313,8 +313,10 @@ namespace mstube.Controllers
             {
                 command.Connection = connection;
                 command.CommandType = CommandType.Text;
-                command.CommandText = "SELECT * FROM Item WHERE topic = @topic";
-                command.Parameters.AddWithValue("@topic", topic);
+                command.CommandText = "SELECT Top 20 * FROM Item WHERE item_id in (SELECT item_id FROM Item WHERE topic like '%"
+                                        + topic + "%') ORDER BY NewID()";
+                //command.Parameters.AddWithValue("@topic", "%" + topic + "%");
+                Debug.WriteLine(command.CommandText);
                 try
                 {
                     connection.Open();
@@ -335,11 +337,63 @@ namespace mstube.Controllers
                                 full_description = reader["full_description"].ToString(),
                                 posted_time = reader["posted_time"].ToString(),
                                 views = Convert.ToInt32(reader["views"]),
-                                quality = Convert.ToDouble(reader["quality"])
+                                quality = Convert.ToDouble(reader["quality"]),
+                                source = reader["source"].ToString()
                             });
                         }
                     }
+                }
+                catch (SqlException)
+                {
+                    // error here
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+            return Json(jsonResult, JsonRequestBehavior.AllowGet);
+        }
 
+        [HttpGet]
+        public JsonResult SearchTitle(string title)
+        {
+            List<Item.Item> jsonResult = new List<Item.Item>();
+            //Return search topic from db
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["MstubeConnection"].ToString());
+            using (SqlCommand command = new SqlCommand())
+            {
+                command.Connection = connection;
+                command.CommandType = CommandType.Text;
+                command.CommandText = "SELECT Top 20 * FROM Item WHERE item_id in (SELECT item_id FROM Item WHERE title like '%"
+                                        + title + "%') ORDER BY NewID()";
+                //command.Parameters.AddWithValue("@topic", "%" + topic + "%");
+                Debug.WriteLine(command.CommandText);
+                try
+                {
+                    connection.Open();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            jsonResult.Add(new Item.Item
+                            {
+                                item_id = Convert.ToInt64(reader["item_id"]),
+                                image_src = reader["image_src"].ToString(),
+                                video_src = reader["video_src"].ToString(),
+                                title = reader["title"].ToString(),
+                                url = reader["url"].ToString(),
+                                description = reader["description"].ToString(),
+                                topic = reader["topic"].ToString(),
+                                category = reader["topic"].ToString(),
+                                full_description = reader["full_description"].ToString(),
+                                posted_time = reader["posted_time"].ToString(),
+                                views = Convert.ToInt32(reader["views"]),
+                                quality = Convert.ToDouble(reader["quality"]),
+                                source = reader["source"].ToString()
+                            });
+                        }
+                    }
                 }
                 catch (SqlException)
                 {
