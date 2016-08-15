@@ -275,6 +275,7 @@
     </Content>
     <Content Include="App_Data\items.json" />
     <Content Include="App_Data\PreferenceSample.csv" />
+    <Content Include="App_Data\vimeo.json" />
     <None Include="Properties\PublishProfiles\mstubedotnet.pubxml" />
     <None Include="Properties\Settings.settings">
       <Generator>PublicSettingsSingleFileGenerator</Generator>

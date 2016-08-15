@@ -202,5 +202,45 @@ namespace MStube
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+
+        private async void AutoSuggestBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        {
+            if (args.ChosenSuggestion != null)
+            {
+                //User selected an item, take an action on it here
+            }
+            else
+            {
+                var searchresult = await Task.Run(() => Utils.GetQuery.GetQueryToServer(args.QueryText));
+
+                if (searchresult.Count >= 1)
+                {
+
+                    InitializeValues();
+                }
+                else
+                {
+                    //Results.Visibility = Visibility.Visible;
+                }
+            }
+
+        }
+
+        private void AutoSuggestBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+        {
+
+        }
+
+        private void AutoSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+            if (args.Reason != AutoSuggestionBoxTextChangeReason.UserInput)
+            {
+                // User selected an item from the suggestion list, take an action on it here.
+            }
+            else
+            {
+                // Use args.QueryText to determine what to do.
+            }
+        }
     }
 }
