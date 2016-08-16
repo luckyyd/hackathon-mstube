@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Core;
@@ -15,8 +16,6 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using MStube.ViewModels;
-using System.Threading.Tasks;
-using System.Diagnostics;
 using Windows.Web.Http;
 using Microsoft.HockeyApp;
 using Newtonsoft.Json.Linq;
@@ -42,7 +41,6 @@ namespace MStube
         {
             base.OnNavigatedTo(e);
             var video = e.Parameter as VideoViewModel;
-            Debug.WriteLine(video.Title);
             WebDetail = video;
             InitializeValues();
 
@@ -65,7 +63,7 @@ namespace MStube
             long user_id = WebDetail.user_id;
             long item_id = WebDetail.item_id;
             Task.Run(() => Utils.SendPreference.SendPreferenceToServer(user_id, item_id, RatingValue));
-            Debug.WriteLine("Send Preference" + user_id.ToString() + item_id.ToString() + RatingValue.ToString());
+            //Debug.WriteLine("Send Preference" + user_id.ToString() + item_id.ToString() + RatingValue.ToString());
         }
 
 
@@ -78,7 +76,6 @@ namespace MStube
             try
             {
                 string result = await httpClient.GetStringAsync(uri);
-                Debug.WriteLine(result);
                 JToken root = JObject.Parse(result);
                 JToken html = root["html"];
                 link = html.ToString();
@@ -86,7 +83,6 @@ namespace MStube
             }
             catch (Exception error)
             {
-                Debug.WriteLine(error);
                 HockeyClient.Current.TrackException(error);
             }
             finally

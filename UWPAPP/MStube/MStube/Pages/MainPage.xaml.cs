@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using MStube.Common;
@@ -91,7 +90,6 @@ namespace MStube
             }
             catch (Exception error)
             {
-                Debug.WriteLine(error);
                 HockeyClient.Current.TrackException(error);
             }
             finally
@@ -111,13 +109,12 @@ namespace MStube
             try
             {
                 var result = await httpClient.GetStringAsync(uri);
-                Debug.WriteLine("User id: " + user_id);
-                Debug.WriteLine(result);
+                //Debug.WriteLine("User id: " + user_id);
+                //Debug.WriteLine(result);
                 items = JsonConvert.DeserializeObject<List<VideoDetailItem>>(result as string);
             }
             catch (Exception error)
             {
-                Debug.WriteLine(error);
                 HockeyClient.Current.TrackException(error);
             }
             finally
@@ -131,7 +128,6 @@ namespace MStube
         {
             VideoViewModel clickedItem = e.ClickedItem as VideoViewModel;
             clickedItem.user_id = user_id;
-            Debug.WriteLine(clickedItem.item_id);
             HockeyClient.Current.TrackEvent("Item Clicked: " +clickedItem.item_id.ToString());
             Task.Run(()=>Utils.SendPreference.SendPreferenceToServer(clickedItem.user_id ,clickedItem.item_id, 4));
             Frame rootFrame = Window.Current.Content as Frame;

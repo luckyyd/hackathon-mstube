@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Core;
@@ -15,8 +16,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using MStube.ViewModels;
-using System.Threading.Tasks;
-using System.Diagnostics;
+
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -38,7 +38,6 @@ namespace MStube
         {
             base.OnNavigatedTo(e);
             var video = e.Parameter as VideoViewModel;
-            Debug.WriteLine(video.Title);
             VideoDetail = video;
 
             Frame rootFrame = Window.Current.Content as Frame;
@@ -59,7 +58,7 @@ namespace MStube
             long user_id = VideoDetail.user_id;
             long item_id = VideoDetail.item_id;
             Task.Run(() => Utils.SendPreference.SendPreferenceToServer(user_id, item_id, RatingValue));
-            Debug.WriteLine("Send Preference" + user_id.ToString() + item_id.ToString() + RatingValue.ToString());
+            //Debug.WriteLine("Send Preference" + user_id.ToString() + item_id.ToString() + RatingValue.ToString());
         }
 
     }

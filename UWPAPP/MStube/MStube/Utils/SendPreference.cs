@@ -3,7 +3,6 @@ using MStube.Items;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,7 +24,6 @@ namespace MStube.Utils
             };
             var uri = new Uri("http://mstubedotnet.azurewebsites.net/api/Preference");
             string uploadPerference = JsonConvert.SerializeObject(preference);
-            Debug.WriteLine(uploadPerference);
             HttpClient httpClient = new HttpClient();
             try
             {
@@ -34,11 +32,9 @@ namespace MStube.Utils
                     Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json");
                 HttpResponseMessage mReceived = await httpClient.SendRequestAsync(mSent,
                                                    HttpCompletionOption.ResponseContentRead);
-                Debug.WriteLine(mReceived);
             }
             catch (Exception error)
             {
-                Debug.WriteLine(error);
                 HockeyClient.Current.TrackException(error);
             }
             finally
