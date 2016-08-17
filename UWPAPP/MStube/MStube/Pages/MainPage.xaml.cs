@@ -40,21 +40,27 @@ namespace MStube
                 }
             }
         }
+        private List<TopicViewModel> topicList = new List<TopicViewModel>();
 
         private DeviceInfo device = DeviceInfo.Instance;
         private long user_id = 0;
         public MainPage()
         {
             this.InitializeComponent();
+            topicList.Add(new TopicViewModel { topic = "Azure"});
+            topicList.Add(new TopicViewModel { topic = "Edge" });
+            topicList.Add(new TopicViewModel { topic = "Silverlight" });
+            topicList.Add(new TopicViewModel { topic = "App" });
+            topicList.Add(new TopicViewModel { topic = "VS" });
         }
 
         public async void InitializeValues()
         {
             LoadingProgressRing.IsActive = true;
             user_id = await GetUserId(this.device);
+            VideoBriefList.Visibility = Visibility.Visible;
+            TopicList.Visibility = Visibility.Collapsed;
             List<VideoDetailItem> newVideoListCandidates = await GetVideoJson();
-
-            //newVideoListCandidates.Reverse();
 
             foreach (VideoDetailItem item in newVideoListCandidates)
             {
@@ -76,6 +82,7 @@ namespace MStube
 
             LoadingProgressRing.IsActive = false;
             VideoBriefList.ItemsSource = videoListCandidates;
+            TopicList.ItemsSource = topicList;
         }
 
         private async Task<int> GetUserId(Utils.DeviceInfo device)
@@ -229,7 +236,22 @@ namespace MStube
 
         private void SearchTopic_Click(object sender, RoutedEventArgs e)
         {
-
+            VideoBriefList.Visibility = Visibility.Collapsed;
+            TopicList.Visibility = Visibility.Visible;
         }
+
+
+        private async void TopicClicked(object sender, ItemClickEventArgs e)
+        {
+            TopicViewModel clickedItem = e.ClickedItem as TopicViewModel;
+
+            var searchresult = await Utils.SearchTitle.SearchTitleToServer(clickedItem.topic);
+            if (searchresult.Count >= 1)
+            {
+                InitializeValues();
+            }
+            
+        }
+
     }
 }

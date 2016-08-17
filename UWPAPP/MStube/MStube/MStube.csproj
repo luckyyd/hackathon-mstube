@@ -136,6 +136,7 @@
     <Compile Include="Common\VideoList.cs" />
     <Compile Include="Utils\SearchTitle.cs" />
     <Compile Include="Utils\SendPreference.cs" />
+    <Compile Include="ViewModels\TopicViewModel.cs" />
     <Compile Include="ViewModels\VideoViewModel.cs" />
   </ItemGroup>
   <ItemGroup>

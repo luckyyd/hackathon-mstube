@@ -54,7 +54,8 @@
                 <Grid Margin="5,5,5,5">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" MaxHeight="20"/>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <Grid Grid.Row="0" >
                         <AutoSuggestBox 
@@ -68,6 +69,30 @@
                             />
                     </Grid>
                     <Grid Grid.Row="1">
+                        <ListView
+                            x:Name="TopicList"
+                            HorizontalAlignment="Stretch"
+                            Margin="0,5,0,10"
+                            VerticalAlignment="Top"
+                            IsItemClickEnabled="True" 
+                            ItemClick="TopicClicked">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="5,5,5,5" MaxHeight="120">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Button x:Name="thumbnail" Grid.Column="0" FontFamily="Segoe MDL2 Assets" Content="&#xE208;" Background="Transparent" />
+                                        <TextBlock x:Name="topicText" Grid.Column="1" MaxLines="2"
+                                            Padding="5,5,5,5" Style="{StaticResource BodyTextBlockStyle}"
+                                            Text="{Binding topic}" FontSize="16"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </Grid>
+                    <Grid Grid.Row="2">
                         <pr:PullToRefreshBox RefreshInvoked="PullToRefreshBox_RefreshInvoked">
                             <pr:PullToRefreshBox.TopIndicatorTemplate>
                                 <DataTemplate>
@@ -121,6 +146,7 @@
                         </pr:PullToRefreshBox>
                         <ProgressRing x:Name="LoadingProgressRing" IsActive="True" Height="80" Width="80"/>
                     </Grid>
+                    
                 </Grid>
             </SplitView.Content>
         </SplitView>
