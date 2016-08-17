@@ -177,7 +177,9 @@ namespace mstube.Controllers
             if (collaborativeFilteringCandidates.Count > 0)
             {
                 collaborativeFilteringCandidates = (await ItemFilterAsync(user_id, collaborativeFilteringCandidates)).Take(10).ToList();
-                collaborativeFilteringList = await GetItemsFromSQLServerAsync(collaborativeFilteringCandidates, 1);
+                if (collaborativeFilteringCandidates.Count > 0) {
+                    collaborativeFilteringList = await GetItemsFromSQLServerAsync(collaborativeFilteringCandidates, 1);
+                }
             }
             timer.Stop();
             Debug.WriteLine("Get Collaborative Filter items time: {0} ms", timer.ElapsedMilliseconds);
@@ -215,7 +217,9 @@ namespace mstube.Controllers
             if (contentBasedCandidates.Count > 0)
             {
                 contentBasedCandidates = (await ItemFilterAsync(user_id, contentBasedCandidates)).Take(10).ToList();
-                contentBasedList = await GetItemsFromSQLServerAsync(contentBasedCandidates, 2);
+                if (contentBasedCandidates.Count != 0) {
+                    contentBasedList = await GetItemsFromSQLServerAsync(contentBasedCandidates, 2);
+                }
             }
 
             timer.Stop();
