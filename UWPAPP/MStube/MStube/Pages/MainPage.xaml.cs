@@ -244,7 +244,7 @@ namespace MStube
         private async void TopicClicked(object sender, ItemClickEventArgs e)
         {
             TopicViewModel clickedItem = e.ClickedItem as TopicViewModel;
-
+            VideoBriefList.Visibility = Visibility.Collapsed;
             var searchresult = await Utils.SearchTitle.SearchTitleToServer(clickedItem.topic);
             if (searchresult.Count >= 1)
             {
