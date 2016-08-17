@@ -88,7 +88,7 @@ namespace mstube.Controllers
                         command.CommandText = "SELECT * FROM Item WHERE item_id in (" + itemsSet + ")";
                         break;
                     case 3:
-                        command.CommandText = "SELECT top 5 * FROM Item WHERE item_id IN (SELECT TOP 50 item_id FROM Item ORDER BY NewID() ) ORDER BY cast(views as int) DESC";
+                        command.CommandText = "SELECT top 10 * FROM Item WHERE item_id IN (SELECT TOP 50 item_id FROM Item ORDER BY NewID() ) ORDER BY cast(views as int) DESC";
                         break;
                 }
                 using (SqlDataReader reader = await command.ExecuteReaderAsync())
@@ -170,7 +170,7 @@ namespace mstube.Controllers
 
             if (collaborativeFilteringCandidates.Count > 0)
             {
-                collaborativeFilteringCandidates = (await ItemFilterAsync(user_id, collaborativeFilteringCandidates)).Take(5).ToList();
+                collaborativeFilteringCandidates = (await ItemFilterAsync(user_id, collaborativeFilteringCandidates)).Take(10).ToList();
                 collaborativeFilteringList = await GetItemsFromSQLServerAsync(collaborativeFilteringCandidates, 1);
             }
             timer.Stop();
@@ -201,7 +201,7 @@ namespace mstube.Controllers
             // Filter Contect-based items
             if (contentBasedCandidates.Count > 0)
             {
-                contentBasedCandidates = (await ItemFilterAsync(user_id, contentBasedCandidates)).Take(5).ToList();
+                contentBasedCandidates = (await ItemFilterAsync(user_id, contentBasedCandidates)).Take(10).ToList();
                 contentBasedList = await GetItemsFromSQLServerAsync(contentBasedCandidates, 2);
             }
 
@@ -315,7 +315,6 @@ namespace mstube.Controllers
                 command.CommandType = CommandType.Text;
                 command.CommandText = "SELECT Top 20 * FROM Item WHERE item_id in (SELECT item_id FROM Item WHERE topic like '%"
                                         + topic + "%') ORDER BY NewID()";
-                //command.Parameters.AddWithValue("@topic", "%" + topic + "%");
                 Debug.WriteLine(command.CommandText);
                 try
                 {

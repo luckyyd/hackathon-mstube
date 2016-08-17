@@ -92,7 +92,7 @@ namespace mstube.Controllers.Tests
             Assert.IsNotNull(items[new Random().Next(items.Count)].item_id);
         }
         [TestMethod()]
-        public void SearchAzureTopicTest()
+        public void SearchTopicTest()
         {
             var controller = new ApiController();
             string topic = "Azure";
@@ -102,7 +102,7 @@ namespace mstube.Controllers.Tests
             Assert.AreNotEqual(items.Count, 0);
         }
         [TestMethod()]
-        public void SearchAzureTitleTest()
+        public void SearchTitleTest()
         {
             var controller = new ApiController();
             string title = "Azure";
