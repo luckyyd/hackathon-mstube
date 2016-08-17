@@ -9,7 +9,11 @@
     mc:Ignorable="d">
 
     <Grid x:Name="OuterContainer" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="91*"/>
+            <RowDefinition Height="229*"/>
+        </Grid.RowDefinitions>
+
         <!--<ToggleButton x:Name="TogglePaneButton" 
                       Visibility="{x:Bind ViewModel.IsInDetailsMode, Mode=OneWay, ConverterParameter=Reverse, Converter={StaticResource BooleanToVisibilityConverter}}"
                       Margin="0"
@@ -19,12 +23,12 @@
                       IsChecked="{Binding IsPaneOpen, ElementName=SplitView, Mode=TwoWay}"
                       AutomationProperties.Name="Menu" ToolTipService.ToolTip="Menu"
                       />-->
-        
+
         <SplitView x:Name="SplitView"
                    DisplayMode="CompactOverlay"
                    IsPaneOpen="False"
                    CompactPaneLength="50"
-                   OpenPaneLength="200">
+                   OpenPaneLength="200" Grid.RowSpan="2">
             <SplitView.Pane>
                 <StackPanel Background="#333533">
                     <Button x:Name="Menu" FontFamily="Segoe MDL2 Assets" Content="&#xE700;"
@@ -33,6 +37,11 @@
                         <Button x:Name="Home" FontFamily="Segoe MDL2 Assets" Content="&#xE10F;"
                    Width="50" Height="50" Background="Transparent" Click="Home_Click"/>
                         <TextBlock x:Name="HomeTextBlock" Text="Home" FontSize="12" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <StackPanel Background="#505450" Orientation="Horizontal">
+                        <Button x:Name="SearchTopic" FontFamily="Segoe MDL2 Assets" Content="&#xE71D;"
+                   Width="50" Height="50" Background="Transparent" Click="SearchTopic_Click"/>
+                        <TextBlock x:Name="SearchTopicTextBlock" Text="Topic" FontSize="12" VerticalAlignment="Center" />
                     </StackPanel>
                     <StackPanel Background="#505450" Orientation="Horizontal">
                         <Button x:Name="SendFeedback" FontFamily="Segoe MDL2 Assets" Content="&#xE170;"
@@ -115,6 +124,6 @@
                 </Grid>
             </SplitView.Content>
         </SplitView>
-        
+
     </Grid>
 </Page>
