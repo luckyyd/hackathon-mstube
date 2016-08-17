@@ -11,12 +11,12 @@ using Windows.Web.Http;
 
 namespace MStube.Utils
 {
-    public class GetQuery
+    public class SearchTitle
     {
-        public static async Task<List<VideoDetailItem>> GetQueryToServer(string query)
+        public static async Task<List<VideoDetailItem>> SearchTitleToServer(string query)
         {
             List<VideoDetailItem> items = new List<VideoDetailItem>();
-            var uri = new Uri("http://mstubedotnet.azurewebsites.net/api/Search?query=" + query);
+            var uri = new Uri("http://mstubedotnet.azurewebsites.net/api/SearchTitle?title=" + query);
             HttpClient httpClient = new HttpClient();
             try
             {
