@@ -55,7 +55,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" MaxHeight="20"/>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <Grid Grid.Row="0" >
                         <AutoSuggestBox 
@@ -144,7 +144,7 @@
                                 </ListView.ItemContainerStyle>
                             </ListView>
                         </pr:PullToRefreshBox>
-                        <ProgressRing x:Name="LoadingProgressRing" IsActive="True" Height="80" Width="80"/>
+                        <ProgressRing x:Name="LoadingProgressRing" IsActive="True" HorizontalAlignment="Center" VerticalAlignment="Center" Height="80" Width="80"/>
                     </Grid>
                     
                 </Grid>
