@@ -179,22 +179,6 @@ namespace MStube
             InitializeValues();
         }
 
-        //    public Rect TogglePaneButtonRect { get; private set; }
-
-        //    public event TypedEventHandler<MainPage, Rect> TogglePaneButtonRectChanged;
-
-        //    private void CheckTogglePaneButtonSizeChanged()
-        //    {
-        //        TogglePaneButtonRect = SplitView.DisplayMode == SplitViewDisplayMode.Inline ||
-        //                                SplitView.DisplayMode == SplitViewDisplayMode.Overlay
-        //                                ? TogglePaneButton.TransformToVisual(this).TransformBounds(
-        //                                    new Rect(0, 0, TogglePaneButton.ActualWidth, TogglePaneButton.ActualHeight))
-        //                                    : new Rect();
-        //        TogglePaneButtonRectChanged?.Invoke(this, this.TogglePaneButtonRect);
-        //    }
-
-        //    private void Root_SizeChanged(object sender, SizeChangedEventArgs e) => CheckTogglePaneButtonSizeChanged();
-
         public event PropertyChangedEventHandler PropertyChanged;
 
         // PropertyChanged event triggering method.
@@ -214,11 +198,9 @@ namespace MStube
             }
             else
             {
-                var searchresult = await Utils.GetQuery.GetQueryToServer(args.QueryText);
-
+                var searchresult = await Utils.SearchTitle.SearchTitleToServer(args.QueryText);
                 if (searchresult.Count >= 1)
                 {
-
                     InitializeValues();
                 }
                 else
@@ -226,7 +208,6 @@ namespace MStube
                     //Results.Visibility = Visibility.Visible;
                 }
             }
-
         }
 
         private void AutoSuggestBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
@@ -244,6 +225,11 @@ namespace MStube
             {
                 // Use args.QueryText to determine what to do.
             }
+        }
+
+        private void SearchTopic_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
