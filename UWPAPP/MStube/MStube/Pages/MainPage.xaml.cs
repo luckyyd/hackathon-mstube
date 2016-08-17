@@ -18,6 +18,7 @@ using Windows.Foundation;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
 using VideoLibrary;
+using System.Linq;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -29,13 +30,15 @@ namespace MStube
     public sealed partial class MainPage : Page, INotifyPropertyChanged
     {
         //private VideoList videoListCandidates = VideoList.Instance;
-        private ObservableCollection<VideoViewModel> _videoListCandidates = new ObservableCollection<VideoViewModel>();
-        public ObservableCollection<VideoViewModel> videoListCandidates {
-            get { return _videoListCandidates; }
+        private List<VideoViewModel> _videoList = new List<VideoViewModel>();
+        public List<VideoViewModel> videoList
+        {
+            get { return _videoList; }
             set
             {
-                if (value != _videoListCandidates) {
-                    _videoListCandidates = value;
+                if (value != _videoList)
+                {
+                    _videoList = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -47,11 +50,11 @@ namespace MStube
         public MainPage()
         {
             this.InitializeComponent();
-            topicList.Add(new TopicViewModel { topic = "Azure"});
+            topicList.Add(new TopicViewModel { topic = "Azure" });
             topicList.Add(new TopicViewModel { topic = "Edge" });
             topicList.Add(new TopicViewModel { topic = "Silverlight" });
             topicList.Add(new TopicViewModel { topic = "App" });
-            topicList.Add(new TopicViewModel { topic = "VS" });
+            topicList.Add(new TopicViewModel { topic = "Visual Studio" });
         }
 
         public async void InitializeValues()
@@ -61,10 +64,20 @@ namespace MStube
             VideoBriefList.Visibility = Visibility.Visible;
             TopicList.Visibility = Visibility.Collapsed;
             List<VideoDetailItem> newVideoListCandidates = await GetVideoJson();
+            List<VideoViewModel> newVideoViewList = GenerateVideoViewFromVideoDetail(newVideoListCandidates);
+            newVideoViewList.AddRange(videoList);
+            videoList = newVideoViewList;
+            LoadingProgressRing.IsActive = false;
+            VideoBriefList.ItemsSource = videoList;
+            TopicList.ItemsSource = topicList;
+        }
 
-            foreach (VideoDetailItem item in newVideoListCandidates)
+        public List<VideoViewModel> GenerateVideoViewFromVideoDetail(List<VideoDetailItem> videoDetailItemCandidates)
+        {
+            List<VideoViewModel> result = new List<VideoViewModel>();
+            foreach (VideoDetailItem item in videoDetailItemCandidates)
             {
-                videoListCandidates.Insert(0, new VideoViewModel
+                result.Insert(0, new VideoViewModel
                 {
                     item_id = item.item_id,
                     Title = item.title,
@@ -79,10 +92,7 @@ namespace MStube
                     Brand = item.brand
                 });
             }
-
-            LoadingProgressRing.IsActive = false;
-            VideoBriefList.ItemsSource = videoListCandidates;
-            TopicList.ItemsSource = topicList;
+            return result;
         }
 
         private async Task<int> GetUserId(Utils.DeviceInfo device)
@@ -135,31 +145,42 @@ namespace MStube
         {
             VideoViewModel clickedItem = e.ClickedItem as VideoViewModel;
             clickedItem.user_id = user_id;
-            HockeyClient.Current.TrackEvent("Item Clicked: " +clickedItem.item_id.ToString());
-            Task.Run(()=>Utils.SendPreference.SendPreferenceToServer(clickedItem.user_id ,clickedItem.item_id, 4));
+            HockeyClient.Current.TrackEvent("Item Clicked: " + clickedItem.item_id.ToString());
+            Task.Run(() => Utils.SendPreference.SendPreferenceToServer(clickedItem.user_id, clickedItem.item_id, 4));
             Frame rootFrame = Window.Current.Content as Frame;
-            if (clickedItem.Source == "channel9")
+            switch (clickedItem.Source)
             {
-                rootFrame.Navigate(typeof(VideoPage), e.ClickedItem);
+                case "channel9":
+                    rootFrame.Navigate(typeof(VideoPage), e.ClickedItem);
+                    break;
+                case "youtube":
+                    var youTube = YouTube.Default;
+                    var video = youTube.GetVideo(clickedItem.Url);
+                    clickedItem.Url = video.Uri;
+                    clickedItem.Description = clickedItem.FullDescription;
+                    rootFrame.Navigate(typeof(VideoPage), e.ClickedItem);
+                    break;
+                case "vimeo":
+                    rootFrame.Navigate(typeof(WebPage), e.ClickedItem);
+                    break;
+                default:
+                    rootFrame.Navigate(typeof(VideoPage), e.ClickedItem);
+                    break;
             }
-            else if (clickedItem.Source == "youtube") {
-                var youTube = YouTube.Default;
-                var video = youTube.GetVideo(clickedItem.Url);
-                clickedItem.Url = video.Uri;
-                rootFrame.Navigate(typeof(VideoPage), e.ClickedItem);
-            }
-            else if (clickedItem.Source == "vimeo")
-            {
-                rootFrame.Navigate(typeof(WebPage), e.ClickedItem);
-            }
-            
         }
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        private async void TopicClicked(object sender, ItemClickEventArgs e)
         {
-            base.OnNavigatedTo(e);
-            SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
-            InitializeValues();
+            TopicViewModel clickedItem = e.ClickedItem as TopicViewModel;
+            VideoBriefList.Visibility = Visibility.Collapsed;
+            List<VideoDetailItem> searchresult = await Utils.SearchTopic.SearchTopicToServer(clickedItem.topic);
+            if (searchresult.Count >= 1)
+            {
+                VideoBriefList.ItemsSource = GenerateVideoViewFromVideoDetail(searchresult);
+                NotifyPropertyChanged();
+            }
+            TopicList.Visibility = Visibility.Collapsed;
+            VideoBriefList.Visibility = Visibility.Visible;
         }
 
         private void PullToRefreshBox_RefreshInvoked(DependencyObject sender, object args)
@@ -167,15 +188,7 @@ namespace MStube
             InitializeValues();
         }
 
-        private async void SendFeedback_Click(object sender, RoutedEventArgs e)
-        {
-            //if (Microsoft.Services.Store.Engagement.Feedback.IsSupported) {
-            //    await Microsoft.Services.Store.Engagement.Feedback.LaunchFeedbackAsync();
-            //}
-            var mailto = new Uri(@"mailto:?to=mstube@microsoft.com&subject=MStube%20Feedback&body=");
-            await Windows.System.Launcher.LaunchUriAsync(mailto);
-        }
-
+        #region Menu items click
         private void Menu_Click(object sender, RoutedEventArgs e)
         {
             SplitView.IsPaneOpen = !SplitView.IsPaneOpen;
@@ -186,17 +199,20 @@ namespace MStube
             InitializeValues();
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        // PropertyChanged event triggering method.
-        private void NotifyPropertyChanged(String propertyName = "")
+        private void SearchTopic_Click(object sender, RoutedEventArgs e)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
+            VideoBriefList.Visibility = Visibility.Collapsed;
+            TopicList.Visibility = Visibility.Visible;
         }
 
+        private async void SendFeedback_Click(object sender, RoutedEventArgs e)
+        {
+            var mailto = new Uri(@"mailto:?to=t-yimwan@microsoft.com&subject=MStube%20Feedback&body=");
+            await Windows.System.Launcher.LaunchUriAsync(mailto);
+        }
+        #endregion
+
+        #region AutoSuggestBox
         private async void AutoSuggestBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
             if (args.ChosenSuggestion != null)
@@ -205,10 +221,11 @@ namespace MStube
             }
             else
             {
-                var searchresult = await Utils.SearchTitle.SearchTitleToServer(args.QueryText);
-                if (searchresult.Count >= 1)
+                List<VideoDetailItem> searchresult = await Utils.SearchTitle.SearchTitleToServer(args.QueryText);
+                if (searchresult.Count >= 0)
                 {
-                    InitializeValues();
+                    VideoBriefList.ItemsSource = GenerateVideoViewFromVideoDetail(searchresult);
+                    NotifyPropertyChanged();
                 }
                 else
                 {
@@ -233,25 +250,26 @@ namespace MStube
                 // Use args.QueryText to determine what to do.
             }
         }
+        #endregion
 
-        private void SearchTopic_Click(object sender, RoutedEventArgs e)
+        #region PropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        // PropertyChanged event triggering method.
+        private void NotifyPropertyChanged(String propertyName = "")
         {
-            VideoBriefList.Visibility = Visibility.Collapsed;
-            TopicList.Visibility = Visibility.Visible;
-        }
-
-
-        private async void TopicClicked(object sender, ItemClickEventArgs e)
-        {
-            TopicViewModel clickedItem = e.ClickedItem as TopicViewModel;
-            VideoBriefList.Visibility = Visibility.Collapsed;
-            var searchresult = await Utils.SearchTitle.SearchTitleToServer(clickedItem.topic);
-            if (searchresult.Count >= 1)
+            if (PropertyChanged != null)
             {
-                InitializeValues();
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
-            
         }
+        #endregion
 
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+            SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
+            InitializeValues();
+        }
     }
 }
