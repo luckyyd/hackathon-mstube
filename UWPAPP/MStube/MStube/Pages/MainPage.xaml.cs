@@ -214,7 +214,7 @@ namespace MStube
             }
             else
             {
-                var searchresult = await Task.Run(() => Utils.GetQuery.GetQueryToServer(args.QueryText));
+                var searchresult = await Utils.GetQuery.GetQueryToServer(args.QueryText);
 
                 if (searchresult.Count >= 1)
                 {
