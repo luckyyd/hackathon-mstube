@@ -61,7 +61,7 @@ namespace MStube
         {
             LoadingProgressRing.IsActive = true;
             user_id = await GetUserId(this.device);
-            VideoBriefList.Visibility = Visibility.Visible;
+            VideoBriefList.Visibility = Visibility.Collapsed;
             TopicList.Visibility = Visibility.Collapsed;
             List<VideoDetailItem> newVideoListCandidates = await GetVideoJson();
             List<VideoViewModel> newVideoViewList = GenerateVideoViewFromVideoDetail(newVideoListCandidates);
