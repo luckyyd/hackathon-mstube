@@ -106,7 +106,17 @@ namespace mstube.Controllers.Tests
         {
             var controller = new ApiController();
             string title = "Azure";
-            var result = controller.SearchTopic(title);
+            var result = controller.SearchTitle(title);
+            Assert.IsInstanceOfType(result, typeof(JsonResult));
+            List<Item.Item> items = JsonConvert.DeserializeObject<List<Item.Item>>(JsonConvert.SerializeObject(result.Data));
+            Assert.AreNotEqual(items.Count, 0);
+        }
+        [TestMethod()]
+        public void SearchMultipleTitleTest()
+        {
+            var controller = new ApiController();
+            string title = "Azure SQL Microsoft";
+            var result = controller.SearchTitle(title);
             Assert.IsInstanceOfType(result, typeof(JsonResult));
             List<Item.Item> items = JsonConvert.DeserializeObject<List<Item.Item>>(JsonConvert.SerializeObject(result.Data));
             Assert.AreNotEqual(items.Count, 0);

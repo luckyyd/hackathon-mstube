@@ -361,13 +361,23 @@ namespace mstube.Controllers
             List<Item.Item> jsonResult = new List<Item.Item>();
             //Return search topic from db
             SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["MstubeConnection"].ToString());
+            string[] words = title.Split(default(string[]), StringSplitOptions.RemoveEmptyEntries);
+            string wordscommand = "";
+            if (words.Length == 0) return Json(jsonResult, JsonRequestBehavior.AllowGet);
+            else
+            {
+                for (int i = 0; i < words.Length; ++i)
+                {
+                    if (i != 0) wordscommand += " and ";
+                    wordscommand += "title like '%" + words[i] + "%'";
+                }
+            }
             using (SqlCommand command = new SqlCommand())
             {
                 command.Connection = connection;
                 command.CommandType = CommandType.Text;
-                command.CommandText = "SELECT Top 20 * FROM Item WHERE item_id in (SELECT item_id FROM Item WHERE title like '%"
-                                        + title + "%') ORDER BY NewID()";
-                //command.Parameters.AddWithValue("@topic", "%" + topic + "%");
+                command.CommandText = "SELECT Top 20 * FROM Item WHERE item_id in (SELECT item_id FROM Item WHERE "
+                                        + wordscommand + ") ORDER BY NewID()";
                 Debug.WriteLine(command.CommandText);
                 try
                 {
