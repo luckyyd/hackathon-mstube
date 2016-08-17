@@ -30,8 +30,8 @@ namespace MStube
     public sealed partial class MainPage : Page, INotifyPropertyChanged
     {
         //private VideoList videoListCandidates = VideoList.Instance;
-        private List<VideoViewModel> _videoList = new List<VideoViewModel>();
-        public List<VideoViewModel> videoList
+        private ObservableCollection<VideoViewModel> _videoList = new ObservableCollection<VideoViewModel>();
+        public ObservableCollection<VideoViewModel> videoList
         {
             get { return _videoList; }
             set
@@ -50,11 +50,14 @@ namespace MStube
         public MainPage()
         {
             this.InitializeComponent();
+            topicList.Add(new TopicViewModel { topic = "App" });
             topicList.Add(new TopicViewModel { topic = "Azure" });
             topicList.Add(new TopicViewModel { topic = "Edge" });
+            topicList.Add(new TopicViewModel { topic = "Office" });
             topicList.Add(new TopicViewModel { topic = "Silverlight" });
-            topicList.Add(new TopicViewModel { topic = "App" });
             topicList.Add(new TopicViewModel { topic = "Visual Studio" });
+            topicList.Add(new TopicViewModel { topic = "Windows Phone" });
+            TopicList.ItemsSource = topicList;
         }
 
         public async void InitializeValues()
@@ -66,10 +69,10 @@ namespace MStube
             List<VideoDetailItem> newVideoListCandidates = await GetVideoJson();
             List<VideoViewModel> newVideoViewList = GenerateVideoViewFromVideoDetail(newVideoListCandidates);
             newVideoViewList.AddRange(videoList);
-            videoList = newVideoViewList;
+            videoList = new ObservableCollection<VideoViewModel>(newVideoViewList);
             LoadingProgressRing.IsActive = false;
             VideoBriefList.ItemsSource = videoList;
-            TopicList.ItemsSource = topicList;
+            VideoBriefList.Visibility = Visibility.Visible;
         }
 
         public List<VideoViewModel> GenerateVideoViewFromVideoDetail(List<VideoDetailItem> videoDetailItemCandidates)
@@ -173,12 +176,14 @@ namespace MStube
         {
             TopicViewModel clickedItem = e.ClickedItem as TopicViewModel;
             VideoBriefList.Visibility = Visibility.Collapsed;
+            LoadingProgressRing.Visibility = Visibility.Visible;
             List<VideoDetailItem> searchresult = await Utils.SearchTopic.SearchTopicToServer(clickedItem.topic);
             if (searchresult.Count >= 1)
             {
                 VideoBriefList.ItemsSource = GenerateVideoViewFromVideoDetail(searchresult);
                 NotifyPropertyChanged();
             }
+            LoadingProgressRing.Visibility = Visibility.Collapsed;
             TopicList.Visibility = Visibility.Collapsed;
             VideoBriefList.Visibility = Visibility.Visible;
         }
@@ -221,7 +226,9 @@ namespace MStube
             }
             else
             {
+                LoadingProgressRing.Visibility = Visibility.Visible;
                 List<VideoDetailItem> searchresult = await Utils.SearchTitle.SearchTitleToServer(args.QueryText);
+                LoadingProgressRing.Visibility = Visibility.Collapsed;
                 if (searchresult.Count >= 0)
                 {
                     VideoBriefList.ItemsSource = GenerateVideoViewFromVideoDetail(searchresult);

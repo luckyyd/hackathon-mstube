@@ -16,7 +16,7 @@ namespace MStube.Utils
         public static async Task<List<VideoDetailItem>> SearchTitleToServer(string query)
         {
             List<VideoDetailItem> items = new List<VideoDetailItem>();
-            var uri = new Uri("http://mstubedotnet.azurewebsites.net/api/SearchTitle?title=" + query);
+            var uri = new Uri("http://mstubedotnet.azurewebsites.net/api/SearchTitle?title=" + query + "&t=" + new Random().Next(1, 1000).ToString());
             HttpClient httpClient = new HttpClient();
             try
             {

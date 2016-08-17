@@ -261,7 +261,7 @@ namespace mstube.Controllers
 
             // Get task results
             contentBasedList = await taskGetContentBasedItems;
-            collaborativeFilteringList = await taskGetCollaborativeFilterIteAms;
+            collaborativeFilteringList = await taskGetCollaborativeFilterItems;
             popularityList = await taskGetPopularityItems;
 
             // Combine result
