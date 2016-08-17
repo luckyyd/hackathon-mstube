@@ -38,7 +38,9 @@ namespace mstube.Controllers.Tests
         public async Task CandidatesTest()
         {
             var controller = new ApiController();
-            var result = await controller.Candidates(9);
+            string uuid = "testUUID";
+            int id = Int32.Parse(JsonConvert.SerializeObject(controller.UserId(uuid).Data));
+            var result = await controller.Candidates(id);
             Assert.IsInstanceOfType(result, typeof(JsonResult));
         }
 
