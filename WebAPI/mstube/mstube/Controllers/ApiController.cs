@@ -162,11 +162,17 @@ namespace mstube.Controllers
             List<Item.Item> collaborativeFilteringList = new List<Item.Item>();
 
             string result = await AzureML_CollaborativeFilter.SendPOSTRequest(user_id);
-
-            dynamic jsonObj = JsonConvert.DeserializeObject(result);
-            JArray values = (JArray)jsonObj.Results.ScoringOutput.value.Values[0];
-            collaborativeFilteringCandidates = values.ToObject<List<string>>();
-            collaborativeFilteringCandidates.RemoveAt(0);
+            try
+            {
+                dynamic jsonObj = JsonConvert.DeserializeObject(result);
+                JArray values = (JArray)jsonObj.Results.ScoringOutput.value.Values[0];
+                collaborativeFilteringCandidates = values.ToObject<List<string>>();
+                collaborativeFilteringCandidates.RemoveAt(0);
+            }
+            catch (Exception)
+            {
+                return collaborativeFilteringList;
+            }
 
             if (collaborativeFilteringCandidates.Count > 0)
             {
@@ -191,11 +197,18 @@ namespace mstube.Controllers
             // Get Content-based result
             if (last_item_id != null)
             {
-                string contentbasedResult = await AzureML_ContentBasedFilter.SendPOSTRequest(user_id, Convert.ToInt64(last_item_id), 3);
-                dynamic jsonContentbasedResultObj = JsonConvert.DeserializeObject(contentbasedResult);
-                JArray values = (JArray)jsonContentbasedResultObj.Results.output1.value.Values[0];
-                contentBasedCandidates = values.ToObject<List<string>>();
-                contentBasedCandidates.RemoveAt(0);
+                try
+                {
+                    string contentbasedResult = await AzureML_ContentBasedFilter.SendPOSTRequest(user_id, Convert.ToInt64(last_item_id), 3);
+                    dynamic jsonContentbasedResultObj = JsonConvert.DeserializeObject(contentbasedResult);
+                    JArray values = (JArray)jsonContentbasedResultObj.Results.output1.value.Values[0];
+                    contentBasedCandidates = values.ToObject<List<string>>();
+                    contentBasedCandidates.RemoveAt(0);
+                }
+                catch (Exception)
+                {
+                    return contentBasedList;
+                }
             }
 
             // Filter Contect-based items
