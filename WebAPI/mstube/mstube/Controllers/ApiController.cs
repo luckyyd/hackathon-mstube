@@ -21,13 +21,16 @@ namespace mstube.Controllers
     public class ApiController : Controller
     {
         private IDatabase cachefilter;
+        private IDatabase cacheitemid;
         private IDatabase cacheid;
         public ApiController()
         {
             ConnectionMultiplexer FilterRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisPostHistory);
             cachefilter = FilterRedis.GetDatabase();
             ConnectionMultiplexer ContentBasedRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisLastItem);
-            cacheid = ContentBasedRedis.GetDatabase();
+            cacheitemid = ContentBasedRedis.GetDatabase();
+            ConnectionMultiplexer UserIdRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisUserId);
+            cacheid = UserIdRedis.GetDatabase();
         }
         public ActionResult Index()
         {
@@ -194,7 +197,7 @@ namespace mstube.Controllers
             List<Item.Item> contentBasedList = new List<Item.Item>();
 
             // Get last item 
-            string last_item_id = cacheid.StringGet(user_id.ToString());
+            string last_item_id = cacheitemid.StringGet(user_id.ToString());
 
             // Get Content-based result
             if (last_item_id != null)
