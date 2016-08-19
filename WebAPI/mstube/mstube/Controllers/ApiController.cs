@@ -15,6 +15,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.TraceListener;
 
 namespace mstube.Controllers
 {
@@ -26,6 +28,7 @@ namespace mstube.Controllers
         ConnectionMultiplexer FilterRedis;
         ConnectionMultiplexer ContentBasedRedis;
         ConnectionMultiplexer UserIdRedis;
+        TelemetryClient telemetry;
         public ApiController()
         {
             FilterRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisPostHistory);
@@ -34,6 +37,8 @@ namespace mstube.Controllers
             cacheitemid = ContentBasedRedis.GetDatabase();
             UserIdRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisUserId);
             cacheid = UserIdRedis.GetDatabase();
+            telemetry = new TelemetryClient();
+            telemetry.TrackTrace("Telemetry started.");
         }
         public ActionResult Index()
         {
@@ -106,7 +111,6 @@ namespace mstube.Controllers
                 {
                     while (reader.Read())
                     {
-                        Debug.WriteLine(reader["item_id"]);
                         Item.Item item = new Item.Item
                         {
                             item_id = Convert.ToInt64(reader["item_id"]),
@@ -128,13 +132,9 @@ namespace mstube.Controllers
                     }
                 }
             }
-            catch (SqlException err)
+            catch (Exception e)
             {
-                Debug.WriteLine(err);
-            }
-            catch (InvalidOperationException err)
-            {
-                Debug.WriteLine(err);
+                telemetry.TrackException(e);
             }
             finally
             {
@@ -166,7 +166,7 @@ namespace mstube.Controllers
                 }
             }
             timer.Stop();
-            Debug.WriteLine("Filter Time: {0} ms", timer.ElapsedMilliseconds);
+            Debug.WriteLine("[Time Record] Filter Time: {0} ms", timer.ElapsedMilliseconds);
             return result;
         }
         private async Task<List<Item.Item>> GetCollaborativeFilterItemsAsync(long user_id)
@@ -187,6 +187,7 @@ namespace mstube.Controllers
             }
             catch (Exception)
             {
+                telemetry.TrackTrace("No result from Collaborative Filter.");
                 return collaborativeFilteringList;
             }
 
@@ -199,7 +200,7 @@ namespace mstube.Controllers
                 }
             }
             timer.Stop();
-            Debug.WriteLine("Get Collaborative Filter items time: {0} ms", timer.ElapsedMilliseconds);
+            Debug.WriteLine("[Time Record] Get Collaborative Filter items time: {0} ms", timer.ElapsedMilliseconds);
             return collaborativeFilteringList;
         }
         private async Task<List<Item.Item>> GetContentBasedItemsAsync(long user_id)
@@ -231,6 +232,7 @@ namespace mstube.Controllers
                 }
                 catch (Exception)
                 {
+                    telemetry.TrackTrace("No result from Content-Based filter.");
                     return contentBasedList;
                 }
             }
@@ -246,7 +248,7 @@ namespace mstube.Controllers
             }
 
             timer.Stop();
-            Debug.WriteLine("Get Content based items time: {0} ms", timer.ElapsedMilliseconds);
+            Debug.WriteLine("[Time Record] Get Content based items time: {0} ms", timer.ElapsedMilliseconds);
             return contentBasedList;
         }
         private async Task<List<Item.Item>> GetPopularItemsAsync(int choices = 50, int top = 5)
@@ -255,7 +257,7 @@ namespace mstube.Controllers
             timer.Start();
             List<Item.Item> resultList = await GetItemsFromSQLServerAsync(new List<string>(), 3);
             timer.Stop();
-            Debug.WriteLine("Get popular items time: {0} ms", timer.ElapsedMilliseconds);
+            Debug.WriteLine("[Time Record] Get popular items time: {0} ms", timer.ElapsedMilliseconds);
             return resultList;
         }
         private void LogRecommendHistory(long user_id, List<Item.Item> items)
@@ -269,6 +271,7 @@ namespace mstube.Controllers
             {
                 cachefilter.SetAdd(user_id.ToString(), v.item_id.ToString());
             }
+            telemetry.TrackTrace("Appended recommend history.");
         }
 
         [HttpGet]
@@ -306,7 +309,7 @@ namespace mstube.Controllers
             Task logRecommendHistory = Task.Run(() => LogRecommendHistory(user_id, distinctList));
 
             timerTotal.Stop();
-            Debug.WriteLine("Total time: {0} ms", timerTotal.ElapsedMilliseconds);
+            Debug.WriteLine("[Time Record] Total time of recommend: {0} ms", timerTotal.ElapsedMilliseconds);
             return Json(distinctList, JsonRequestBehavior.AllowGet);
         }
 
@@ -338,7 +341,7 @@ namespace mstube.Controllers
                 }
                 catch (SqlException e)
                 {
-                    System.Diagnostics.Debug.WriteLine(e.ToString());
+                    telemetry.TrackException(e);
                 }
                 finally
                 {
@@ -360,7 +363,6 @@ namespace mstube.Controllers
                 command.CommandType = CommandType.Text;
                 command.CommandText = "SELECT Top 20 * FROM Item WHERE item_id in (SELECT item_id FROM Item WHERE topic like '%"
                                         + topic + "%') ORDER BY NewID()";
-                Debug.WriteLine(command.CommandText);
                 try
                 {
                     connection.Open();
@@ -387,9 +389,9 @@ namespace mstube.Controllers
                         }
                     }
                 }
-                catch (SqlException)
+                catch (Exception e)
                 {
-                    // error here
+                    telemetry.TrackException(e);
                 }
                 finally
                 {
@@ -422,7 +424,6 @@ namespace mstube.Controllers
                 command.CommandType = CommandType.Text;
                 command.CommandText = "SELECT Top 20 * FROM Item WHERE item_id in (SELECT item_id FROM Item WHERE "
                                         + wordscommand + ") ORDER BY NewID()";
-                Debug.WriteLine(command.CommandText);
                 try
                 {
                     connection.Open();
@@ -449,9 +450,9 @@ namespace mstube.Controllers
                         }
                     }
                 }
-                catch (SqlException)
+                catch (Exception e)
                 {
-                    // error here
+                    telemetry.TrackException(e);
                 }
                 finally
                 {
@@ -535,7 +536,7 @@ namespace mstube.Controllers
                     }
                     catch (SqlException e)
                     {
-                        System.Diagnostics.Debug.WriteLine(e.Message);
+                        Debug.WriteLine(e.Message);
                         break;
                     }
                     finally
@@ -543,7 +544,7 @@ namespace mstube.Controllers
                         connection.Close();
                     }
                 }
-                System.Diagnostics.Debug.WriteLine("Insert Succeed!");
+                Debug.WriteLine("Insert Succeed!");
             }
             return Json(jsonItem, JsonRequestBehavior.AllowGet);
         }
