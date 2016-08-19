@@ -23,13 +23,16 @@ namespace mstube.Controllers
         private IDatabase cachefilter;
         private IDatabase cacheitemid;
         private IDatabase cacheid;
+        ConnectionMultiplexer FilterRedis;
+        ConnectionMultiplexer ContentBasedRedis;
+        ConnectionMultiplexer UserIdRedis;
         public ApiController()
         {
-            ConnectionMultiplexer FilterRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisPostHistory);
+            FilterRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisPostHistory);
             cachefilter = FilterRedis.GetDatabase();
-            ConnectionMultiplexer ContentBasedRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisLastItem);
+            ContentBasedRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisLastItem);
             cacheitemid = ContentBasedRedis.GetDatabase();
-            ConnectionMultiplexer UserIdRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisUserId);
+            UserIdRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisUserId);
             cacheid = UserIdRedis.GetDatabase();
         }
         public ActionResult Index()
@@ -40,6 +43,11 @@ namespace mstube.Controllers
         [HttpGet]
         public JsonResult UserId(string uuid)
         {
+            if (UserIdRedis.IsConnected == false)
+            {
+                UserIdRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisUserId);
+                cacheid = UserIdRedis.GetDatabase();
+            }
             //Get user_id for uuid
             string dbsize = cacheid.StringGet("RedisSize");
             if (dbsize == null)
@@ -136,6 +144,11 @@ namespace mstube.Controllers
         }
         private async Task<List<string>> ItemFilterAsync(long user_id, List<string> itemsToFilter)
         {
+            if (FilterRedis.IsConnected == false)
+            {
+                FilterRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisPostHistory);
+                cachefilter = FilterRedis.GetDatabase();
+            }
             Stopwatch timer = new Stopwatch();
             timer.Start();
             List<string> result = new List<string>(itemsToFilter);
@@ -180,7 +193,8 @@ namespace mstube.Controllers
             if (collaborativeFilteringCandidates.Count > 0)
             {
                 collaborativeFilteringCandidates = (await ItemFilterAsync(user_id, collaborativeFilteringCandidates)).Take(10).ToList();
-                if (collaborativeFilteringCandidates.Count > 0) {
+                if (collaborativeFilteringCandidates.Count > 0)
+                {
                     collaborativeFilteringList = await GetItemsFromSQLServerAsync(collaborativeFilteringCandidates, 1);
                 }
             }
@@ -190,6 +204,11 @@ namespace mstube.Controllers
         }
         private async Task<List<Item.Item>> GetContentBasedItemsAsync(long user_id)
         {
+            if (ContentBasedRedis.IsConnected == false)
+            {
+                ContentBasedRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisLastItem);
+                cacheitemid = ContentBasedRedis.GetDatabase();
+            }
             Stopwatch timer = new Stopwatch();
             timer.Start();
 
@@ -220,7 +239,8 @@ namespace mstube.Controllers
             if (contentBasedCandidates.Count > 0)
             {
                 contentBasedCandidates = (await ItemFilterAsync(user_id, contentBasedCandidates)).Take(10).ToList();
-                if (contentBasedCandidates.Count != 0) {
+                if (contentBasedCandidates.Count != 0)
+                {
                     contentBasedList = await GetItemsFromSQLServerAsync(contentBasedCandidates, 2);
                 }
             }
@@ -240,6 +260,11 @@ namespace mstube.Controllers
         }
         private void LogRecommendHistory(long user_id, List<Item.Item> items)
         {
+            if (FilterRedis.IsConnected == false)
+            {
+                FilterRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisPostHistory);
+                cachefilter = FilterRedis.GetDatabase();
+            }
             foreach (var v in items)
             {
                 cachefilter.SetAdd(user_id.ToString(), v.item_id.ToString());
