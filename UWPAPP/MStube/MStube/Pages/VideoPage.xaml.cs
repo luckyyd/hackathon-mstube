@@ -49,7 +49,6 @@ namespace MStube
             {
                 SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
             }
-
             RatingBar.GetRatingBarValue += new RatingBar.RatingBarDelegate(RatingBar_GetRatingBarValue);
         }
 

@@ -49,7 +49,7 @@
                              HorizontalAlignment="Center" 
                              Margin="0,15,0,10"
                              NumberOfStars="5" 
-                             RatingValue="3" 
+                             RatingValue="0" 
                              StarForegroundColor="#cccc33" 
                              HeightValue="25" 
                              />

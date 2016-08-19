@@ -159,7 +159,7 @@ namespace MStube
                 case "youtube":
                     var youTube = YouTube.Default;
                     var video = youTube.GetVideo(clickedItem.Url);
-                    clickedItem.Url = video.Uri;
+                    clickedItem.VideoSourceUri = video.Uri;
                     clickedItem.Description = clickedItem.FullDescription;
                     rootFrame.Navigate(typeof(VideoPage), e.ClickedItem);
                     break;
