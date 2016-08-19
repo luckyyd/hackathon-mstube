@@ -19,7 +19,6 @@ using System.ComponentModel;
 using System.Collections.ObjectModel;
 using VideoLibrary;
 using System.Linq;
-
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
 namespace MStube
@@ -58,6 +57,7 @@ namespace MStube
             topicList.Add(new TopicViewModel { topic = "Visual Studio" });
             topicList.Add(new TopicViewModel { topic = "Windows Phone" });
             TopicList.ItemsSource = topicList;
+            TopicList.Visibility = Visibility.Collapsed;
         }
 
         public async void InitializeValues()
@@ -107,6 +107,7 @@ namespace MStube
             try
             {
                 user_id = Int32.Parse(await httpClient.GetStringAsync(uri));
+                System.Diagnostics.Debug.WriteLine(user_id);
             }
             catch (Exception error)
             {
@@ -130,7 +131,6 @@ namespace MStube
             {
                 var result = await httpClient.GetStringAsync(uri);
                 //Debug.WriteLine("User id: " + user_id);
-                //Debug.WriteLine(result);
                 items = JsonConvert.DeserializeObject<List<VideoDetailItem>>(result as string);
             }
             catch (Exception error)
@@ -176,15 +176,15 @@ namespace MStube
         {
             TopicViewModel clickedItem = e.ClickedItem as TopicViewModel;
             VideoBriefList.Visibility = Visibility.Collapsed;
-            LoadingProgressRing.Visibility = Visibility.Visible;
+            TopicList.Visibility = Visibility.Collapsed;
+            LoadingProgressRing.IsActive = true;
             List<VideoDetailItem> searchresult = await Utils.SearchTopic.SearchTopicToServer(clickedItem.topic);
             if (searchresult.Count >= 1)
             {
                 VideoBriefList.ItemsSource = GenerateVideoViewFromVideoDetail(searchresult);
                 NotifyPropertyChanged();
             }
-            LoadingProgressRing.Visibility = Visibility.Collapsed;
-            TopicList.Visibility = Visibility.Collapsed;
+            LoadingProgressRing.IsActive = false;
             VideoBriefList.Visibility = Visibility.Visible;
         }
 
@@ -206,8 +206,8 @@ namespace MStube
 
         private void SearchTopic_Click(object sender, RoutedEventArgs e)
         {
-            VideoBriefList.Visibility = Visibility.Collapsed;
             TopicList.Visibility = Visibility.Visible;
+            VideoBriefList.Visibility = Visibility.Collapsed;
         }
 
         private async void SendFeedback_Click(object sender, RoutedEventArgs e)
@@ -226,9 +226,9 @@ namespace MStube
             }
             else
             {
-                LoadingProgressRing.Visibility = Visibility.Visible;
+                LoadingProgressRing.IsActive = true;
                 List<VideoDetailItem> searchresult = await Utils.SearchTitle.SearchTitleToServer(args.QueryText);
-                LoadingProgressRing.Visibility = Visibility.Collapsed;
+                LoadingProgressRing.IsActive = false;
                 if (searchresult.Count >= 0)
                 {
                     VideoBriefList.ItemsSource = GenerateVideoViewFromVideoDetail(searchresult);
