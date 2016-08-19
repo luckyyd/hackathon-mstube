@@ -13,17 +13,6 @@
             <RowDefinition Height="91*"/>
             <RowDefinition Height="229*"/>
         </Grid.RowDefinitions>
-
-        <!--<ToggleButton x:Name="TogglePaneButton" 
-                      Visibility="{x:Bind ViewModel.IsInDetailsMode, Mode=OneWay, ConverterParameter=Reverse, Converter={StaticResource BooleanToVisibilityConverter}}"
-                      Margin="0"
-                      TabIndex="1"
-                      Checked="{x:Bind CheckTogglePaneButtonSizeChanged}"
-                      Unchecked="{x:Bind CheckTogglePaneButtonSizeChanged}"
-                      IsChecked="{Binding IsPaneOpen, ElementName=SplitView, Mode=TwoWay}"
-                      AutomationProperties.Name="Menu" ToolTipService.ToolTip="Menu"
-                      />-->
-
         <SplitView x:Name="SplitView"
                    DisplayMode="CompactOverlay"
                    IsPaneOpen="False"
@@ -31,21 +20,17 @@
                    OpenPaneLength="200" Grid.RowSpan="2">
             <SplitView.Pane>
                 <StackPanel Background="#333533">
-                    <Button x:Name="Menu" FontFamily="Segoe MDL2 Assets" Content="&#xE700;"
-                   Width="50" Height="50" Background="Transparent" Click="Menu_Click"/>
+                    <Button x:Name="Menu" FontFamily="Segoe MDL2 Assets" Content="&#xE700;" Width="50" Height="50" Background="Transparent" Click="Menu_Click"/>
                     <StackPanel Background="#505450" Orientation="Horizontal">
-                        <Button x:Name="Home" FontFamily="Segoe MDL2 Assets" Content="&#xE10F;"
-                   Width="50" Height="50" Background="Transparent" Click="Home_Click"/>
+                        <Button x:Name="Home" FontFamily="Segoe MDL2 Assets" Content="&#xE10F;" Width="50" Height="50" Background="Transparent" Click="Home_Click"/>
                         <TextBlock x:Name="HomeTextBlock" Text="Home" FontSize="12" VerticalAlignment="Center" />
                     </StackPanel>
                     <StackPanel Background="#505450" Orientation="Horizontal">
-                        <Button x:Name="SearchTopic" FontFamily="Segoe MDL2 Assets" Content="&#xE71D;"
-                   Width="50" Height="50" Background="Transparent" Click="SearchTopic_Click"/>
+                        <Button x:Name="SearchTopic" FontFamily="Segoe MDL2 Assets" Content="&#xE71D;" Width="50" Height="50" Background="Transparent" Click="SearchTopic_Click"/>
                         <TextBlock x:Name="SearchTopicTextBlock" Text="Topic" FontSize="12" VerticalAlignment="Center" />
                     </StackPanel>
                     <StackPanel Background="#505450" Orientation="Horizontal">
-                        <Button x:Name="SendFeedback" FontFamily="Segoe MDL2 Assets" Content="&#xE170;"
-                   Width="50" Height="50" Background="Transparent" Click="SendFeedback_Click"/>
+                        <Button x:Name="SendFeedback" FontFamily="Segoe MDL2 Assets" Content="&#xE170;" Width="50" Height="50" Background="Transparent" Click="SendFeedback_Click"/>
                         <TextBlock x:Name="SendFeedbackTextBlock" Text="Send Feedback" FontSize="12" VerticalAlignment="Center" />
                     </StackPanel>
                 </StackPanel>
@@ -58,24 +43,10 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <Grid Grid.Row="0" >
-                        <AutoSuggestBox 
-                                Margin="5,5,5,5"
-                                Width="Auto"
-                                PlaceholderText="Search"
-                                QueryIcon="Find" 
-                                TextChanged="AutoSuggestBox_TextChanged"
-                                QuerySubmitted="AutoSuggestBox_QuerySubmitted"
-                                SuggestionChosen="AutoSuggestBox_SuggestionChosen"
-                            />
+                        <AutoSuggestBox Margin="5,5,5,5" Width="Auto" PlaceholderText="Search" QueryIcon="Find" TextChanged="AutoSuggestBox_TextChanged" QuerySubmitted="AutoSuggestBox_QuerySubmitted" SuggestionChosen="AutoSuggestBox_SuggestionChosen" />
                     </Grid>
                     <Grid Grid.Row="1">
-                        <ListView
-                            x:Name="TopicList"
-                            HorizontalAlignment="Stretch"
-                            Margin="0,5,0,10"
-                            VerticalAlignment="Top"
-                            IsItemClickEnabled="True" 
-                            ItemClick="TopicClicked">
+                        <ListView Width="Auto" x:Name="TopicList" HorizontalAlignment="Stretch" Margin="0,5,0,10" VerticalAlignment="Top" IsItemClickEnabled="True" ItemClick="TopicClicked">
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <Grid Margin="5,5,5,5" MaxHeight="120">
@@ -84,9 +55,7 @@
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
                                         <Button x:Name="thumbnail" Grid.Column="0" FontFamily="Segoe MDL2 Assets" Content="&#xE208;" Background="Transparent" />
-                                        <TextBlock x:Name="topicText" Grid.Column="1" MaxLines="2"
-                                            Padding="5,5,5,5" Style="{StaticResource BodyTextBlockStyle}"
-                                            Text="{Binding topic}" FontSize="16"/>
+                                        <TextBlock x:Name="topicText" Grid.Column="1" MaxLines="2" Padding="5,5,5,5" Style="{StaticResource BodyTextBlockStyle}" Text="{Binding topic}" FontSize="16"/>
                                     </Grid>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
@@ -99,13 +68,7 @@
                                     <pr:PullRefreshProgressControl PullToRefreshText="Pull" ReleaseToRefreshText="Release" Progress="{Binding}"/>
                                 </DataTemplate>
                             </pr:PullToRefreshBox.TopIndicatorTemplate>
-                            <ListView 
-                        x:Name="VideoBriefList"
-                        HorizontalAlignment="Left"
-                        Margin="0,5,0,10"
-                        VerticalAlignment="Top"
-                        IsItemClickEnabled="True" 
-                        ItemClick="ItemClicked">
+                            <ListView Width="Auto" x:Name="VideoBriefList" HorizontalAlignment="Left" Margin="0,5,0,10" VerticalAlignment="Top" IsItemClickEnabled="True" ItemClick="ItemClicked">
                                 <ListView.ItemTemplate>
                                     <DataTemplate>
                                         <Grid Margin="5,5,5,5" MaxHeight="120">
@@ -113,8 +76,7 @@
                                                 <ColumnDefinition Width="Auto" />
                                                 <ColumnDefinition Width="*" />
                                             </Grid.ColumnDefinitions>
-                                            <Image Grid.Row="0" Grid.Column="0" Width="100" Height="100" HorizontalAlignment="Left" 
-                                           VerticalAlignment="Center" Source="{Binding ImageSourceUri}" Stretch="UniformToFill"/>
+                                            <Image Grid.Row="0" Grid.Column="0" Width="100" Height="100" HorizontalAlignment="Left" VerticalAlignment="Center" Source="{Binding ImageSourceUri}" Stretch="UniformToFill"/>
                                             <Grid Grid.Row="0" Grid.Column="1" Margin="10">
                                                 <Grid.RowDefinitions>
                                                     <RowDefinition Height="Auto"/>
@@ -146,10 +108,8 @@
                         </pr:PullToRefreshBox>
                         <ProgressRing x:Name="LoadingProgressRing" IsActive="True" HorizontalAlignment="Center" VerticalAlignment="Center" Height="80" Width="80"/>
                     </Grid>
-                    
                 </Grid>
             </SplitView.Content>
         </SplitView>
-
     </Grid>
 </Page>

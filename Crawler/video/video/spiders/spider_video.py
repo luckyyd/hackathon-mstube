@@ -51,8 +51,6 @@ class VideoSpider(scrapy.Spider):
                 # Get video brief description
                 try:
                     video_description = entry.xpath('//div[@class="description"]/text()').extract()[0]
-                    video_description = re.sub('\u00a0', ' ', video_description)
-                    video_description = re.sub('\u2026', ' ', video_description)
                     video_description = re.sub(r'\r', '', video_description)
                     video_description = re.sub(r'\n', '', video_description)
                     video_description = re.sub(r'\t', '', video_description)

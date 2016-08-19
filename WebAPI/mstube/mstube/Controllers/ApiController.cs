@@ -22,13 +22,13 @@ namespace mstube.Controllers
 {
     public class ApiController : Controller
     {
-        private IDatabase cachefilter;
-        private IDatabase cacheitemid;
-        private IDatabase cacheid;
-        ConnectionMultiplexer FilterRedis;
-        ConnectionMultiplexer ContentBasedRedis;
-        ConnectionMultiplexer UserIdRedis;
-        TelemetryClient telemetry;
+        private static IDatabase cachefilter;
+        private static IDatabase cacheitemid;
+        private static IDatabase cacheid;
+        static ConnectionMultiplexer FilterRedis;
+        static ConnectionMultiplexer ContentBasedRedis;
+        static ConnectionMultiplexer UserIdRedis;
+        static TelemetryClient telemetry = new TelemetryClient();
         public ApiController()
         {
             FilterRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisPostHistory);
@@ -37,8 +37,7 @@ namespace mstube.Controllers
             cacheitemid = ContentBasedRedis.GetDatabase();
             UserIdRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisUserId);
             cacheid = UserIdRedis.GetDatabase();
-            telemetry = new TelemetryClient();
-            telemetry.TrackTrace("Telemetry started.");
+            telemetry.TrackTrace("API controller constructed.");
         }
         public ActionResult Index()
         {
@@ -58,7 +57,7 @@ namespace mstube.Controllers
             if (dbsize == null)
             {
                 dbsize = "0";
-                cacheid.StringSet("RedisSize", "0");
+                cacheid.StringSetAsync("RedisSize", "0");
             }
             if (uuid != null)
             {
@@ -66,8 +65,8 @@ namespace mstube.Controllers
                 if (id == null)
                 {
                     long user_id = Convert.ToInt64(dbsize) + 1;
-                    cacheid.StringSet(uuid, user_id.ToString());
-                    cacheid.StringSet("RedisSize", user_id.ToString());
+                    cacheid.StringSetAsync(uuid, user_id.ToString());
+                    cacheid.StringSetAsync("RedisSize", user_id.ToString());
                     return Json(user_id, JsonRequestBehavior.AllowGet);
                 }
                 else
@@ -217,7 +216,7 @@ namespace mstube.Controllers
             List<Item.Item> contentBasedList = new List<Item.Item>();
 
             // Get last item 
-            string last_item_id = cacheitemid.StringGet(user_id.ToString());
+            string last_item_id = await cacheitemid.StringGetAsync(user_id.ToString());
 
             // Get Content-based result
             if (last_item_id != null)

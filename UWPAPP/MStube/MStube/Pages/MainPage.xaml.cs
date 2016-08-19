@@ -70,9 +70,12 @@ namespace MStube
             List<VideoViewModel> newVideoViewList = GenerateVideoViewFromVideoDetail(newVideoListCandidates);
             newVideoViewList.AddRange(videoList);
             videoList = new ObservableCollection<VideoViewModel>(newVideoViewList);
-            LoadingProgressRing.IsActive = false;
-            VideoBriefList.ItemsSource = videoList;
-            VideoBriefList.Visibility = Visibility.Visible;
+            if (TopicList.Visibility == Visibility.Collapsed)
+            {
+                LoadingProgressRing.IsActive = false;
+                VideoBriefList.ItemsSource = videoList;
+                VideoBriefList.Visibility = Visibility.Visible;
+            }
         }
 
         public List<VideoViewModel> GenerateVideoViewFromVideoDetail(List<VideoDetailItem> videoDetailItemCandidates)
@@ -206,6 +209,7 @@ namespace MStube
 
         private void SearchTopic_Click(object sender, RoutedEventArgs e)
         {
+            LoadingProgressRing.IsActive = false;
             TopicList.Visibility = Visibility.Visible;
             VideoBriefList.Visibility = Visibility.Collapsed;
         }
@@ -227,16 +231,12 @@ namespace MStube
             else
             {
                 LoadingProgressRing.IsActive = true;
-                List<VideoDetailItem> searchresult = await Utils.SearchTitle.SearchTitleToServer(args.QueryText);
+                List<VideoDetailItem> searchresult = await SearchTitle.SearchTitleToServer(args.QueryText);
                 LoadingProgressRing.IsActive = false;
                 if (searchresult.Count >= 0)
                 {
                     VideoBriefList.ItemsSource = GenerateVideoViewFromVideoDetail(searchresult);
                     NotifyPropertyChanged();
-                }
-                else
-                {
-                    //Results.Visibility = Visibility.Visible;
                 }
             }
         }

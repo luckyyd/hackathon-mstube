@@ -130,7 +130,7 @@
     <Compile Include="Pages\VideoPage.xaml.cs">
       <DependentUpon>VideoPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="RatingBar.xaml.cs">
+    <Compile Include="Styles\RatingBar.xaml.cs">
       <DependentUpon>RatingBar.xaml</DependentUpon>
     </Compile>
     <Compile Include="Utils\DeviceInfo.cs" />
@@ -223,13 +223,12 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="RatingBar.xaml">
+    <Page Include="Styles\RatingBar.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Styles\" />
     <Folder Include="Views\" />
   </ItemGroup>
   <ItemGroup>
