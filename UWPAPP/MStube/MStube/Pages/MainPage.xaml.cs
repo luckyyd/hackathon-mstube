@@ -62,6 +62,7 @@ namespace MStube
 
         public async void InitializeValues()
         {
+            autoSuggestBox.Text = "";
             LoadingProgressRing.IsActive = true;
             user_id = await GetUserId(this.device);
             VideoBriefList.Visibility = Visibility.Collapsed;
@@ -181,6 +182,7 @@ namespace MStube
             VideoBriefList.Visibility = Visibility.Collapsed;
             TopicList.Visibility = Visibility.Collapsed;
             LoadingProgressRing.IsActive = true;
+            autoSuggestBox.Text = clickedItem.topic;
             List<VideoDetailItem> searchresult = await Utils.SearchTopic.SearchTopicToServer(clickedItem.topic);
             if (searchresult.Count >= 1)
             {
