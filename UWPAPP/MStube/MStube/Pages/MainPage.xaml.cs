@@ -49,14 +49,13 @@ namespace MStube
         public MainPage()
         {
             this.InitializeComponent();
-            topicList.Add(new TopicViewModel { topic = "App" });
-            topicList.Add(new TopicViewModel { topic = "Azure" });
-            topicList.Add(new TopicViewModel { topic = "Edge" });
-            topicList.Add(new TopicViewModel { topic = "Office" });
-            topicList.Add(new TopicViewModel { topic = "Silverlight" });
-            topicList.Add(new TopicViewModel { topic = "Visual Studio" });
-            topicList.Add(new TopicViewModel { topic = "Windows Phone" });
-            TopicList.ItemsSource = topicList;
+            //topicList.Add(new TopicViewModel { topic = "App" });
+            //topicList.Add(new TopicViewModel { topic = "Azure" });
+            //topicList.Add(new TopicViewModel { topic = "Edge" });
+            //topicList.Add(new TopicViewModel { topic = "Office" });
+            //topicList.Add(new TopicViewModel { topic = "Silverlight" });
+            //topicList.Add(new TopicViewModel { topic = "Visual Studio" });
+            //topicList.Add(new TopicViewModel { topic = "Windows Phone" });
             TopicList.Visibility = Visibility.Collapsed;
         }
 
@@ -68,9 +67,11 @@ namespace MStube
             VideoBriefList.Visibility = Visibility.Collapsed;
             TopicList.Visibility = Visibility.Collapsed;
             List<VideoDetailItem> newVideoListCandidates = await GetVideoJson();
+            List<TopicViewModel> topicList = await GetTopicJson();
             List<VideoViewModel> newVideoViewList = GenerateVideoViewFromVideoDetail(newVideoListCandidates);
             newVideoViewList.AddRange(videoList);
             videoList = new ObservableCollection<VideoViewModel>(newVideoViewList);
+            TopicList.ItemsSource = topicList;
             if (TopicList.Visibility == Visibility.Collapsed)
             {
                 LoadingProgressRing.IsActive = false;
@@ -146,6 +147,29 @@ namespace MStube
                 httpClient.Dispose();
             }
             return items;
+        }
+
+        private async Task<List<TopicViewModel>> GetTopicJson()
+        {
+            List<TopicViewModel> topicList = new List<TopicViewModel>();
+            HttpClient httpClient = new HttpClient();
+            // Cache-Control: private, to avoid load cache.
+            var uri = new Uri("http://mstubedotnet.azurewebsites.net/api/Topic" + "&t=" + new Random().Next(1, 1000).ToString());
+            try
+            {
+                var result = await httpClient.GetStringAsync(uri);
+                //Debug.WriteLine("User id: " + user_id);
+                topicList = JsonConvert.DeserializeObject<List<TopicViewModel>>(result as string);
+            }
+            catch (Exception error)
+            {
+                HockeyClient.Current.TrackException(error);
+            }
+            finally
+            {
+                httpClient.Dispose();
+            }
+            return topicList;
         }
 
         private void ItemClicked(object sender, ItemClickEventArgs e)
