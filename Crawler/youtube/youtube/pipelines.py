@@ -11,8 +11,8 @@ import SQLsetting
 class SQLServerPipeline(object):
 
     def __init__(self):
-        self.conn = pymssql.connect(
-            server=SQLsetting.server, user=SQLsetting.user, password=SQLsetting.password, database=SQLsetting.database)
+        self.conn = pymssql.connect(server=SQLsetting.server, user=SQLsetting.user, database=SQLsetting.database,
+                                    password=SQLsetting.password, port=1433, tds_version="8.0")
         self.cursor = self.conn.cursor()
 
     def process_item(self, item, spider):
