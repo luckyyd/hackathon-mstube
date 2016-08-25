@@ -154,7 +154,7 @@ namespace MStube
             List<TopicViewModel> topicList = new List<TopicViewModel>();
             HttpClient httpClient = new HttpClient();
             // Cache-Control: private, to avoid load cache.
-            var uri = new Uri("http://mstubedotnet.azurewebsites.net/api/Topic" + "&t=" + new Random().Next(1, 1000).ToString());
+            var uri = new Uri("http://mstubedotnet.azurewebsites.net/api/ListTopic");
             try
             {
                 var result = await httpClient.GetStringAsync(uri);

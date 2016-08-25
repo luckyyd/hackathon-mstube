@@ -322,7 +322,7 @@ namespace mstube.Controllers
                 SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["MstubeConnection"].ToString());
                 command.Connection = connection;
                 command.CommandType = CommandType.Text;
-                command.CommandText = "SELECT DISTINCT topic FROM Item";
+                command.CommandText = "SELECT DISTINCT TOP 10 topic, count(*) as count FROM Item GROUP BY topic ORDER BY count DESC";
                 try
                 {
                     connection.Open();
