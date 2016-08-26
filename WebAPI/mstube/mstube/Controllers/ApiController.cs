@@ -316,8 +316,14 @@ namespace mstube.Controllers
         public JsonResult ListTopic()
         {
             List<Item.Topic> jsonResult = new List<Item.Topic>();
+            jsonResult.Add(new Item.Topic { topic = "Azure"});
+            jsonResult.Add(new Item.Topic { topic = "Edge" });
+            jsonResult.Add(new Item.Topic { topic = "Office" });
+            jsonResult.Add(new Item.Topic { topic = "Silverlight" });
+            jsonResult.Add(new Item.Topic { topic = "Visual Studio" });
+            jsonResult.Add(new Item.Topic { topic = "Windows Phone" });
             //Return list topic from db
-            using (SqlCommand command = new SqlCommand())
+            /*using (SqlCommand command = new SqlCommand())
             {
                 SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["MstubeConnection"].ToString());
                 command.Connection = connection;
@@ -347,6 +353,7 @@ namespace mstube.Controllers
                     connection.Close();
                 }
             }
+            */
             return Json(jsonResult, JsonRequestBehavior.AllowGet);
         }
 
@@ -464,6 +471,9 @@ namespace mstube.Controllers
         [HttpPost]
         public JsonResult Preference(Preference.Preference pre)
         {
+            if (pre.score < 0 || pre.score >= 5) {
+                return null;
+            }
             //Append preference data to Azure Blob
             const string StorageAccountName = "mstubeblob";
             const string storageContainerName = "mstube-container";

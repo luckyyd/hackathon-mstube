@@ -49,13 +49,6 @@ namespace MStube
         public MainPage()
         {
             this.InitializeComponent();
-            //topicList.Add(new TopicViewModel { topic = "App" });
-            //topicList.Add(new TopicViewModel { topic = "Azure" });
-            //topicList.Add(new TopicViewModel { topic = "Edge" });
-            //topicList.Add(new TopicViewModel { topic = "Office" });
-            //topicList.Add(new TopicViewModel { topic = "Silverlight" });
-            //topicList.Add(new TopicViewModel { topic = "Visual Studio" });
-            //topicList.Add(new TopicViewModel { topic = "Windows Phone" });
             TopicList.Visibility = Visibility.Collapsed;
         }
 
