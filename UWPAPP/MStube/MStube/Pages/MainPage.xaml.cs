@@ -19,6 +19,7 @@ using System.ComponentModel;
 using System.Collections.ObjectModel;
 using VideoLibrary;
 using System.Linq;
+using Windows.Storage;
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
 namespace MStube
@@ -260,16 +261,39 @@ namespace MStube
             }
         }
 
-        private void AutoSuggestBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+        private async void AutoSuggestBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
         {
+            var selectedItem = args.SelectedItem.ToString();
+            sender.Text = selectedItem;
+            List<VideoDetailItem> searchresult = await SearchTitle.SearchTitleToServer(sender.Text);
+            LoadingProgressRing.IsActive = false;
+            if (searchresult.Count >= 0)
+            {
+                VideoBriefList.ItemsSource = GenerateVideoViewFromVideoDetail(searchresult);
+                NotifyPropertyChanged();
+            }
 
         }
 
-        private void AutoSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        private List<string> _listSuggestion = null;
+        private async void AutoSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
-            if (args.Reason != AutoSuggestionBoxTextChangeReason.UserInput)
+            if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
             {
                 // User selected an item from the suggestion list, take an action on it here.
+                List<string> wordList = new List<string>();
+               StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Assets/Typeahead.txt"));
+                using (var inputStream = await file.OpenReadAsync())
+                using (var classicStream = inputStream.AsStreamForRead())
+                using (var streamReader = new StreamReader(classicStream))
+                {
+                    while (streamReader.Peek() >= 0)
+                    {
+                        wordList.Add(streamReader.ReadLine());
+                    }
+                }
+                _listSuggestion = wordList.Where(x => x.StartsWith(sender.Text)).ToList();
+                sender.ItemsSource = _listSuggestion;
             }
             else
             {
