@@ -20,12 +20,12 @@ class SQLServerPipeline(object):
         try:
             self.cursor.execute(
                 "IF NOT EXISTS (SELECT * FROM ItemTest Where url = %s) \
-                 INSERT INTO ItemTest(title, video_src, image_src, url, \
-                views, category, posted_time, description, full_description, source) \
+                 INSERT INTO ItemTest(title, topic, video_src, image_src, url, \
+                views, category, posted_time, quality, description, full_description, source) \
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                (item['url'], item['title'], item['video_src'], item['image_src'],
-                 item['url'], item['views'], item[
-                     'category'], item['upload_date'],
+                (item['url'], item['title'], item['topic'], item['video_src'], item['image_src'],
+                 item['url'], item['views'], item['category'],
+                 item['upload_date'], item['avg_rating'],
                  item['description'], item['full_description'], item['source']))
             self.conn.commit()
         except pymssql.Error as e:
