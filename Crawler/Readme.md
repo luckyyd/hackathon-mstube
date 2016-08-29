@@ -1,12 +1,27 @@
 # Crawler
 
-Here is the crawler.
+Here is the crawlers of the project.
 
-- `video` is for channel9, built by python3.5
-- `vimeo` is for vimeo, built by python2.7
-- `youtube` is for youtube, built by python3.5, including SQL Server connect
+- `channel9` is for videos from channel9
+- `vimeo` is for videos from vimeo
+- `youtube` is for videos from youtube
 
-The other folders are for test.
+### Usage
+
+You need to install these two packages first.
+
+```shell
+pip install scrapy  # Scrapy framework
+pip install pymssql # Microsoft SQL Server
+```
+
+Run `scrapy crawl 'project'` under the opposite crawler folder. Here, `'project'` should be replaced by `channel9`/`vimeo`/`youtube`.
+
+Notice that the items will be written into Azure SQL Server.
+
+All the `items.json` files are the example output, you could get it by run `scrapy crawl 'project' -o items.json`.
+
+Folder `tools` is just for generating data, ignore it.
 
 ---
 
