@@ -6,7 +6,7 @@ Here is the crawlers of the project.
 - `vimeo` is for videos from vimeo
 - `youtube` is for videos from youtube
 
-### Usage
+### Environment
 
 You need to install these two packages first.
 
@@ -14,6 +14,10 @@ You need to install these two packages first.
 pip install scrapy  # Scrapy framework
 pip install pymssql # Microsoft SQL Server
 ```
+
+Or as recommend, run the project under the docker container: [docker-scrapy](https://github.com/irmowan/docker-scrapy)
+
+### Usage
 
 Run `scrapy crawl 'project'` under the opposite crawler folder. Here, `'project'` should be replaced by `channel9`/`vimeo`/`youtube`.
 
