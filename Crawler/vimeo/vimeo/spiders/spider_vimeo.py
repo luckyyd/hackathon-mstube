@@ -8,25 +8,21 @@
 import scrapy
 import time
 import re
-from vimeodetail.items import VimeodetailItem
-from vimeodetail.PageDataLink import PageDataLink
+from vimeo.items import VimeoItem
+from vimeo.PageDataLink import PageDataLink
 
 
 class VimeodetailSpider(scrapy.Spider):
-    name = 'vimeodetail'
+    name = 'vimeo'
     allowed_domains = ["vimeo.com"]
     start_urls = [(word) for word in PageDataLink().page]
 
     def __init__(self):
         scrapy.Spider.__init__(self)
-        self.counter = 6000
-
-    def __del__(self):
-        self.driver.close()
 
     def parse(self, response):
         hxs = response
-        item = VimeodetailItem()
+        item = VimeoItem()
         item['url'] = hxs.xpath(
             '//meta[@property="og:url"]/@content').extract()[0]
         item['video_src'] = hxs.xpath(
@@ -45,8 +41,12 @@ class VimeodetailSpider(scrapy.Spider):
         except:
             item['topic'] = hxs.xpath(
                 '//meta[@property="article:tag"]/@content').extract()[0]
-        item['posted_time'] = hxs.xpath(
-            '//span[@class="clip_info-time"]/time/@datetime').re(r'([\d-]*)T')[0]
+        try:
+            item['upload_date'] = hxs.xpath(
+                '//script[@type="application/ld+json"]').re('"uploadDate":"(.*?)T')[0]
+        except Exception:
+            self.log('Cannot find upload date.')
+            return
         try:
             item['views'] = int(hxs.xpath(
                 '//script[@type="application/ld+json"]/text()').re(r'"interactionCount":(\d*)')[0])
@@ -54,5 +54,5 @@ class VimeodetailSpider(scrapy.Spider):
             item['views'] = int(100)
         item['category'] = str("video")
         item['source'] = str("vimeo")
-        item['quality'] = int(4)
+        item['avg_rating'] = int(4)
         yield item

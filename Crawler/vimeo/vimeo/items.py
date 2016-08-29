@@ -8,7 +8,7 @@
 import scrapy
 
 
-class VideoItem(scrapy.Item):
+class VimeoItem(scrapy.Item):
     # define the fields for your item here like:
     item_id = scrapy.Field()
     title = scrapy.Field()
@@ -23,3 +23,4 @@ class VideoItem(scrapy.Item):
     avg_rating = scrapy.Field()
     description = scrapy.Field()
     full_description = scrapy.Field()
+    source = scrapy.Field()

@@ -86,6 +86,7 @@ class YoutubeSpider(scrapy.Spider):
         item['upload_date'] = upload_date
         item['views'] = views
         item['category'] = 'video'
+        item['source'] = 'youtube'
         self.counter += 1
         item['item_id'] = self.counter
         yield item

@@ -4,6 +4,7 @@
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
+
 import pymssql
 import SQLsetting
 
@@ -25,7 +26,7 @@ class SQLServerPipeline(object):
                 (item['url'], item['title'], item['video_src'], item['image_src'],
                  item['url'], item['views'], item[
                      'category'], item['upload_date'],
-                 item['description'], item['full_description'], "vimeo"))
+                 item['description'], item['full_description'], item['source']))
             self.conn.commit()
         except pymssql.Error as e:
             print("Error with pymssql: " + str(e))

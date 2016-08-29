@@ -9,10 +9,10 @@
 #     http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
 #     http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = 'video'
+BOT_NAME = 'channel9'
 
-SPIDER_MODULES = ['video.spiders']
-NEWSPIDER_MODULE = 'video.spiders'
+SPIDER_MODULES = ['channel9.spiders']
+NEWSPIDER_MODULE = 'channel9.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the
@@ -25,7 +25,7 @@ USER_AGENT = 'Mozilla/5.0 (Linux; Android 4.4; Nexus 5 Build/BuildID) AppleWebKi
 # Configure a delay for requests for the same website (default: 0)
 # See http://scrapy.readthedocs.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-DOWNLOAD_DELAY = 3
+DOWNLOAD_DELAY = 5
 # The download delay setting will honor only one of:
 # CONCURRENT_REQUESTS_PER_DOMAIN=16
 # CONCURRENT_REQUESTS_PER_IP=16
@@ -63,7 +63,7 @@ DOWNLOAD_DELAY = 3
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'video.pipelines.SQLServerPipeline': 800,
+    'channel9.pipelines.SQLServerPipeline': 800,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

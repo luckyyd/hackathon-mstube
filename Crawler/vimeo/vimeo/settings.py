@@ -9,10 +9,10 @@
 #     http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
 #     http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = 'vimeodetail'
+BOT_NAME = 'vimeo'
 
-SPIDER_MODULES = ['vimeodetail.spiders']
-NEWSPIDER_MODULE = 'vimeodetail.spiders'
+SPIDER_MODULES = ['vimeo.spiders']
+NEWSPIDER_MODULE = 'vimeo.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the
@@ -25,7 +25,7 @@ USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.10; rv:39.0) Gecko/20100
 # Configure a delay for requests for the same website (default: 0)
 # See http://scrapy.readthedocs.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-DOWNLOAD_DELAY = 3
+DOWNLOAD_DELAY = 5
 # The download delay setting will honor only one of:
 # CONCURRENT_REQUESTS_PER_DOMAIN=16
 # CONCURRENT_REQUESTS_PER_IP=16
@@ -63,7 +63,7 @@ DOWNLOAD_DELAY = 3
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'vimeodetail.pipelines.SQLServerPipeline': 300,
+    'vimeo.pipelines.SQLServerPipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
