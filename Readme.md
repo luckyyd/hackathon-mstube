@@ -15,10 +15,11 @@ MSTube is a personalized recommendation app for Microsoft related videos.
 
 - Scrapy
 - Azure Machine Learning
-- ASP.Net MVC SWeb Application
+- ASP.Net MVC Web Application
 - Universal Windows Platform
 - Redis, SQL Server, Azure Blob
 - Application Insight
+- Docker
 
 ### License
 

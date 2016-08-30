@@ -23,3 +23,4 @@ class YoutubeItem(scrapy.Item):
     avg_rating = scrapy.Field()
     description = scrapy.Field()
     full_description = scrapy.Field()
+    source = scrapy.Field()
