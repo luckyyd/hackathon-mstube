@@ -30,7 +30,7 @@ namespace MStube
     public sealed partial class MainPage : Page, INotifyPropertyChanged
     {
         //private VideoList videoListCandidates = VideoList.Instance;
-        private ObservableCollection<VideoViewModel> _videoList = new ObservableCollection<VideoViewModel>();
+        private static ObservableCollection<VideoViewModel> _videoList = new ObservableCollection<VideoViewModel>();
         public ObservableCollection<VideoViewModel> videoList
         {
             get { return _videoList; }
@@ -51,21 +51,29 @@ namespace MStube
         {
             this.InitializeComponent();
             TopicList.Visibility = Visibility.Collapsed;
+            if (videoList.Count == 0)
+            {
+                this.InitializeValues();
+            }
+
         }
 
-        public async void InitializeValues()
+        public async void InitializeValues(bool refresh = true)
         {
             autoSuggestBox.Text = "";
-            LoadingProgressRing.IsActive = true;
-            user_id = await GetUserId(this.device);
-            VideoBriefList.Visibility = Visibility.Collapsed;
-            TopicList.Visibility = Visibility.Collapsed;
-            List<VideoDetailItem> newVideoListCandidates = await GetVideoJson();
             List<TopicViewModel> topicList = await GetTopicJson();
-            List<VideoViewModel> newVideoViewList = GenerateVideoViewFromVideoDetail(newVideoListCandidates);
-            newVideoViewList.AddRange(videoList);
-            videoList = new ObservableCollection<VideoViewModel>(newVideoViewList);
             TopicList.ItemsSource = topicList;
+            if (refresh == true)
+            {
+                LoadingProgressRing.IsActive = true;
+                user_id = await GetUserId(this.device);
+                VideoBriefList.Visibility = Visibility.Collapsed;
+                TopicList.Visibility = Visibility.Collapsed;
+                List<VideoDetailItem> newVideoListCandidates = await GetVideoJson();
+                List<VideoViewModel> newVideoViewList = GenerateVideoViewFromVideoDetail(newVideoListCandidates);
+                newVideoViewList.AddRange(videoList);
+                videoList = new ObservableCollection<VideoViewModel>(newVideoViewList);
+            }
             if (TopicList.Visibility == Visibility.Collapsed)
             {
                 LoadingProgressRing.IsActive = false;
@@ -74,12 +82,12 @@ namespace MStube
             }
         }
 
-        public List<VideoViewModel> GenerateVideoViewFromVideoDetail(List<VideoDetailItem> videoDetailItemCandidates)
+        public List<VideoViewModel> GenerateVideoViewFromVideoDetail(List<VideoDetailItem> videoDetailItemCandidates, bool reverseInsert = true)
         {
             List<VideoViewModel> result = new List<VideoViewModel>();
             foreach (VideoDetailItem item in videoDetailItemCandidates)
             {
-                result.Insert(0, new VideoViewModel
+                VideoViewModel temp = new VideoViewModel
                 {
                     item_id = item.item_id,
                     Title = item.title,
@@ -92,7 +100,15 @@ namespace MStube
                     UploadDate = item.posted_time,
                     Source = item.source,
                     Brand = item.brand
-                });
+                };
+                if (reverseInsert)
+                {
+                    result.Insert(0, temp);
+                }
+                else
+                {
+                    result.Add(temp);
+                }
             }
             return result;
         }
@@ -213,7 +229,7 @@ namespace MStube
 
         private void PullToRefreshBox_RefreshInvoked(DependencyObject sender, object args)
         {
-            InitializeValues();
+            this.InitializeValues();
         }
 
         #region Menu items click
@@ -232,6 +248,21 @@ namespace MStube
             LoadingProgressRing.IsActive = false;
             TopicList.Visibility = Visibility.Visible;
             VideoBriefList.Visibility = Visibility.Collapsed;
+        }
+
+        private async void Latest_Click(object sender, RoutedEventArgs e)
+        {
+            VideoBriefList.Visibility = Visibility.Collapsed;
+            TopicList.Visibility = Visibility.Collapsed;
+            LoadingProgressRing.IsActive = true;
+            List<VideoDetailItem> searchresult = await Utils.SearchLatest.SearchLatestToServer();
+            if (searchresult.Count >= 1)
+            {
+                VideoBriefList.ItemsSource = GenerateVideoViewFromVideoDetail(searchresult, reverseInsert: false);
+                NotifyPropertyChanged();
+            }
+            LoadingProgressRing.IsActive = false;
+            VideoBriefList.Visibility = Visibility.Visible;
         }
 
         private async void SendFeedback_Click(object sender, RoutedEventArgs e)
@@ -282,7 +313,7 @@ namespace MStube
             {
                 // User selected an item from the suggestion list, take an action on it here.
                 List<string> wordList = new List<string>();
-               StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Assets/Typeahead.txt"));
+                StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Assets/Typeahead.txt"));
                 using (var inputStream = await file.OpenReadAsync())
                 using (var classicStream = inputStream.AsStreamForRead())
                 using (var streamReader = new StreamReader(classicStream))
@@ -319,7 +350,7 @@ namespace MStube
         {
             base.OnNavigatedTo(e);
             SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
-            InitializeValues();
+            this.InitializeValues(false);
         }
     }
 }
