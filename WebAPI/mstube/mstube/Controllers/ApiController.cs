@@ -436,6 +436,55 @@ namespace mstube.Controllers
             return Json(jsonResult, JsonRequestBehavior.AllowGet);
         }
 
+        [HttpGet]
+        public JsonResult ListLatest()
+        {
+            List<Item.Item> jsonResult = new List<Item.Item>();
+            //Return search topic from db
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["MstubeConnection"].ToString());
+            using (SqlCommand command = new SqlCommand())
+            {
+                command.Connection = connection;
+                command.CommandType = CommandType.Text;
+                command.CommandText = "SELECT Top 10 * FROM Item ORDER BY posted_time DESC";
+                try
+                {
+                    connection.Open();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            jsonResult.Add(new Item.Item
+                            {
+                                item_id = Convert.ToInt64(reader["item_id"]),
+                                image_src = reader["image_src"].ToString(),
+                                video_src = reader["video_src"].ToString(),
+                                title = reader["title"].ToString(),
+                                url = reader["url"].ToString(),
+                                description = reader["description"].ToString(),
+                                topic = reader["topic"].ToString(),
+                                category = reader["topic"].ToString(),
+                                full_description = reader["full_description"].ToString(),
+                                posted_time = reader["posted_time"].ToString(),
+                                views = Convert.ToInt32(reader["views"]),
+                                quality = Convert.ToDouble(reader["quality"]),
+                                source = reader["source"].ToString()
+                            });
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    telemetry.TrackException(e);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+            return Json(jsonResult, JsonRequestBehavior.AllowGet);
+        }
+
         [HttpPost]
         public JsonResult Preference(Preference.Preference pre)
         {
