@@ -1,2 +1,2 @@
-cd ~/hackathon-mstube/Crawler/channel9
+# Notice: Change to current directory
 scrapy crawl channel9

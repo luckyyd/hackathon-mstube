@@ -23,9 +23,8 @@ class SQLServerPipeline(object):
                 views, category, posted_time, description, full_description, source) \
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                 (item['url'], item['title'], item['video_src'], item['image_src'],
-                 item['url'], item['views'], item[
-                     'category'], item['upload_date'],
-                 item['description'], item['full_description'], item['source']))
+                 item['url'], item['views'], item['category'],
+                 item['upload_date'], item['description'], item['full_description'], item['source']))
             self.conn.commit()
         except pymssql.Error as e:
             print("Error with pymssql: " + str(e))

@@ -1,2 +1,2 @@
-cd ~/hackathon-mstube/Crawler/youtube
+# Notice: Change to current directory
 scrapy crawl youtube

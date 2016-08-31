@@ -22,7 +22,7 @@ class SQLServerPipeline(object):
                 "IF NOT EXISTS (SELECT * FROM ItemTest Where url = %s) \
                  INSERT INTO ItemTest(title, topic, video_src, image_src, url, \
                 views, category, posted_time, quality, description, full_description, source) \
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                 (item['url'], item['title'], item['topic'], item['video_src'], item['image_src'],
                  item['url'], item['views'], item['category'],
                  item['upload_date'], item['avg_rating'],

@@ -1,2 +1,2 @@
-cd ~/hackathon-mstube/Crawler/vimeo
+# Notice: Change to current directory
 scrapy crawl vimeo
