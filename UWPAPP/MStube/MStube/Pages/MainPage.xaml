@@ -30,6 +30,10 @@
                         <TextBlock x:Name="SearchTopicTextBlock" Text="Topic" FontSize="12" VerticalAlignment="Center" />
                     </StackPanel>
                     <StackPanel Background="#505450" Orientation="Horizontal">
+                        <Button x:Name="Latest" FontFamily="Segoe MDL2 Assets" Content="&#xE71D;" Width="50" Height="50" Background="Transparent" Click="Latest_Click"/>
+                        <TextBlock x:Name="LatestTextBlock" Text="Latest" FontSize="12" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <StackPanel Background="#505450" Orientation="Horizontal">
                         <Button x:Name="SendFeedback" FontFamily="Segoe MDL2 Assets" Content="&#xE170;" Width="50" Height="50" Background="Transparent" Click="SendFeedback_Click"/>
                         <TextBlock x:Name="SendFeedbackTextBlock" Text="Send Feedback" FontSize="12" VerticalAlignment="Center" />
                     </StackPanel>

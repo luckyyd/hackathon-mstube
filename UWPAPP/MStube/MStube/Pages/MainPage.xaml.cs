@@ -82,12 +82,12 @@ namespace MStube
             }
         }
 
-        public List<VideoViewModel> GenerateVideoViewFromVideoDetail(List<VideoDetailItem> videoDetailItemCandidates)
+        public List<VideoViewModel> GenerateVideoViewFromVideoDetail(List<VideoDetailItem> videoDetailItemCandidates, bool reverseInsert = true)
         {
             List<VideoViewModel> result = new List<VideoViewModel>();
             foreach (VideoDetailItem item in videoDetailItemCandidates)
             {
-                result.Insert(0, new VideoViewModel
+                VideoViewModel temp = new VideoViewModel
                 {
                     item_id = item.item_id,
                     Title = item.title,
@@ -100,7 +100,15 @@ namespace MStube
                     UploadDate = item.posted_time,
                     Source = item.source,
                     Brand = item.brand
-                });
+                };
+                if (reverseInsert)
+                {
+                    result.Insert(0, temp);
+                }
+                else
+                {
+                    result.Add(temp);
+                }
             }
             return result;
         }
@@ -240,6 +248,21 @@ namespace MStube
             LoadingProgressRing.IsActive = false;
             TopicList.Visibility = Visibility.Visible;
             VideoBriefList.Visibility = Visibility.Collapsed;
+        }
+
+        private async void Latest_Click(object sender, RoutedEventArgs e)
+        {
+            VideoBriefList.Visibility = Visibility.Collapsed;
+            TopicList.Visibility = Visibility.Collapsed;
+            LoadingProgressRing.IsActive = true;
+            List<VideoDetailItem> searchresult = await Utils.SearchLatest.SearchLatestToServer();
+            if (searchresult.Count >= 1)
+            {
+                VideoBriefList.ItemsSource = GenerateVideoViewFromVideoDetail(searchresult, reverseInsert: false);
+                NotifyPropertyChanged();
+            }
+            LoadingProgressRing.IsActive = false;
+            VideoBriefList.Visibility = Visibility.Visible;
         }
 
         private async void SendFeedback_Click(object sender, RoutedEventArgs e)
