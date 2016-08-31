@@ -316,44 +316,12 @@ namespace mstube.Controllers
         public JsonResult ListTopic()
         {
             List<Item.Topic> jsonResult = new List<Item.Topic>();
-            jsonResult.Add(new Item.Topic { topic = "Azure"});
+            jsonResult.Add(new Item.Topic { topic = "Azure" });
             jsonResult.Add(new Item.Topic { topic = "Edge" });
             jsonResult.Add(new Item.Topic { topic = "Office" });
             jsonResult.Add(new Item.Topic { topic = "Silverlight" });
             jsonResult.Add(new Item.Topic { topic = "Visual Studio" });
             jsonResult.Add(new Item.Topic { topic = "Windows Phone" });
-            //Return list topic from db
-            /*using (SqlCommand command = new SqlCommand())
-            {
-                SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["MstubeConnection"].ToString());
-                command.Connection = connection;
-                command.CommandType = CommandType.Text;
-                command.CommandText = "SELECT DISTINCT TOP 10 topic, count(*) as count FROM Item GROUP BY topic ORDER BY count DESC";
-                try
-                {
-                    connection.Open();
-                    using (var reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            jsonResult.Add(new Item.Topic
-                            {
-                                topic = reader["topic"].ToString()
-                            });
-                        }
-                    }
-
-                }
-                catch (SqlException e)
-                {
-                    telemetry.TrackException(e);
-                }
-                finally
-                {
-                    connection.Close();
-                }
-            }
-            */
             return Json(jsonResult, JsonRequestBehavior.AllowGet);
         }
 
@@ -385,7 +353,7 @@ namespace mstube.Controllers
                                 url = reader["url"].ToString(),
                                 description = reader["description"].ToString(),
                                 topic = reader["topic"].ToString(),
-                                category = reader["topic"].ToString(),
+                                category = reader["category"].ToString(),
                                 full_description = reader["full_description"].ToString(),
                                 posted_time = reader["posted_time"].ToString(),
                                 views = Convert.ToInt32(reader["views"]),
@@ -446,7 +414,7 @@ namespace mstube.Controllers
                                 url = reader["url"].ToString(),
                                 description = reader["description"].ToString(),
                                 topic = reader["topic"].ToString(),
-                                category = reader["topic"].ToString(),
+                                category = reader["category"].ToString(),
                                 full_description = reader["full_description"].ToString(),
                                 posted_time = reader["posted_time"].ToString(),
                                 views = Convert.ToInt32(reader["views"]),
@@ -471,7 +439,8 @@ namespace mstube.Controllers
         [HttpPost]
         public JsonResult Preference(Preference.Preference pre)
         {
-            if (pre.score < 0 || pre.score >= 5) {
+            if (pre.score < 0 || pre.score >= 5)
+            {
                 return null;
             }
             //Append preference data to Azure Blob
