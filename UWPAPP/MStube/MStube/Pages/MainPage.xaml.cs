@@ -197,6 +197,7 @@ namespace MStube
                 LoadingProgressRing.IsActive = true;
                 List<VideoDetailItem> searchresult = await SearchTitle.SearchTitleToServer(args.QueryText);
                 LoadingProgressRing.IsActive = false;
+                SetText(args.QueryText);
                 if (searchresult.Count >= 1)
                 {
                     List<VideoViewModel> videoView = GenerateVideoViewModel.GenerateVideoViewFromVideoDetail(searchresult, reverseInsert: false);
@@ -213,6 +214,7 @@ namespace MStube
             sender.Text = selectedItem;
             List<VideoDetailItem> searchresult = await SearchTitle.SearchTitleToServer(sender.Text);
             LoadingProgressRing.IsActive = false;
+            SetText(sender.Text);
             if (searchresult.Count >= 1)
             {
                 List<VideoViewModel> videoView = GenerateVideoViewModel.GenerateVideoViewFromVideoDetail(searchresult, reverseInsert: false);
