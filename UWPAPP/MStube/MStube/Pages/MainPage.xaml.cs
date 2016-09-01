@@ -60,7 +60,7 @@ namespace MStube
 
         public async void InitializeValues(bool refresh = true)
         {
-            autoSuggestBox.Text = "";
+            SetText("");
             if (refresh == true)
             {
                 LoadingProgressRing.IsActive = true;
@@ -114,7 +114,7 @@ namespace MStube
             VideoBriefList.Visibility = Visibility.Collapsed;
             TopicList.Visibility = Visibility.Collapsed;
             LoadingProgressRing.IsActive = true;
-            autoSuggestBox.Text = clickedItem.topic;
+            SetText(clickedItem.topic);
             List<VideoDetailItem> searchresult = await Utils.SearchTopic.SearchTopicToServer(clickedItem.topic);
             if (searchresult.Count >= 1)
             {
@@ -126,7 +126,11 @@ namespace MStube
             LoadingProgressRing.IsActive = false;
             VideoBriefList.Visibility = Visibility.Visible;
         }
-
+        private void SetText(string text)
+        {
+            autoSuggestBox.Text = text;
+            MainPageState.currentText = text;
+        }
         private void PullToRefreshBox_RefreshInvoked(DependencyObject sender, object args)
         {
             this.InitializeValues();
@@ -145,6 +149,7 @@ namespace MStube
 
         private async void SearchTopic_Click(object sender, RoutedEventArgs e)
         {
+            SetText("");
             LoadingProgressRing.IsActive = false;
             List<TopicViewModel> topicList = await GetTopicList.GetTopicListFromServer();
             TopicList.ItemsSource = topicList;
@@ -157,6 +162,7 @@ namespace MStube
             VideoBriefList.Visibility = Visibility.Collapsed;
             TopicList.Visibility = Visibility.Collapsed;
             LoadingProgressRing.IsActive = true;
+            SetText("Latest");
             List<VideoDetailItem> searchresult = await Utils.GetLastest.GetLatestFromServer();
             if (searchresult.Count >= 1)
             {
@@ -165,8 +171,11 @@ namespace MStube
                 MainPageState.setVideo(MainPageState.State.Latest, new ObservableCollection<VideoViewModel>(videoView));
                 currentVideoList = MainPageState.getVideo(MainPageState.State.Latest);
             }
-            LoadingProgressRing.IsActive = false;
-            VideoBriefList.Visibility = Visibility.Visible;
+            if (TopicList.Visibility == Visibility.Collapsed)
+            {
+                LoadingProgressRing.IsActive = false;
+                VideoBriefList.Visibility = Visibility.Visible;
+            }
         }
 
         private async void SendFeedback_Click(object sender, RoutedEventArgs e)
@@ -259,6 +268,7 @@ namespace MStube
             SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
             LoadingProgressRing.IsActive = false;
             currentVideoList = MainPageState.getVideo(MainPageState.currentState);
+            autoSuggestBox.Text = MainPageState.currentText;
         }
     }
 }

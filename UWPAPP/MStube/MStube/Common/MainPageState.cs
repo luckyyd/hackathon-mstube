@@ -19,14 +19,19 @@ namespace MStube.Common
             Search
         }
         static State _currentState = State.None;
+        static string _currentText = "";
+        static Dictionary<State, ObservableCollection<VideoViewModel>> _videos = new Dictionary<State, ObservableCollection<VideoViewModel>>();
         public static State currentState
         {
             get { return _currentState; }
             set { _currentState = value; }
         }
 
-        static Dictionary<State, ObservableCollection<VideoViewModel>> _videos = new Dictionary<State, ObservableCollection<VideoViewModel>>();
-
+        public static string currentText
+        {
+            get { return _currentText; }
+            set { _currentText = value; }
+        }
         public static ObservableCollection<VideoViewModel> getVideo(State state)
         {
             if (!_videos.ContainsKey(state))
@@ -37,7 +42,6 @@ namespace MStube.Common
         }
         public static void setVideo(State state, ObservableCollection<VideoViewModel> video)
         {
-            //currentState = state;
             if (!_videos.ContainsKey(state))
             {
                 _videos.Add(state, new ObservableCollection<VideoViewModel>());
