@@ -123,5 +123,15 @@ namespace mstube.Controllers.Tests
             List<Item.Item> items = JsonConvert.DeserializeObject<List<Item.Item>>(JsonConvert.SerializeObject(result.Data));
             Assert.AreNotEqual(items.Count, 0);
         }
+
+        [TestMethod()]
+        public void ListLatestTest()
+        {
+            var controller = new ApiController();
+            var result = controller.ListLatest();
+            Assert.IsInstanceOfType(result, typeof(JsonResult));
+            List<Item.Item> items = JsonConvert.DeserializeObject<List<Item.Item>>(JsonConvert.SerializeObject(result.Data));
+            Assert.AreNotEqual(items.Count, 0);
+        }
     }
 }
