@@ -267,7 +267,7 @@ namespace MStube
 
         private async void SendFeedback_Click(object sender, RoutedEventArgs e)
         {
-            var mailto = new Uri(@"mailto:?to=t-yimwan@microsoft.com&subject=MStube%20Feedback&body=");
+            var mailto = new Uri(@"mailto:t-yimwan@microsoft.com?subject=MStube%20Feedback&body=");
             await Windows.System.Launcher.LaunchUriAsync(mailto);
         }
         #endregion
