@@ -345,7 +345,7 @@ namespace mstube.Controllers
                 command.Connection = connection;
                 command.CommandType = CommandType.Text;
                 command.CommandText = "SELECT Top 20 * FROM Item WHERE item_id in (SELECT item_id FROM Item WHERE topic like '%"
-                                        + topic + "%') ORDER BY NewID()";
+                                        + topic + "%') ORDER BY views DESC";
                 try
                 {
                     connection.Open();
@@ -406,7 +406,7 @@ namespace mstube.Controllers
                 command.Connection = connection;
                 command.CommandType = CommandType.Text;
                 command.CommandText = "SELECT Top 20 * FROM Item WHERE item_id in (SELECT item_id FROM Item WHERE "
-                                        + wordscommand + ") ORDER BY NewID()";
+                                        + wordscommand + ") ORDER BY views DESC";
                 try
                 {
                     connection.Open();
