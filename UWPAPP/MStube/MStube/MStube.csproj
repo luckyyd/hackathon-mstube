@@ -117,6 +117,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Common\MainPageState.cs" />
     <Compile Include="CustomMediaTransportControls.cs" />
     <Compile Include="Items\VideoDetailItem.cs" />
     <Compile Include="Items\Prefrence.cs" />

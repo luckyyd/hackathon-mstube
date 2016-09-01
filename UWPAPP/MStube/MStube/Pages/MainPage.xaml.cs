@@ -29,9 +29,8 @@ namespace MStube
     /// </summary>
     public sealed partial class MainPage : Page, INotifyPropertyChanged
     {
-        //private VideoList videoListCandidates = VideoList.Instance;
-        private static ObservableCollection<VideoViewModel> _videoList = new ObservableCollection<VideoViewModel>();
-        public ObservableCollection<VideoViewModel> videoList
+        private ObservableCollection<VideoViewModel> _videoList = new ObservableCollection<VideoViewModel>();
+        public ObservableCollection<VideoViewModel> currentVideoList
         {
             get { return _videoList; }
             set
@@ -39,6 +38,7 @@ namespace MStube
                 if (value != _videoList)
                 {
                     _videoList = value;
+                    VideoBriefList.ItemsSource = _videoList;
                     NotifyPropertyChanged();
                 }
             }
@@ -51,18 +51,16 @@ namespace MStube
         {
             this.InitializeComponent();
             TopicList.Visibility = Visibility.Collapsed;
-            if (videoList.Count == 0)
+            if (MainPageState.currentState.Equals(MainPageState.State.None))
             {
+                MainPageState.currentState = MainPageState.State.Recommend;
                 this.InitializeValues();
             }
-
         }
 
         public async void InitializeValues(bool refresh = true)
         {
             autoSuggestBox.Text = "";
-            List<TopicViewModel> topicList = await GetTopicList.GetTopicListFromServer();
-            TopicList.ItemsSource = topicList;
             if (refresh == true)
             {
                 LoadingProgressRing.IsActive = true;
@@ -71,17 +69,17 @@ namespace MStube
                 TopicList.Visibility = Visibility.Collapsed;
                 List<VideoDetailItem> newVideoListCandidates = await Utils.GetRecommend.GetRecommendFromServer(user_id);
                 List<VideoViewModel> newVideoViewList = GenerateVideoViewModel.GenerateVideoViewFromVideoDetail(newVideoListCandidates);
-                newVideoViewList.AddRange(videoList);
-                videoList = new ObservableCollection<VideoViewModel>(newVideoViewList);
+                MainPageState.currentState = MainPageState.State.Recommend;
+                MainPageState.setVideo(MainPageState.State.Recommend, new ObservableCollection<VideoViewModel>(newVideoViewList));
+                currentVideoList = MainPageState.getVideo(MainPageState.State.Recommend);
             }
             if (TopicList.Visibility == Visibility.Collapsed)
             {
                 LoadingProgressRing.IsActive = false;
-                VideoBriefList.ItemsSource = videoList;
                 VideoBriefList.Visibility = Visibility.Visible;
             }
         }
-  
+
         private void ItemClicked(object sender, ItemClickEventArgs e)
         {
             VideoViewModel clickedItem = e.ClickedItem as VideoViewModel;
@@ -120,8 +118,10 @@ namespace MStube
             List<VideoDetailItem> searchresult = await Utils.SearchTopic.SearchTopicToServer(clickedItem.topic);
             if (searchresult.Count >= 1)
             {
-                VideoBriefList.ItemsSource = GenerateVideoViewModel.GenerateVideoViewFromVideoDetail(searchresult);
-                NotifyPropertyChanged();
+                List<VideoViewModel> videoView = GenerateVideoViewModel.GenerateVideoViewFromVideoDetail(searchresult, reverseInsert: false);
+                MainPageState.currentState = MainPageState.State.Topic;
+                MainPageState.setVideo(MainPageState.State.Topic, new ObservableCollection<VideoViewModel>(videoView));
+                currentVideoList = MainPageState.getVideo(MainPageState.State.Topic);
             }
             LoadingProgressRing.IsActive = false;
             VideoBriefList.Visibility = Visibility.Visible;
@@ -143,9 +143,11 @@ namespace MStube
             InitializeValues();
         }
 
-        private void SearchTopic_Click(object sender, RoutedEventArgs e)
+        private async void SearchTopic_Click(object sender, RoutedEventArgs e)
         {
             LoadingProgressRing.IsActive = false;
+            List<TopicViewModel> topicList = await GetTopicList.GetTopicListFromServer();
+            TopicList.ItemsSource = topicList;
             TopicList.Visibility = Visibility.Visible;
             VideoBriefList.Visibility = Visibility.Collapsed;
         }
@@ -158,8 +160,10 @@ namespace MStube
             List<VideoDetailItem> searchresult = await Utils.GetLastest.GetLatestFromServer();
             if (searchresult.Count >= 1)
             {
-                VideoBriefList.ItemsSource = GenerateVideoViewModel.GenerateVideoViewFromVideoDetail(searchresult, reverseInsert: false);
-                NotifyPropertyChanged();
+                List<VideoViewModel> videoView = GenerateVideoViewModel.GenerateVideoViewFromVideoDetail(searchresult, reverseInsert: false);
+                MainPageState.currentState = MainPageState.State.Latest;
+                MainPageState.setVideo(MainPageState.State.Latest, new ObservableCollection<VideoViewModel>(videoView));
+                currentVideoList = MainPageState.getVideo(MainPageState.State.Latest);
             }
             LoadingProgressRing.IsActive = false;
             VideoBriefList.Visibility = Visibility.Visible;
@@ -184,10 +188,12 @@ namespace MStube
                 LoadingProgressRing.IsActive = true;
                 List<VideoDetailItem> searchresult = await SearchTitle.SearchTitleToServer(args.QueryText);
                 LoadingProgressRing.IsActive = false;
-                if (searchresult.Count >= 0)
+                if (searchresult.Count >= 1)
                 {
-                    VideoBriefList.ItemsSource = Utils.GenerateVideoViewModel.GenerateVideoViewFromVideoDetail(searchresult);
-                    NotifyPropertyChanged();
+                    List<VideoViewModel> videoView = GenerateVideoViewModel.GenerateVideoViewFromVideoDetail(searchresult, reverseInsert: false);
+                    MainPageState.currentState = MainPageState.State.Search;
+                    MainPageState.setVideo(MainPageState.State.Search, new ObservableCollection<VideoViewModel>(videoView));
+                    currentVideoList = MainPageState.getVideo(MainPageState.State.Search);
                 }
             }
         }
@@ -198,12 +204,13 @@ namespace MStube
             sender.Text = selectedItem;
             List<VideoDetailItem> searchresult = await SearchTitle.SearchTitleToServer(sender.Text);
             LoadingProgressRing.IsActive = false;
-            if (searchresult.Count >= 0)
+            if (searchresult.Count >= 1)
             {
-                VideoBriefList.ItemsSource = Utils.GenerateVideoViewModel.GenerateVideoViewFromVideoDetail(searchresult);
-                NotifyPropertyChanged();
+                List<VideoViewModel> videoView = GenerateVideoViewModel.GenerateVideoViewFromVideoDetail(searchresult, reverseInsert: false);
+                MainPageState.currentState = MainPageState.State.Search;
+                MainPageState.setVideo(MainPageState.State.Search, new ObservableCollection<VideoViewModel>(videoView));
+                currentVideoList = MainPageState.getVideo(MainPageState.State.Search);
             }
-
         }
 
         private List<string> _listSuggestion = null;
@@ -250,7 +257,8 @@ namespace MStube
         {
             base.OnNavigatedTo(e);
             SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
-            this.InitializeValues(false);
+            LoadingProgressRing.IsActive = false;
+            currentVideoList = MainPageState.getVideo(MainPageState.currentState);
         }
     }
 }
