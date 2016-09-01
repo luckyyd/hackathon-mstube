@@ -47,10 +47,11 @@ namespace mstube.Controllers
         [HttpGet]
         public JsonResult UserId(string uuid)
         {
-            if (UserIdRedis.IsConnected == false)
+            if (UserIdRedis.IsConnected == false || cacheid.IsConnected("0") == false)
             {
                 UserIdRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisUserId);
                 cacheid = UserIdRedis.GetDatabase();
+                telemetry.TrackEvent("Reconnect Redis with RedisUserId.");
             }
             //Get user_id for uuid
             string dbsize = cacheid.StringGet("RedisSize");
@@ -143,10 +144,11 @@ namespace mstube.Controllers
         }
         private async Task<List<string>> ItemFilterAsync(long user_id, List<string> itemsToFilter)
         {
-            if (FilterRedis.IsConnected == false)
+            if (FilterRedis.IsConnected == false || cachefilter.IsConnected("0") == false)
             {
                 FilterRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisPostHistory);
                 cachefilter = FilterRedis.GetDatabase();
+                telemetry.TrackEvent("Reconnect Redis with ReidsPostHistory.");
             }
             Stopwatch timer = new Stopwatch();
             timer.Start();
@@ -204,10 +206,11 @@ namespace mstube.Controllers
         }
         private async Task<List<Item.Item>> GetContentBasedItemsAsync(long user_id)
         {
-            if (ContentBasedRedis.IsConnected == false)
+            if (ContentBasedRedis.IsConnected == false || cacheitemid.IsConnected("0") == false)
             {
                 ContentBasedRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisLastItem);
                 cacheitemid = ContentBasedRedis.GetDatabase();
+                telemetry.TrackEvent("Reconnect Redis with RedisLastItem.");
             }
             Stopwatch timer = new Stopwatch();
             timer.Start();
@@ -261,10 +264,11 @@ namespace mstube.Controllers
         }
         private void LogRecommendHistory(long user_id, List<Item.Item> items)
         {
-            if (FilterRedis.IsConnected == false)
+            if (FilterRedis.IsConnected == false || cachefilter.IsConnected("0") == false)
             {
                 FilterRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisPostHistory);
                 cachefilter = FilterRedis.GetDatabase();
+                telemetry.TrackEvent("Reconnect Redis with RedisPostHistory.");
             }
             foreach (var v in items)
             {
