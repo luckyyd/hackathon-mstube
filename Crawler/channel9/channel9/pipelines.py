@@ -19,8 +19,8 @@ class SQLServerPipeline(object):
     def process_item(self, item, spider):
         try:
             self.cursor.execute(
-                "IF NOT EXISTS (SELECT * FROM ItemTest Where url = %s) \
-                 INSERT INTO ItemTest(title, topic, video_src, image_src, url, \
+                "IF NOT EXISTS (SELECT * FROM Item Where url = %s) \
+                 INSERT INTO Item(title, topic, video_src, image_src, url, \
                 views, category, posted_time, quality, description, full_description, source) \
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                 (item['url'], item['title'], item['topic'], item['video_src'], item['image_src'],
