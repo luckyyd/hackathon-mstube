@@ -18,6 +18,7 @@ namespace MStube.Common
             Latest,
             Search
         }
+        static int MAX_COUNT = 50;
         static State _currentState = State.None;
         static string _currentText = "";
         static Dictionary<State, ObservableCollection<VideoViewModel>> _videos = new Dictionary<State, ObservableCollection<VideoViewModel>>();
@@ -32,21 +33,43 @@ namespace MStube.Common
             get { return _currentText; }
             set { _currentText = value; }
         }
+
+        #region Convert Utils
+        private static ObservableCollection<T> Convert<T>(IEnumerable<T> original)
+        {
+            return new ObservableCollection<T>(original);
+        }
+        private static ObservableCollection<T> ToObservableCollection<T>(this IEnumerable<T> source)
+        {
+            var result = new ObservableCollection<T>();
+            foreach (var item in source)
+                result.Add(item);
+            return result;
+        }
+        #endregion
+
         public static ObservableCollection<VideoViewModel> getVideo(State state)
         {
             if (!_videos.ContainsKey(state))
             {
                 _videos.Add(state, new ObservableCollection<VideoViewModel>());
             }
-            return _videos[state];
+            return Convert(_videos[state].Take(MAX_COUNT));
         }
+
         public static void setVideo(State state, ObservableCollection<VideoViewModel> video)
         {
             if (!_videos.ContainsKey(state))
             {
                 _videos.Add(state, new ObservableCollection<VideoViewModel>());
             }
-            _videos[state] = video;
+            if (state.Equals(State.Recommend))
+            {
+                _videos[state] = _videos[state].Union(video).ToObservableCollection();
+            }
+            else {
+                _videos[state] = video;
+            }
         }
     }
 }

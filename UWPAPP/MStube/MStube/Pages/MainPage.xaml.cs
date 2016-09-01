@@ -68,9 +68,9 @@ namespace MStube
                 VideoBriefList.Visibility = Visibility.Collapsed;
                 TopicList.Visibility = Visibility.Collapsed;
                 List<VideoDetailItem> newVideoListCandidates = await Utils.GetRecommend.GetRecommendFromServer(user_id);
-                List<VideoViewModel> newVideoViewList = GenerateVideoViewModel.GenerateVideoViewFromVideoDetail(newVideoListCandidates);
+                List<VideoViewModel> videoView = GenerateVideoViewModel.GenerateVideoViewFromVideoDetail(newVideoListCandidates);
                 MainPageState.currentState = MainPageState.State.Recommend;
-                MainPageState.setVideo(MainPageState.State.Recommend, new ObservableCollection<VideoViewModel>(newVideoViewList));
+                MainPageState.setVideo(MainPageState.State.Recommend, new ObservableCollection<VideoViewModel>(videoView));
                 currentVideoList = MainPageState.getVideo(MainPageState.State.Recommend);
             }
             if (TopicList.Visibility == Visibility.Collapsed)
@@ -118,7 +118,7 @@ namespace MStube
             List<VideoDetailItem> searchresult = await Utils.SearchTopic.SearchTopicToServer(clickedItem.topic);
             if (searchresult.Count >= 1)
             {
-                List<VideoViewModel> videoView = GenerateVideoViewModel.GenerateVideoViewFromVideoDetail(searchresult, reverseInsert: false);
+                List<VideoViewModel> videoView = GenerateVideoViewModel.GenerateVideoViewFromVideoDetail(searchresult);
                 MainPageState.currentState = MainPageState.State.Topic;
                 MainPageState.setVideo(MainPageState.State.Topic, new ObservableCollection<VideoViewModel>(videoView));
                 currentVideoList = MainPageState.getVideo(MainPageState.State.Topic);
@@ -166,7 +166,7 @@ namespace MStube
             List<VideoDetailItem> searchresult = await Utils.GetLastest.GetLatestFromServer();
             if (searchresult.Count >= 1)
             {
-                List<VideoViewModel> videoView = GenerateVideoViewModel.GenerateVideoViewFromVideoDetail(searchresult, reverseInsert: false);
+                List<VideoViewModel> videoView = GenerateVideoViewModel.GenerateVideoViewFromVideoDetail(searchresult);
                 MainPageState.currentState = MainPageState.State.Latest;
                 MainPageState.setVideo(MainPageState.State.Latest, new ObservableCollection<VideoViewModel>(videoView));
                 currentVideoList = MainPageState.getVideo(MainPageState.State.Latest);
@@ -200,7 +200,7 @@ namespace MStube
                 SetText(args.QueryText);
                 if (searchresult.Count >= 1)
                 {
-                    List<VideoViewModel> videoView = GenerateVideoViewModel.GenerateVideoViewFromVideoDetail(searchresult, reverseInsert: false);
+                    List<VideoViewModel> videoView = GenerateVideoViewModel.GenerateVideoViewFromVideoDetail(searchresult);
                     MainPageState.currentState = MainPageState.State.Search;
                     MainPageState.setVideo(MainPageState.State.Search, new ObservableCollection<VideoViewModel>(videoView));
                     currentVideoList = MainPageState.getVideo(MainPageState.State.Search);
@@ -217,7 +217,7 @@ namespace MStube
             SetText(sender.Text);
             if (searchresult.Count >= 1)
             {
-                List<VideoViewModel> videoView = GenerateVideoViewModel.GenerateVideoViewFromVideoDetail(searchresult, reverseInsert: false);
+                List<VideoViewModel> videoView = GenerateVideoViewModel.GenerateVideoViewFromVideoDetail(searchresult);
                 MainPageState.currentState = MainPageState.State.Search;
                 MainPageState.setVideo(MainPageState.State.Search, new ObservableCollection<VideoViewModel>(videoView));
                 currentVideoList = MainPageState.getVideo(MainPageState.State.Search);

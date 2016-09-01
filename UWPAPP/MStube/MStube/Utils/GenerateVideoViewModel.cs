@@ -15,7 +15,7 @@ namespace MStube.Utils
 {
     class GenerateVideoViewModel
     {
-        public static List<VideoViewModel> GenerateVideoViewFromVideoDetail(List<VideoDetailItem> videoDetailItemCandidates, bool reverseInsert = true)
+        public static List<VideoViewModel> GenerateVideoViewFromVideoDetail(List<VideoDetailItem> videoDetailItemCandidates, bool reverseInsert = false)
         {
             List<VideoViewModel> result = new List<VideoViewModel>();
             foreach (VideoDetailItem item in videoDetailItemCandidates)
