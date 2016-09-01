@@ -317,12 +317,12 @@ namespace mstube.Controllers
         {
             List<Item.Topic> jsonResult = new List<Item.Topic>();
             jsonResult.Add(new Item.Topic { topic = "Azure" });
-            jsonResult.Add(new Item.Topic { topic = "Coding4fun"});
+            jsonResult.Add(new Item.Topic { topic = "Coding4fun" });
             jsonResult.Add(new Item.Topic { topic = "DevOps" });
             jsonResult.Add(new Item.Topic { topic = "MVPs" });
             jsonResult.Add(new Item.Topic { topic = "Visual Studio" });
             jsonResult.Add(new Item.Topic { topic = "Windows" });
-            
+
             //Return list topic from db
             //using (SqlCommand command = new SqlCommand())
             //jsonResult.Add(new Item.Topic { topic = "Azure" });
@@ -344,8 +344,8 @@ namespace mstube.Controllers
             {
                 command.Connection = connection;
                 command.CommandType = CommandType.Text;
-                command.CommandText = "SELECT Top 20 * FROM Item WHERE item_id in (SELECT item_id FROM Item WHERE topic like '%"
-                                        + topic + "%') ORDER BY views DESC";
+                command.CommandText = "SELECT * FROM Item WHERE item_id in (SELECT Top 20 item_id FROM Item WHERE topic like '%"
+                                        + topic + "%' ORDER BY NewID()) ORDER BY cast(views as int) DESC";
                 try
                 {
                     connection.Open();
@@ -405,8 +405,8 @@ namespace mstube.Controllers
             {
                 command.Connection = connection;
                 command.CommandType = CommandType.Text;
-                command.CommandText = "SELECT Top 20 * FROM Item WHERE item_id in (SELECT item_id FROM Item WHERE "
-                                        + wordscommand + ") ORDER BY views DESC";
+                command.CommandText = "SELECT * FROM Item WHERE item_id in (SELECT Top 20 item_id FROM Item WHERE ("
+                                        + wordscommand + ") ORDER BY newID()) ORDER BY cast(views as int) DESC";
                 try
                 {
                     connection.Open();
