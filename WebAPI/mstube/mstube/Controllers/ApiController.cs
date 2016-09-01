@@ -316,20 +316,21 @@ namespace mstube.Controllers
         public JsonResult ListTopic()
         {
             List<Item.Topic> jsonResult = new List<Item.Topic>();
+            jsonResult.Add(new Item.Topic { topic = "Azure" });
             jsonResult.Add(new Item.Topic { topic = "Coding4fun"});
-            jsonResult.Add(new Item.Topic { topic = "Windows" });
-            jsonResult.Add(new Item.Topic { topic = "Azure" });
             jsonResult.Add(new Item.Topic { topic = "DevOps" });
-            jsonResult.Add(new Item.Topic { topic = "Visual Studio" });
             jsonResult.Add(new Item.Topic { topic = "MVPs" });
-            //Return list topic from db
-            using (SqlCommand command = new SqlCommand())
-            jsonResult.Add(new Item.Topic { topic = "Azure" });
-            jsonResult.Add(new Item.Topic { topic = "Edge" });
-            jsonResult.Add(new Item.Topic { topic = "Office" });
-            jsonResult.Add(new Item.Topic { topic = "Silverlight" });
             jsonResult.Add(new Item.Topic { topic = "Visual Studio" });
-            jsonResult.Add(new Item.Topic { topic = "Windows Phone" });
+            jsonResult.Add(new Item.Topic { topic = "Windows" });
+            
+            //Return list topic from db
+            //using (SqlCommand command = new SqlCommand())
+            //jsonResult.Add(new Item.Topic { topic = "Azure" });
+            //jsonResult.Add(new Item.Topic { topic = "Edge" });
+            //jsonResult.Add(new Item.Topic { topic = "Office" });
+            //jsonResult.Add(new Item.Topic { topic = "Silverlight" });
+            //jsonResult.Add(new Item.Topic { topic = "Visual Studio" });
+            //jsonResult.Add(new Item.Topic { topic = "Windows Phone" });
             return Json(jsonResult, JsonRequestBehavior.AllowGet);
         }
 
