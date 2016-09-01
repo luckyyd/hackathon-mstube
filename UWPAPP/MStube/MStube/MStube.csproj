@@ -135,7 +135,11 @@
     </Compile>
     <Compile Include="Utils\DeviceInfo.cs" />
     <Compile Include="Common\VideoList.cs" />
-    <Compile Include="Utils\SearchLatest.cs" />
+    <Compile Include="Utils\GenerateVideoViewModel.cs" />
+    <Compile Include="Utils\GetRecommend.cs" />
+    <Compile Include="Utils\GetLastest.cs" />
+    <Compile Include="Utils\GetTopicList.cs" />
+    <Compile Include="Utils\GetUserId.cs" />
     <Compile Include="Utils\SearchTitle.cs" />
     <Compile Include="Utils\SearchTopic.cs" />
     <Compile Include="Utils\SendPreference.cs" />

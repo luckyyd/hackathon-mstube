@@ -61,16 +61,16 @@ namespace MStube
         public async void InitializeValues(bool refresh = true)
         {
             autoSuggestBox.Text = "";
-            List<TopicViewModel> topicList = await GetTopicJson();
+            List<TopicViewModel> topicList = await GetTopicList.GetTopicListFromServer();
             TopicList.ItemsSource = topicList;
             if (refresh == true)
             {
                 LoadingProgressRing.IsActive = true;
-                user_id = await GetUserId(this.device);
+                user_id = await GetUserId.GetUserIdFromServer(this.device);
                 VideoBriefList.Visibility = Visibility.Collapsed;
                 TopicList.Visibility = Visibility.Collapsed;
-                List<VideoDetailItem> newVideoListCandidates = await GetVideoJson();
-                List<VideoViewModel> newVideoViewList = GenerateVideoViewFromVideoDetail(newVideoListCandidates);
+                List<VideoDetailItem> newVideoListCandidates = await Utils.GetRecommend.GetRecommendFromServer(user_id);
+                List<VideoViewModel> newVideoViewList = GenerateVideoViewModel.GenerateVideoViewFromVideoDetail(newVideoListCandidates);
                 newVideoViewList.AddRange(videoList);
                 videoList = new ObservableCollection<VideoViewModel>(newVideoViewList);
             }
@@ -81,107 +81,7 @@ namespace MStube
                 VideoBriefList.Visibility = Visibility.Visible;
             }
         }
-
-        public List<VideoViewModel> GenerateVideoViewFromVideoDetail(List<VideoDetailItem> videoDetailItemCandidates, bool reverseInsert = true)
-        {
-            List<VideoViewModel> result = new List<VideoViewModel>();
-            foreach (VideoDetailItem item in videoDetailItemCandidates)
-            {
-                VideoViewModel temp = new VideoViewModel
-                {
-                    item_id = item.item_id,
-                    Title = item.title,
-                    ImageSourceUri = item.image_src,
-                    VideoSourceUri = item.video_src,
-                    Description = item.description,
-                    FullDescription = item.full_description,
-                    Url = item.url,
-                    Views = item.views,
-                    UploadDate = item.posted_time,
-                    Source = item.source,
-                    Brand = item.brand
-                };
-                if (reverseInsert)
-                {
-                    result.Insert(0, temp);
-                }
-                else
-                {
-                    result.Add(temp);
-                }
-            }
-            return result;
-        }
-
-        private async Task<int> GetUserId(Utils.DeviceInfo device)
-        {
-            HttpClient httpClient = new HttpClient();
-            var uuid = device.Id;
-            var uri = new Uri("http://mstubedotnet.azurewebsites.net/api/userid?uuid=" + uuid);
-            int user_id = 0;
-            try
-            {
-                user_id = Int32.Parse(await httpClient.GetStringAsync(uri));
-                System.Diagnostics.Debug.WriteLine(user_id);
-            }
-            catch (Exception error)
-            {
-                HockeyClient.Current.TrackException(error);
-            }
-            finally
-            {
-                httpClient.Dispose();
-            }
-            HockeyClient.Current.TrackEvent("User: " + user_id.ToString());
-            return user_id;
-        }
-
-        private async Task<List<VideoDetailItem>> GetVideoJson()
-        {
-            List<VideoDetailItem> items = new List<VideoDetailItem>();
-            HttpClient httpClient = new HttpClient();
-            // Cache-Control: private, to avoid load cache.
-            var uri = new Uri("http://mstubedotnet.azurewebsites.net/api/Candidates?user_id=" + user_id.ToString() + "&t=" + new Random().Next(1, 1000).ToString());
-            try
-            {
-                var result = await httpClient.GetStringAsync(uri);
-                //Debug.WriteLine("User id: " + user_id);
-                items = JsonConvert.DeserializeObject<List<VideoDetailItem>>(result as string);
-            }
-            catch (Exception error)
-            {
-                HockeyClient.Current.TrackException(error);
-            }
-            finally
-            {
-                httpClient.Dispose();
-            }
-            return items;
-        }
-
-        private async Task<List<TopicViewModel>> GetTopicJson()
-        {
-            List<TopicViewModel> topicList = new List<TopicViewModel>();
-            HttpClient httpClient = new HttpClient();
-            // Cache-Control: private, to avoid load cache.
-            var uri = new Uri("http://mstubedotnet.azurewebsites.net/api/ListTopic");
-            try
-            {
-                var result = await httpClient.GetStringAsync(uri);
-                //Debug.WriteLine("User id: " + user_id);
-                topicList = JsonConvert.DeserializeObject<List<TopicViewModel>>(result as string);
-            }
-            catch (Exception error)
-            {
-                HockeyClient.Current.TrackException(error);
-            }
-            finally
-            {
-                httpClient.Dispose();
-            }
-            return topicList;
-        }
-
+  
         private void ItemClicked(object sender, ItemClickEventArgs e)
         {
             VideoViewModel clickedItem = e.ClickedItem as VideoViewModel;
@@ -220,7 +120,7 @@ namespace MStube
             List<VideoDetailItem> searchresult = await Utils.SearchTopic.SearchTopicToServer(clickedItem.topic);
             if (searchresult.Count >= 1)
             {
-                VideoBriefList.ItemsSource = GenerateVideoViewFromVideoDetail(searchresult);
+                VideoBriefList.ItemsSource = GenerateVideoViewModel.GenerateVideoViewFromVideoDetail(searchresult);
                 NotifyPropertyChanged();
             }
             LoadingProgressRing.IsActive = false;
@@ -255,10 +155,10 @@ namespace MStube
             VideoBriefList.Visibility = Visibility.Collapsed;
             TopicList.Visibility = Visibility.Collapsed;
             LoadingProgressRing.IsActive = true;
-            List<VideoDetailItem> searchresult = await Utils.SearchLatest.SearchLatestToServer();
+            List<VideoDetailItem> searchresult = await Utils.GetLastest.GetLatestFromServer();
             if (searchresult.Count >= 1)
             {
-                VideoBriefList.ItemsSource = GenerateVideoViewFromVideoDetail(searchresult, reverseInsert: false);
+                VideoBriefList.ItemsSource = GenerateVideoViewModel.GenerateVideoViewFromVideoDetail(searchresult, reverseInsert: false);
                 NotifyPropertyChanged();
             }
             LoadingProgressRing.IsActive = false;
@@ -286,7 +186,7 @@ namespace MStube
                 LoadingProgressRing.IsActive = false;
                 if (searchresult.Count >= 0)
                 {
-                    VideoBriefList.ItemsSource = GenerateVideoViewFromVideoDetail(searchresult);
+                    VideoBriefList.ItemsSource = Utils.GenerateVideoViewModel.GenerateVideoViewFromVideoDetail(searchresult);
                     NotifyPropertyChanged();
                 }
             }
@@ -300,7 +200,7 @@ namespace MStube
             LoadingProgressRing.IsActive = false;
             if (searchresult.Count >= 0)
             {
-                VideoBriefList.ItemsSource = GenerateVideoViewFromVideoDetail(searchresult);
+                VideoBriefList.ItemsSource = Utils.GenerateVideoViewModel.GenerateVideoViewFromVideoDetail(searchresult);
                 NotifyPropertyChanged();
             }
 

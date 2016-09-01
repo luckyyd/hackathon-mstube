@@ -11,17 +11,18 @@ using Windows.Web.Http;
 
 namespace MStube.Utils
 {
-    class SearchLatest
+    class GetUserId
     {
-        public static async Task<List<VideoDetailItem>> SearchLatestToServer()
+        public static async Task<int> GetUserIdFromServer(DeviceInfo device)
         {
-            List<VideoDetailItem> items = new List<VideoDetailItem>();
-            var uri = new Uri("http://mstubedotnet.azurewebsites.net/api/ListLatest?" + "&t=" + new Random().Next(1, 1000).ToString());
+            var uuid = device.Id;
+            var uri = new Uri("http://mstubedotnet.azurewebsites.net/api/userid?uuid=" + uuid);
             HttpClient httpClient = new HttpClient();
+            int user_id = 0;
             try
             {
-                var result = await httpClient.GetStringAsync(uri);
-                items = JsonConvert.DeserializeObject<List<VideoDetailItem>>(result as string);
+                user_id = Int32.Parse(await httpClient.GetStringAsync(uri));
+                System.Diagnostics.Debug.WriteLine(user_id);
             }
             catch (Exception error)
             {
@@ -31,7 +32,8 @@ namespace MStube.Utils
             {
                 httpClient.Dispose();
             }
-            return items;
+            HockeyClient.Current.TrackEvent("User: " + user_id.ToString());
+            return user_id;
         }
     }
 }
