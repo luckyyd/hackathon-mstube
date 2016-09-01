@@ -65,7 +65,7 @@ namespace MStube.Common
             }
             if (state.Equals(State.Recommend))
             {
-                _videos[state] = _videos[state].Union(video).ToObservableCollection();
+                _videos[state] = video.Union(_videos[state]).ToObservableCollection();
             }
             else {
                 _videos[state] = video;
