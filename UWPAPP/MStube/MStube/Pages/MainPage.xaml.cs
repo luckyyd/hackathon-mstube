@@ -204,6 +204,8 @@ namespace MStube
                     MainPageState.currentState = MainPageState.State.Search;
                     MainPageState.setVideo(MainPageState.State.Search, new ObservableCollection<VideoViewModel>(videoView));
                     currentVideoList = MainPageState.getVideo(MainPageState.State.Search);
+                    TopicList.Visibility = Visibility.Collapsed;
+                    VideoBriefList.Visibility = Visibility.Visible;
                 }
             }
         }
@@ -221,6 +223,8 @@ namespace MStube
                 MainPageState.currentState = MainPageState.State.Search;
                 MainPageState.setVideo(MainPageState.State.Search, new ObservableCollection<VideoViewModel>(videoView));
                 currentVideoList = MainPageState.getVideo(MainPageState.State.Search);
+                TopicList.Visibility = Visibility.Collapsed;
+                VideoBriefList.Visibility = Visibility.Visible;
             }
         }
 
