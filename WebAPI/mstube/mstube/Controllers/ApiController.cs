@@ -52,6 +52,7 @@ namespace mstube.Controllers
                 UserIdRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisUserId);
                 cacheid = UserIdRedis.GetDatabase();
                 telemetry.TrackEvent("Reconnect Redis with RedisUserId.");
+                telemetry.TrackTrace(ContentBasedRedis.GetStatus());
             }
             //Get user_id for uuid
             string dbsize = cacheid.StringGet("RedisSize");
@@ -149,6 +150,7 @@ namespace mstube.Controllers
                 FilterRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisPostHistory);
                 cachefilter = FilterRedis.GetDatabase();
                 telemetry.TrackEvent("Reconnect Redis with ReidsPostHistory.");
+                telemetry.TrackTrace(ContentBasedRedis.GetStatus());
             }
             Stopwatch timer = new Stopwatch();
             timer.Start();
@@ -211,6 +213,7 @@ namespace mstube.Controllers
                 ContentBasedRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisLastItem);
                 cacheitemid = ContentBasedRedis.GetDatabase();
                 telemetry.TrackEvent("Reconnect Redis with RedisLastItem.");
+                telemetry.TrackTrace(ContentBasedRedis.GetStatus());
             }
             Stopwatch timer = new Stopwatch();
             timer.Start();
@@ -459,7 +462,7 @@ namespace mstube.Controllers
             {
                 command.Connection = connection;
                 command.CommandType = CommandType.Text;
-                command.CommandText = "SELECT Top 10 * FROM Item ORDER BY posted_time DESC";
+                command.CommandText = "SELECT Top 20 * FROM Item ORDER BY posted_time DESC";
                 try
                 {
                     connection.Open();
@@ -467,22 +470,28 @@ namespace mstube.Controllers
                     {
                         while (reader.Read())
                         {
-                            jsonResult.Add(new Item.Item
+                            try {
+                                jsonResult.Add(new Item.Item
+                                {
+                                    item_id = Convert.ToInt64(reader["item_id"]),
+                                    image_src = reader["image_src"].ToString(),
+                                    video_src = reader["video_src"].ToString(),
+                                    title = reader["title"].ToString(),
+                                    url = reader["url"].ToString(),
+                                    description = reader["description"].ToString(),
+                                    topic = reader["topic"].ToString(),
+                                    category = reader["category"].ToString(),
+                                    full_description = reader["full_description"].ToString(),
+                                    posted_time = reader["posted_time"].ToString(),
+                                    views = Convert.ToInt32(reader["views"]),
+                                    quality = Convert.ToDouble(reader["quality"]),
+                                    source = reader["source"].ToString()
+                                });
+                            }
+                            catch (Exception)
                             {
-                                item_id = Convert.ToInt64(reader["item_id"]),
-                                image_src = reader["image_src"].ToString(),
-                                video_src = reader["video_src"].ToString(),
-                                title = reader["title"].ToString(),
-                                url = reader["url"].ToString(),
-                                description = reader["description"].ToString(),
-                                topic = reader["topic"].ToString(),
-                                category = reader["topic"].ToString(),
-                                full_description = reader["full_description"].ToString(),
-                                posted_time = reader["posted_time"].ToString(),
-                                views = Convert.ToInt32(reader["views"]),
-                                quality = Convert.ToDouble(reader["quality"]),
-                                source = reader["source"].ToString()
-                            });
+                                // Some field is NULL or wrong
+                            }
                         }
                     }
                 }
