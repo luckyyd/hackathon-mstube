@@ -63,10 +63,10 @@ namespace MStube
             SetText("");
             if (refresh == true)
             {
-                LoadingProgressRing.IsActive = true;
                 user_id = await GetUserId.GetUserIdFromServer(this.device);
                 VideoBriefList.Visibility = Visibility.Collapsed;
                 TopicList.Visibility = Visibility.Collapsed;
+                LoadingProgressRing.IsActive = true;
                 List<VideoDetailItem> newVideoListCandidates = await Utils.GetRecommend.GetRecommendFromServer(user_id);
                 List<VideoViewModel> videoView = GenerateVideoViewModel.GenerateVideoViewFromVideoDetail(newVideoListCandidates);
                 MainPageState.currentState = MainPageState.State.Recommend;
@@ -133,7 +133,7 @@ namespace MStube
         }
         private void PullToRefreshBox_RefreshInvoked(DependencyObject sender, object args)
         {
-            this.InitializeValues();
+            InitializeValues();
         }
 
         #region Menu items click
