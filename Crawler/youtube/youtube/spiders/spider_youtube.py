@@ -87,6 +87,7 @@ class YoutubeSpider(scrapy.Spider):
         item['views'] = views
         item['category'] = 'video'
         item['source'] = 'youtube'
+        item['avg_rating'] = 0
         self.counter += 1
         item['item_id'] = self.counter
         yield item
