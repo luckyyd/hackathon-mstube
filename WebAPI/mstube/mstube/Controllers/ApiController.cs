@@ -47,10 +47,12 @@ namespace mstube.Controllers
         [HttpGet]
         public JsonResult UserId(string uuid)
         {
-            if (UserIdRedis.IsConnected == false)
+            if (UserIdRedis.IsConnected == false || cacheid.IsConnected("0") == false)
             {
                 UserIdRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisUserId);
                 cacheid = UserIdRedis.GetDatabase();
+                telemetry.TrackEvent("Reconnect Redis with RedisUserId.");
+                telemetry.TrackTrace(ContentBasedRedis.GetStatus());
             }
             //Get user_id for uuid
             string dbsize = cacheid.StringGet("RedisSize");
@@ -143,10 +145,12 @@ namespace mstube.Controllers
         }
         private async Task<List<string>> ItemFilterAsync(long user_id, List<string> itemsToFilter)
         {
-            if (FilterRedis.IsConnected == false)
+            if (FilterRedis.IsConnected == false || cachefilter.IsConnected("0") == false)
             {
                 FilterRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisPostHistory);
                 cachefilter = FilterRedis.GetDatabase();
+                telemetry.TrackEvent("Reconnect Redis with ReidsPostHistory.");
+                telemetry.TrackTrace(ContentBasedRedis.GetStatus());
             }
             Stopwatch timer = new Stopwatch();
             timer.Start();
@@ -204,10 +208,12 @@ namespace mstube.Controllers
         }
         private async Task<List<Item.Item>> GetContentBasedItemsAsync(long user_id)
         {
-            if (ContentBasedRedis.IsConnected == false)
+            if (ContentBasedRedis.IsConnected == false || cacheitemid.IsConnected("0") == false)
             {
                 ContentBasedRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisLastItem);
                 cacheitemid = ContentBasedRedis.GetDatabase();
+                telemetry.TrackEvent("Reconnect Redis with RedisLastItem.");
+                telemetry.TrackTrace(ContentBasedRedis.GetStatus());
             }
             Stopwatch timer = new Stopwatch();
             timer.Start();
@@ -261,10 +267,11 @@ namespace mstube.Controllers
         }
         private void LogRecommendHistory(long user_id, List<Item.Item> items)
         {
-            if (FilterRedis.IsConnected == false)
+            if (FilterRedis.IsConnected == false || cachefilter.IsConnected("0") == false)
             {
                 FilterRedis = ConnectionMultiplexer.Connect(Properties.Settings.Default.RedisPostHistory);
                 cachefilter = FilterRedis.GetDatabase();
+                telemetry.TrackEvent("Reconnect Redis with RedisPostHistory.");
             }
             foreach (var v in items)
             {
@@ -316,20 +323,21 @@ namespace mstube.Controllers
         public JsonResult ListTopic()
         {
             List<Item.Topic> jsonResult = new List<Item.Topic>();
-            jsonResult.Add(new Item.Topic { topic = "Coding4fun"});
-            jsonResult.Add(new Item.Topic { topic = "Windows" });
             jsonResult.Add(new Item.Topic { topic = "Azure" });
+            jsonResult.Add(new Item.Topic { topic = "Coding4fun" });
             jsonResult.Add(new Item.Topic { topic = "DevOps" });
-            jsonResult.Add(new Item.Topic { topic = "Visual Studio" });
             jsonResult.Add(new Item.Topic { topic = "MVPs" });
-            //Return list topic from db
-            using (SqlCommand command = new SqlCommand())
-            jsonResult.Add(new Item.Topic { topic = "Azure" });
-            jsonResult.Add(new Item.Topic { topic = "Edge" });
-            jsonResult.Add(new Item.Topic { topic = "Office" });
-            jsonResult.Add(new Item.Topic { topic = "Silverlight" });
             jsonResult.Add(new Item.Topic { topic = "Visual Studio" });
-            jsonResult.Add(new Item.Topic { topic = "Windows Phone" });
+            jsonResult.Add(new Item.Topic { topic = "Windows" });
+
+            //Return list topic from db
+            //using (SqlCommand command = new SqlCommand())
+            //jsonResult.Add(new Item.Topic { topic = "Azure" });
+            //jsonResult.Add(new Item.Topic { topic = "Edge" });
+            //jsonResult.Add(new Item.Topic { topic = "Office" });
+            //jsonResult.Add(new Item.Topic { topic = "Silverlight" });
+            //jsonResult.Add(new Item.Topic { topic = "Visual Studio" });
+            //jsonResult.Add(new Item.Topic { topic = "Windows Phone" });
             return Json(jsonResult, JsonRequestBehavior.AllowGet);
         }
 
@@ -343,8 +351,8 @@ namespace mstube.Controllers
             {
                 command.Connection = connection;
                 command.CommandType = CommandType.Text;
-                command.CommandText = "SELECT Top 20 * FROM Item WHERE item_id in (SELECT item_id FROM Item WHERE topic like '%"
-                                        + topic + "%') ORDER BY NewID()";
+                command.CommandText = "SELECT * FROM Item WHERE item_id in (SELECT Top 20 item_id FROM Item WHERE topic like '%"
+                                        + topic + "%' ORDER BY NewID()) ORDER BY cast(views as int) DESC";
                 try
                 {
                     connection.Open();
@@ -404,8 +412,8 @@ namespace mstube.Controllers
             {
                 command.Connection = connection;
                 command.CommandType = CommandType.Text;
-                command.CommandText = "SELECT Top 20 * FROM Item WHERE item_id in (SELECT item_id FROM Item WHERE "
-                                        + wordscommand + ") ORDER BY NewID()";
+                command.CommandText = "SELECT * FROM Item WHERE item_id in (SELECT Top 20 item_id FROM Item WHERE ("
+                                        + wordscommand + ") ORDER BY newID()) ORDER BY cast(views as int) DESC";
                 try
                 {
                     connection.Open();
@@ -454,7 +462,7 @@ namespace mstube.Controllers
             {
                 command.Connection = connection;
                 command.CommandType = CommandType.Text;
-                command.CommandText = "SELECT Top 10 * FROM Item ORDER BY posted_time DESC";
+                command.CommandText = "SELECT Top 20 * FROM Item ORDER BY posted_time DESC";
                 try
                 {
                     connection.Open();
@@ -462,22 +470,28 @@ namespace mstube.Controllers
                     {
                         while (reader.Read())
                         {
-                            jsonResult.Add(new Item.Item
+                            try {
+                                jsonResult.Add(new Item.Item
+                                {
+                                    item_id = Convert.ToInt64(reader["item_id"]),
+                                    image_src = reader["image_src"].ToString(),
+                                    video_src = reader["video_src"].ToString(),
+                                    title = reader["title"].ToString(),
+                                    url = reader["url"].ToString(),
+                                    description = reader["description"].ToString(),
+                                    topic = reader["topic"].ToString(),
+                                    category = reader["category"].ToString(),
+                                    full_description = reader["full_description"].ToString(),
+                                    posted_time = reader["posted_time"].ToString(),
+                                    views = Convert.ToInt32(reader["views"]),
+                                    quality = Convert.ToDouble(reader["quality"]),
+                                    source = reader["source"].ToString()
+                                });
+                            }
+                            catch (Exception)
                             {
-                                item_id = Convert.ToInt64(reader["item_id"]),
-                                image_src = reader["image_src"].ToString(),
-                                video_src = reader["video_src"].ToString(),
-                                title = reader["title"].ToString(),
-                                url = reader["url"].ToString(),
-                                description = reader["description"].ToString(),
-                                topic = reader["topic"].ToString(),
-                                category = reader["topic"].ToString(),
-                                full_description = reader["full_description"].ToString(),
-                                posted_time = reader["posted_time"].ToString(),
-                                views = Convert.ToInt32(reader["views"]),
-                                quality = Convert.ToDouble(reader["quality"]),
-                                source = reader["source"].ToString()
-                            });
+                                // Some field is NULL or wrong
+                            }
                         }
                     }
                 }
