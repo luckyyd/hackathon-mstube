@@ -9,7 +9,7 @@ MSTube is a personalized recommendation app for Microsoft related videos.
 - Crawlers of channel9, youtube and vimeo.
 - Azure Machine Learning Web Service.
 - Web application as a server.
-- Universal Winodows Platform Application for watching videos.
+- Universal Windows Platform Application for watching videos.
 
 ## Technology Stack
 

@@ -1,6 +1,6 @@
 # Crawler
 
-Here is the crawlers of the project.
+Here is the crawlers of the project, using the Scrapy framework.
 
 - `channel9` is for videos from channel9
 - `vimeo` is for videos from vimeo
@@ -19,13 +19,21 @@ Or as recommend, run the project under the docker container: [docker-scrapy](htt
 
 ### Usage
 
-Run `scrapy crawl 'project'` under the opposite crawler folder. Here, `'project'` should be replaced by `channel9`/`vimeo`/`youtube`.
+Run `scrapy crawl 'project'` under the opposite crawler folder. Here, `'project'` should be replaced by `channel9`/`vimeo`/`youtube`. Or you can run the shell script under each project folder.
 
 Notice that the items will be written into Azure SQL Server.
 
 All the `items.json` files are the example output, you could get it by run `scrapy crawl 'project' -o items.json`.
 
 Folder `tools` is just for generating data, ignore it.
+
+### SQL Server
+
+`SQLsetting` file is for the settings of the database. You can change it if you need to change the database.
+
+### Deploy
+
+I have deployed the project with docker: [docker-scrapy](https://github.com/irmowan/docker-scrapy), turn to it and set up the crawler.
 
 ---
 

@@ -13,6 +13,7 @@ The project is to transfer data from several data storage sources and provides i
 - `ListLatest` (list latest items)
 - `SearchTitle` (search for items by title)
 - `SearchTopic` (search for items by topic)
+- Some others
 
 `POST` methods:
 
@@ -26,6 +27,10 @@ The project need to connect to Redis and SQL Server, Azure Machine Learning Serv
 - `Microsoft SQL Server` holds the video detail data. It was crawled by crawlers.
 - `Azure Machine Learning Service` provides two APIs. One is for the most recommend items for one user (using Collaborative Filtering Algorithm), the other is for the most related item of one specific item.
 - `blob` is used to conserve preference data, which is used to retrain the recommendation model.
+
+### Machine Learning
+
+The backend project used [Azure Machine Learning](https://studio.azureml.net/) for the recommendation system.
 
 ## Usage
 
